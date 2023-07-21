@@ -1,0 +1,33 @@
+package game;
+
+//游戏开始
+message GameStartCast {
+	repeated int32 seat_id_list = 1;
+}
+
+//游戏结束
+message GameOverCast {
+	optional int32 lose_player_id = 1;
+	optional DoingCast doing_list = 2;
+	optional string result = 3;
+}
+
+//接下来谁操作
+message NextDoingCast {
+	optional int32 doing_player_id = 1;
+	optional int32 doing_seat_id = 2;
+	optional int32 min_num = 3;
+	optional int32 max_num = 4;
+}
+
+//操作请求
+message DoingReq {
+	optional int32 doing_type = 1;      //1 石头  2剪刀   3布
+}
+
+//操作广播
+message DoingCast {
+	optional int32 player_id = 1;
+	optional int32 seat_id = 2;
+	optional int32 doing_type = 3;
+}
