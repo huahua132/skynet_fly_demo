@@ -2,6 +2,7 @@ local log = require "log"
 local pbnet_util = require "pbnet_util"
 local pb_netpack = require "pb_netpack"
 local ws_errors_msg = require "ws_errors_msg"
+local login_msg = require "login_msg"
 local errorcode = require "errorcode"
 local timer = require "timer"
 
@@ -53,12 +54,12 @@ end
 
 --登录失败
 function M.login_failed(gate,fd,player_id,errcode,errmsg,packname)
-	ws_errors_msg.errors(gate,fd,errcode,errmsg)
+	ws_errors_msg.errors(gate,fd,errcode,errmsg,packname)
 end
 
 --登录成功
 function M.login_succ(gate,fd,player_id,login_res)
-
+	login_msg.login_res(gate,fd,player_id,login_msg)
 end
 
 --登出回调
@@ -73,12 +74,12 @@ end
 
 --正在登录中
 function M.logining(gate,fd,player_id)
-
+	ws_errors_msg.errors(gate,fd,errorcode.LOGINING,"logining")
 end
 
 --重复登录
 function M.repeat_login(gate,fd,player_id)
-
+	ws_errors_msg.errors(gate,fd,errorcode.REPAET_LOGIN,"repeat login")
 end
 
 return M
