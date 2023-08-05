@@ -11,7 +11,7 @@ local setmetatable = setmetatable
 local pairs = pairs
 
 local M = {}
-local mt = { __index = M}
+local mt = { __index = M }
 
 function M:new()
     local instance = {
@@ -44,6 +44,7 @@ function M:run()
 end
 
 function M:add_route(method, absolute_path, handlers)
+    log.debug("add_route:", method, absolute_path, #handlers)
     self.router:insert(method, absolute_path, handlers)
 end
 
@@ -79,7 +80,8 @@ end
 
 function M.dispatch(app)
 	return function(req)
-		local c <close> = context:new(app,req)
+		log.debug("dispatch request. addr:", req.ip .. ':' .. req.port, ", fd:", req.fd)
+		local c = context:new(app,req)
 		if not c then
 			log.warn("dispatch request failed addr:",req.ip .. ':' .. req.port,", fd:",req.fd)
 			return HTTP_STATUS.Internal_Server_Error

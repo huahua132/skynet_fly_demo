@@ -1,4 +1,4 @@
-local M <const> = {
+return {
     GET     = true,
     POST    = true,
     PUT     = true,
@@ -7,5 +7,3 @@ local M <const> = {
     HEAD    = true,
     OPTIONS = true,
 }
-
-return M
