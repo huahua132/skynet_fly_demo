@@ -37,7 +37,8 @@ lrax_insert(lua_State *L) {
         return luaL_error(L, "buf is null.");
     }
 
-    int idx = luaL_checkinteger(L, 3);
+    intptr_t idx = luaL_checkinteger(L, 3);
+
     int ret = raxInsert(r, buf, len, (void *)idx, NULL);
     lua_pushboolean(L, ret);
     return 1;
@@ -60,7 +61,7 @@ lrax_find(lua_State *L) {
     if (res == raxNotFound) {
         return 0;
     }
-    int idx = (int)res;
+    intptr_t idx = (intptr_t)res;
     lua_pushinteger(L, idx);
     return 1;
 }
@@ -113,7 +114,7 @@ lrax_prev(lua_State *L) {
         break;
     }
 
-    int idx = (int)iter->data;
+    intptr_t idx = (intptr_t)iter->data;
     lua_pushinteger(L, idx);
     return 1;
 }
@@ -142,7 +143,7 @@ lrax_next(lua_State *L) {
         return 1;
     }
 
-    int idx = (int)iter->data;
+    intptr_t idx = (intptr_t)iter->data;
     lua_pushinteger(L, idx);
     return 1;
 }
