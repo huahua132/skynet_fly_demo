@@ -1,5 +1,7 @@
 local lfs = require "lfs"
+local string_util = require "string_util"
 
+local string = string
 local tinsert = table.insert
 local tremove = table.remove
 local assert = assert
@@ -21,7 +23,11 @@ function M.diripairs(path_url)
 		})
 	end
 
-	push_stack(path_url)
+	local root_info = lfs.attributes(path_url)
+	if root_info and root_info.mode == 'directory' then
+		push_stack(path_url)
+	end
+
 	return function() 
 		while #stack > 0 do
 			local cur = stack[#stack]
@@ -42,18 +48,29 @@ function M.diripairs(path_url)
 	end
 end
 
---创建 lua文件 查找规则，优先级 server下非service文件夹 > skynet_fly lualib下所有文件夹 > skynet lualib下所以文件夹
+--创建 lua文件 查找规则，优先级 server下非service文件夹 > server上上级目录common文件夹非service文件夹 > skynet_fly lualib下所有文件夹 > skynet lualib下所以文件夹
 function M.create_luapath(skynet_fly_path)
 	local server_path = './'
 	local skynet_path = skynet_fly_path .. '/skynet'
-	local lua_path = server_path .. '?.lua;'
+	local common_path = '../../common'
 
+	--server下非service文件夹
+	local lua_path = server_path .. '?.lua;'
 	for file_name,file_path,file_info in M.diripairs(server_path) do
 		if file_info.mode == 'directory' and file_name ~= 'service' then
 			lua_path = lua_path .. file_path .. '/?.lua;'
 		end
 	end
 
+	--server上上级目录common所有文件夹
+	lua_path = lua_path .. common_path .. '?.lua;'
+	for file_name,file_path,file_info in M.diripairs(common_path) do
+		if file_info.mode == 'directory' and file_name ~= 'service' then
+			lua_path = lua_path .. file_path .. '/?.lua;'
+		end
+	end
+
+	--skynet_fly lualib下所有文件夹
 	lua_path = lua_path .. skynet_fly_path .. '/lualib/?.lua;'
 	for file_name,file_path,file_info in M.diripairs(skynet_fly_path .. '/lualib') do
 		if file_info.mode == 'directory' then
@@ -61,14 +78,16 @@ function M.create_luapath(skynet_fly_path)
 		end
 	end
 
-	lua_path = lua_path .. skynet_path .. '/lualib/?.lua;'
-	for file_name,file_path,file_info in M.diripairs(skynet_path .. '/lualib') do
+	--skynet_fly 3rd下所以文件夹
+	for file_name,file_path,file_info in M.diripairs(skynet_fly_path .. '/3rd') do
 		if file_info.mode == 'directory' then
 			lua_path = lua_path .. file_path .. '/?.lua;'
 		end
 	end
 
-	for file_name,file_path,file_info in M.diripairs(skynet_fly_path .. '/3rd') do
+	--skynet lualib下所以文件夹
+	lua_path = lua_path .. skynet_path .. '/lualib/?.lua;'
+	for file_name,file_path,file_info in M.diripairs(skynet_path .. '/lualib') do
 		if file_info.mode == 'directory' then
 			lua_path = lua_path .. file_path .. '/?.lua;'
 		end
@@ -85,5 +104,27 @@ function M.readallfile(file_path)
 	file:close()
 	return str
 end
+
+--获取当前目录文件夹名称
+function M.get_cur_dir_name()
+	local curdir = lfs.currentdir()
+	local strsplit = string_util.split(curdir,'/')
+	return strsplit[#strsplit]
+end
+
+function M.path_join(a,b)
+    if a:sub(-1) == "/" then
+        if b:sub(1, 1) == "/" then
+            return a .. b:sub(2)
+        end
+        return a .. b
+    end
+    if b:sub(1, 1) == '/' then
+        return a .. b
+    end
+    return string.format("%s/%s", a, b)
+end
+
+
 
 return M

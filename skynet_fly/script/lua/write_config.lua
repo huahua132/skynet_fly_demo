@@ -1,10 +1,7 @@
 local assert = assert
 local ARGV = {...}
 local skynet_fly_path = ARGV[1]
-local svr_name = ARGV[2]
-local thread = tonumber(ARGV[3]) or 4
 assert(skynet_fly_path,'缺少 skynet_fly_path')
-assert(svr_name,'缺少 svr_name')
 
 package.cpath = skynet_fly_path .. "/luaclib/?.so;"
 package.path = './?.lua;' .. skynet_fly_path .."/lualib/utils/?.lua;"
@@ -16,9 +13,11 @@ local file_util = require "file_util"
 
 local skynet_path = skynet_fly_path .. '/skynet/'
 local server_path = "./"
+local common_path = "../../common/"
 
+local svr_name = file_util.get_cur_dir_name()
 local config = {
-	thread = thread,
+	thread = 4,
 	start = "main",
 	harbor = 0,
 	profile = true,
@@ -37,18 +36,16 @@ local config = {
 
 	lua_cpath = skynet_fly_path .. "luaclib/?.so;" .. skynet_path .. "luaclib/?.so;",
 
-	--luaservice 约束服务只能放在 server根目录 || server->service || skynet_fly->service || skynet->service
+	--luaservice 约束服务只能放在 server根目录 || server->service || common->service || skynet_fly->service || skynet->service
 	luaservice = server_path .. "?.lua;" .. 
  			 server_path .. "service/?.lua;" .. 
 			  skynet_fly_path .. "service/?.lua;" .. 
+			  common_path .. "service/?.lua;" ..
 			 skynet_path .. "service/?.lua;",
 
 	lua_path = "",
 }
 
---路径优先级  服务 > skynet_fly > skynet
-
---lua_path server [非service的目录] skynet_fly[lualib 目录下所有文件] skynet[lualib 下所有文件] 自动生成路径
 config.lua_path = file_util.create_luapath(skynet_fly_path)
 
 local config_path = server_path .. '/' .. svr_name .. '_config.lua'
@@ -69,3 +66,4 @@ assert(file)
 local str = table_util.table_to_luafile("G",config)
 file:write(str)
 file:close()
+print("make " .. config_path)
