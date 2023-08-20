@@ -3,7 +3,6 @@ local mod_config = require "mod_config"
 local table_util = require "table_util"
 
 skynet.start(function()
-	--这是一个简单的石头剪刀布的游戏
 	skynet.error("start chinese_chess>>>>>>>>>>>>>>>>>")
 
 	--启动热更管理员服务
