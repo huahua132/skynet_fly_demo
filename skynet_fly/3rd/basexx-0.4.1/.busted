@@ -1,7 +1,0 @@
-return {
-   default = {
-      ROOT = { "test" },
-      verbose = true,
-      lpath = "lib/?.lua"
-   }
-}

@@ -42,12 +42,6 @@ function M.check(gate,fd,packname,req)
 		return false,errorcode.REQ_PARAM_ERR,"not player_id",packname
 	end
 
-	--检测密码是否正确
-	if req.password ~= '123456' then
-		log.error("login err ",req)
-		return false,errorcode.LOGIN_PASS_ERR,"pass err ",packname
-	end
-
 	--成功返回玩家id
 	return player_id
 end
