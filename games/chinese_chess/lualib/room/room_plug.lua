@@ -157,6 +157,10 @@ end
 		log.info("游戏结束:",win_seat_id)
 		m_game_state = GAME_STATE_ENUM.over
 		--踢出所有玩家
+		for _,seat_player in ipairs(m_seat_list) do
+			seat_player:game_over()
+		end
+
 		local seat_player = m_seat_list[win_seat_id]
 		local win_player_id = seat_player:get_player().player_id
 
