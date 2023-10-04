@@ -13,6 +13,7 @@ function M:new()
 	local t = {
 		player = nil,
 		state = SEAT_STATE.empty,
+		team_type = 0,
 	}
 
 	setmetatable(t,meta)
@@ -68,6 +69,16 @@ end
 --游戏结束
 function M:game_over()
 	self.state = SEAT_STATE.waitting
+end
+
+--设置队伍类型
+function M:set_team_type(team_type)
+	self.team_type = team_type
+end
+
+--返回队伍类型
+function M:get_team_type()
+	return self.team_type
 end
 
 return M

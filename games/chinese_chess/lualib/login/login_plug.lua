@@ -1,5 +1,5 @@
 local log = require "log"
-local pbnet_util = require "pbnet_util"
+local ws_pbnet_util = require "ws_pbnet_util"
 local pb_netpack = require "pb_netpack"
 local ws_errors_msg = require "ws_errors_msg"
 local login_msg = require "login_msg"
@@ -21,7 +21,7 @@ function M.init()
 end
 
 --解包函数
-M.unpack = pbnet_util.unpack
+M.unpack = ws_pbnet_util.unpack
 
 --登录检测函数 packname,req是解包函数返回的
 --登入成功后返回玩家id
@@ -53,7 +53,7 @@ end
 
 --登录成功
 function M.login_succ(gate,fd,player_id,login_res)
-	login_msg.login_res(gate,fd,player_id,login_msg)
+	login_msg.login_res(gate,fd,login_res)
 end
 
 --登出回调

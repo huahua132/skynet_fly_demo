@@ -1,0 +1,58 @@
+package chinese_chess_game;
+
+message gameStateReq {
+	optional int32 player_id = 1;
+}
+
+message playerInfo {
+	optional int32 seat_id = 1;
+	optional int32 player_id = 2;
+	optional int32 team_type = 3;       //队伍id  
+}
+
+message oneChess {
+	optional int32 chess_id = 1;           //棋子id
+	optional int32 chess_type = 2;         //棋子类型
+	optional int32 row = 3;                //第几行
+	optional int32 col = 4;                //第几列
+	optional int32 team_type = 5;          //棋子是哪个队伍
+}
+
+message chessCanMove {
+	optional int32 chess_id = 1;           //棋子id
+	repeated int32 row_list = 2;
+	repeated int32 col_list = 3;
+}
+
+message nextDoing {
+	optional int32 seat_id = 1;
+	optional int32 player_id = 2;
+	optional int32 team_type = 3;
+	repeated chessCanMove can_move_list = 4;
+}
+
+message gameStateRes {
+	optional int32 state = 1;         		//游戏状态
+	repeated playerInfo player_list = 2;    //玩家数据
+    repeated oneChess chess_list = 3;       //棋子数据
+
+	//在玩状态的数据
+	optional nextDoing next_doing = 4;      //接下来谁操作
+
+	//赢家
+	optional int32 win_player_id = 5;       //赢家
+}
+
+//移动棋子请求
+message moveReq {
+	optional int32 chess_id = 1;           //棋子id
+	optional int32 move_row = 2;           //移动到第几行
+	optional int32 move_col = 3;           //移动到第几列
+}
+
+//移动棋子结果
+message moveRes {
+	optional int32 chess_id = 1;          //棋子id
+	optional int32 move_row = 2;          //移动到第几行
+	optional int32 move_col = 3;          //移动到第几列
+}

@@ -1,6 +1,6 @@
 
 local log = require "log"
-local pbnet_util = require "pbnet_util"
+local ws_pbnet_util = require "ws_pbnet_util"
 local pb_netpack = require "pb_netpack"
 
 local assert = assert
@@ -8,7 +8,7 @@ local assert = assert
 local M = {}
 
 --指定解包函数
-M.unpack = pbnet_util.unpack
+M.unpack = ws_pbnet_util.unpack
 
 --初始化
 function M.init()

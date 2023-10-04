@@ -9,7 +9,7 @@ return {
 				gateservice = "ws_gate", --gate 或者 ws_gate
 				--gate连接配置
 				gateconf = {
-					address = '127.0.0.1',
+					address = '0.0.0.0',
 					port = 8001,
 					maxclient = 2048,
 				},
