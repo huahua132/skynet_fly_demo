@@ -1,12 +1,16 @@
 local skynet = require "skynet"
 local pb_netpack = require "pb_netpack"
+local ws_pbnet_util = require "ws_pbnet_util"
 local string_util = require "string_util"
-local GAME_STATE_ENUM = require "GAME_STATE_ENUM"
+local GAME_STATE = require "GAME_STATE"
 local DOGIN_TYPE = require "DOGIN_TYPE"
 local seater = require "seater"
 local log = require "log"
 local chess_rule = require "chess_rule"
 local TEAM_TYPE = require "TEAM_TYPE"
+local module_cfg = require "module_info".get_cfg()
+local errors_msg = require "errors_msg"
+local game_msg = require "game_msg"
 
 local string = string
 local assert = assert
@@ -16,19 +20,27 @@ local math = math
 local pairs = pairs
 local next = next
 
+local g_table_conf = module_cfg.table_conf
+local g_interface_mgr = nil
+
 local M = {}
 
-function M.init()
+function M.init(interface_mgr)
+	g_interface_mgr = interface_mgr
+	assert(g_table_conf.player_num,"not player_num")
 	pb_netpack.load('./proto')
 end
 
---游戏桌子创建者
-function M.table_creator(table_id,room_conf,ROOM_CMD)
-	assert(room_conf.player_num,"not player_num")
+M.send = ws_pbnet_util.send
 
+--游戏桌子创建者
+function M.table_creator(table_id)
 	local m_HANDLE = {}
 	local m_table_id = table_id
-    local m_game_state = GAME_STATE_ENUM.waiting 	 --参与游戏的玩家座位号
+	local m_interface_mgr = g_interface_mgr:new(table_id)
+	local m_errors_msg = errors_msg:new(m_interface_mgr)
+	local m_game_msg = game_msg:new(m_interface_mgr)
+    local m_game_state = GAME_STATE.waiting 	 --参与游戏的玩家座位号
     local m_doing_seat_id = nil                  	 --操作座位号
     local m_seat_list = {}						 	 --座位列表
     local m_player_seat_map = {}				 	 --玩家座位号
@@ -73,15 +85,8 @@ function M.table_creator(table_id,room_conf,ROOM_CMD)
 		return true
 	end
 
-	--消息广播
-	local function broadcast(packname,pack)
-		for _,seat_player in ipairs(m_seat_list) do
-			seat_player:send_msg(packname,pack)
-		end
-	end
-
 	--座位初始化
-    for i = 1,room_conf.player_num do
+    for i = 1,g_table_conf.player_num do
         m_seat_list[i] = seater:new()
     end
 -----------------------------------------------------------------------
@@ -108,17 +113,18 @@ local function send_game_state(seat_player)
 	end
 
 	log.info("send_msg:",msg_body)
+	local player_id = nil
 	if seat_player then
-		seat_player:send_msg('.chinese_chess_game.gameStateRes',msg_body)
-	else
-		broadcast('.chinese_chess_game.gameStateRes',msg_body)
+		player_id = seat_player.player_id
 	end
+	
+	game_msg:game_state_res(player_id,msg_body)
 end
 
 --发送接下来谁操作
 local function send_next_doing()
 	log.error("send_next_doing:",m_next_doing)
-	broadcast('.chinese_chess_game.nextDoing',m_next_doing)
+	game_msg:next_doing(m_next_doing)
 end
 
 -----------------------------------------------------------------------
@@ -126,7 +132,7 @@ end
 -----------------------------------------------------------------------
 	--开始游戏
 	local function game_start()
-		m_game_state = GAME_STATE_ENUM.playing
+		m_game_state = GAME_STATE.playing
 		m_game_seat_id_list = {}
 
 		local rand_num = math.random(1,2)
@@ -155,7 +161,7 @@ end
 	--结束游戏
 	local function game_over(win_seat_id)
 		log.info("游戏结束:",win_seat_id)
-		m_game_state = GAME_STATE_ENUM.over
+		m_game_state = GAME_STATE.over
 		--踢出所有玩家
 		for _,seat_player in ipairs(m_seat_list) do
 			seat_player:game_over()
@@ -165,107 +171,21 @@ end
 		local win_player_id = seat_player:get_player().player_id
 
 		send_game_state()
-		ROOM_CMD.kick_out_all(m_table_id)
+		m_interface_mgr:kick_out_all()
 		return true
 	end
 -----------------------------------------------------------------------
 --state
 -----------------------------------------------------------------------
-
------------------------------------------------------------------------
---HANDLE
------------------------------------------------------------------------
-	--消息处理
-	m_HANDLE['chinese_chess_game'] = {
-		--玩家请求游戏状态数据
-		['gameStateReq'] = function(player,args)
-			local player_id = player.player_id
-			local seat_id = m_player_seat_map[player_id]
-			if not seat_id then
-				log.error("player not seat_down ",player_id)
-				return
-			end
-			local seat_player = m_seat_list[seat_id]
-			send_game_state(seat_player)
-			return true
-		end,
-		['moveReq'] = function (player,args)
-			local player_id = player.player_id
-			local seat_id = m_player_seat_map[player_id]
-			if not seat_id then
-				log.error("player not seat_down ",player_id)
-				return
-			end
-
-			if seat_id ~= m_next_doing.seat_id then
-				log.error("can`t doing now ",seat_id)
-				return
-			end
-
-			local seat_player = m_seat_list[seat_id]
-			args.chess_id = args.chess_id or 0
-			args.move_row = args.move_row or 0
-			args.move_col =  args.move_col or 0
-			local chess_id = args.chess_id
-			local move_row = args.move_row
-			local move_col = args.move_col			
-			local move_chess = nil
-			for _,one_chess in ipairs(m_chess_list) do
-				if one_chess.chess_id == chess_id then
-					move_chess = one_chess
-					break
-				end
-			end
-
-			if not move_chess then
-				log.error("args err not find chess ",chess_id)
-				return
-			end
-
-			local can_move_list = m_can_move_map[chess_id]
-			local isok = false
-			for _,one_pos in ipairs(can_move_list) do
-				if one_pos.row == move_row and one_pos.col == move_col then
-					isok = true
-					break
-				end
-			end
-
-			if not isok then
-				log.error("can`t move to ",move_chess,move_row,move_col)
-				return
-			end
-
-			chess_rule.move_chess(m_chess_list,m_chess_map,m_boss_chess_map,move_chess,{row = move_row,col = move_col})
-
-			log.error("moveRes:",args)
-			broadcast(".chinese_chess_game.moveRes",args)
-
-			local next_seat_id = (seat_id % 2) + 1
-			if set_next_doing(next_seat_id) then
-				send_next_doing()
-			else
-				game_over(seat_id)
-			end
-			return true
-		end
-	}
-
------------------------------------------------------------------------
---HANDLE
------------------------------------------------------------------------
-
     return {
 		--玩家进入桌子
-        enter = function(player)
-            local player_id = player.player_id
+        enter = function(player_id)
             assert(not m_player_seat_map[player_id])
-            
             local alloc_seat_id = nil
             for seat_id,seater in ipairs(m_seat_list) do
                 if seater:is_empty() then
 					log.info("玩家坐下:",player_id)
-                    seater:enter(player)
+                    seater:enter(player_id)
                     m_player_seat_map[player_id] = seat_id
                     m_enter_num = m_enter_num + 1
                     alloc_seat_id = seat_id
@@ -274,7 +194,7 @@ end
             end
 
             if not alloc_seat_id then
-                log.info("进入房间失败 ",player.player_id)
+                log.info("进入房间失败 ",player_id)
                 return
             end
           
@@ -285,8 +205,7 @@ end
             return alloc_seat_id
         end,
 		--玩家离开桌子
-		leave = function(player)
-			local player_id = player.player_id
+		leave = function(player_id)
 			local seat_id = m_player_seat_map[player_id]
 			if not seat_id then
 				log.error("not in table ",player_id)
@@ -307,33 +226,86 @@ end
 			return seat_id
 		end,
 		--玩家掉线
-		disconnect = function(player)
-			log.error("disconnect:",m_seat_list)
+		disconnect = function(player_id)
+			log.error("disconnect:",player_id)
 		end,
 		--玩家重连
-		reconnect = function(player)
-			log.error("reconnect:",m_seat_list)
+		reconnect = function(player_id)
+			log.error("reconnect:",player_id)
 		end,
 		--消息分发处理
-		handler = function(player,packname,req)
-			local pack_req = string_util.split(packname,'.')
-			assert(#pack_req == 2,"packname err " .. packname)
-			local package = pack_req[1]
-			local msg_name = pack_req[2]
+		handle = {
+			--玩家请求游戏状态数据
+			['.chinese_chess_game.gameStateReq'] = function(player_id,packname,pack_body)
+				local seat_id = m_player_seat_map[player_id]
+				if not seat_id then
+					log.error("player not seat_down ",player_id)
+					return
+				end
+				local seat_player = m_seat_list[seat_id]
+				send_game_state(seat_player)
+				return true
+			end,
+			['.chinese_chess_game.moveReq'] = function (player_id,packname,pack_body)
+				local seat_id = m_player_seat_map[player_id]
+				if not seat_id then
+					log.error("player not seat_down ",player_id)
+					return
+				end
 
-			local handle_func = m_HANDLE[package][msg_name]
-			if not handle_func then
-				log.error("not handle_func ",packname)
-				return
+				if seat_id ~= m_next_doing.seat_id then
+					log.error("can`t doing now ",seat_id)
+					return
+				end
+
+				local seat_player = m_seat_list[seat_id]
+				pack_body.chess_id = pack_body.chess_id or 0
+				pack_body.move_row = pack_body.move_row or 0
+				pack_body.move_col =  pack_body.move_col or 0
+				local chess_id = pack_body.chess_id
+				local move_row = pack_body.move_row
+				local move_col = pack_body.move_col			
+				local move_chess = nil
+				for _,one_chess in ipairs(m_chess_list) do
+					if one_chess.chess_id == chess_id then
+						move_chess = one_chess
+						break
+					end
+				end
+
+				if not move_chess then
+					log.error("args err not find chess ",chess_id)
+					return
+				end
+
+				local can_move_list = m_can_move_map[chess_id]
+				local isok = false
+				for _,one_pos in ipairs(can_move_list) do
+					if one_pos.row == move_row and one_pos.col == move_col then
+						isok = true
+						break
+					end
+				end
+
+				if not isok then
+					log.error("can`t move to ",move_chess,move_row,move_col)
+					return
+				end
+
+				chess_rule.move_chess(m_chess_list,m_chess_map,m_boss_chess_map,move_chess,{row = move_row,col = move_col})
+
+				log.error("moveRes:",pack_body)
+				game_msg:move_res(pack_body)
+
+				local next_seat_id = (seat_id % 2) + 1
+				if set_next_doing(next_seat_id) then
+					send_next_doing()
+				else
+					game_over(seat_id)
+				end
+				return true
 			end
-
-			local isok,errcode,errmsg = handle_func(player,req)
-
-			if not isok then
-				log.error("request err ",errcode,errmsg,packname)
-				return
-			end
-		end,
+		}
     }
 end
 

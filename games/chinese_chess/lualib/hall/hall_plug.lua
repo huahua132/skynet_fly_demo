@@ -2,39 +2,46 @@
 local log = require "log"
 local ws_pbnet_util = require "ws_pbnet_util"
 local pb_netpack = require "pb_netpack"
+local timer = require "timer"
 
 local assert = assert
+
+local g_interface_mgr = nil
 
 local M = {}
 
 --指定解包函数
 M.unpack = ws_pbnet_util.unpack
+M.send = ws_pbnet_util.send
+M.disconn_time_out = timer.minute                   --掉线一分钟就清理
 
 --初始化
-function M.init()
+function M.init(interface_mgr)
 	--加载协议
-	pb_netpack.load("./proto")
-end
-
---处理请求
-function M.dispatch(gate,fd,packname,req,CMD)
-	--返回false转发给room服务
-	return false
+	pb_netpack.load('../../common/proto')
+	pb_netpack.load('./proto')
+	g_interface_mgr = interface_mgr
 end
 
 --连接成功
-function M.connect(gate,fd,player_id)
-	log.info("hall_plug connect ",fd,player_id)
+function M.connect(player_id)
+	log.info("hall_plug connect ",player_id)
+	return {
+		player_id = player_id
+	}
 end
 
 --掉线
-function M.disconnect(gate,fd,player_id)
-	log.info("hall_plug disconnect ",fd,player_id)
+function M.disconnect(player_id)
+	log.info("hall_plug disconnect ",player_id)
 end
 
 --重连
-function M.reconnect(gate,fd,player_id)
-	log.info("hall_plug reconnect ",fd,player_id)
+function M.reconnect(player_id)
+	log.info("hall_plug reconnect ",player_id)
+	return {
+		player_id = player_id
+	}
 end
 
 --登出
