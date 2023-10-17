@@ -56,6 +56,9 @@ local function player_game(login_res)
 			})
 
 			log.info("发送操作:",g_config.player_id,doing_type)
+		elseif packname == '.login.LoginRes' then
+			log.info("登录成功:",res)
+			net_util.send(nil,fd,'.hall.MatchReq',{player_id = 1})
 		end
 	end)
 

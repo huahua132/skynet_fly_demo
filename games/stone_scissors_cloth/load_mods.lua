@@ -27,23 +27,23 @@ return {
 		}
 	},
 
-	--匹配服
-	room_game_match_m = {
+	--桌子分配服
+	room_game_alloc_m = {
 		launch_seq = 3, --第三个启动
 		launch_num = 1, --启动1个
 		default_arg = {
-			match_plug = "match_plug",       --匹配加载的插件lua模块文件名
+			alloc_plug = "alloc_plug",       --匹配加载的插件lua模块文件名
 			MAX_TABLES = 10000,  --最多1万个游戏桌子
 		}
 	},
 
-	--房间服
-	room_game_room_m = {
+	--桌子服
+	room_game_table_m = {
 		launch_seq = 4, --第四个启动
 		launch_num = 6, --启动6个
 		default_arg = {
-			room_plug = "room_plug",   --房间插件
-			room_conf = {
+			table_plug = "table_plug",   --房间插件
+			table_conf = {
 				player_num = 2,        --2个人玩
 			}
 		}
@@ -53,6 +53,7 @@ return {
 	client_m = {
 		launch_seq = 5,    --第5个启动
 		launch_num = 2,    --启动2个
+		delay_run = true,
 		mod_args = {
 			{password = '123456',player_id = 10000}, --第一个服务的配置
 			{password = '123456',player_id = 10001}, --第二个服务的配置

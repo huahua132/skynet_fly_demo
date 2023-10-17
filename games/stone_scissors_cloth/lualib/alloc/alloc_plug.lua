@@ -46,7 +46,7 @@ function M.match(player_id)
 end
 
 --创建桌子
-function M.createtable(table_id) 
+function M.createtable(table_name, table_id, create_player_id) 
 	--没有匹配到会尝试创建桌子，到这来说明桌子创建成功了
 	log.info("createtable:",table_id)
 	assert(not g_table_map[table_id],"repeat table_id")
@@ -113,6 +113,11 @@ end
 --桌子已满
 function M.tablefull()
 	--桌子满了，这里可以返回错误码可错误信息
+end
+
+--桌子不存在
+function M.table_not_exists()
+
 end
 
 return M

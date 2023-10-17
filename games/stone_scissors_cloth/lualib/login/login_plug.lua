@@ -8,39 +8,43 @@ local x_pcall = x_pcall
 
 local M = {}
 
+local g_instance = nil
 --登录检测的超时时间
 M.time_out = timer.second * 5
 
-function M.init()
+function M.init(instance)
 	--加载pb文件
 	pb_netpack.load('./proto')
+	g_instance = instance
 end
 
 --解包函数
 M.unpack = pbnet_util.unpack
+--指定发包函数
+M.send = pbnet_util.send
 
---登录检测函数 packname,req是解包函数返回的
+--登录检测函数 packname,pack_body是解包函数返回的
 --登入成功后返回玩家id
-function M.check(gate,fd,packname,req)
+function M.check(packname,pack_body)
 	if not packname then
-		log.error("unpack err ",packname,req)
+		log.error("unpack err ",packname,pack_body)
 		return
 	end
 	--检测是不是登录请求
 	if packname ~= '.login.LoginReq' then
-		log.error("login_check msg err ",fd)
+		log.error("login_check msg err ",packname)
 		return
 	end
 
-	local player_id = req.player_id
+	local player_id = pack_body.player_id
 	if not player_id then
-		log.error("req err ",fd,req)
+		log.error("req err ",pack_body)
 		return
 	end
 
 	--检测密码是否正确
-	if req.password ~= '123456' then
-		log.error("login err ",req)
+	if pack_body.password ~= '123456' then
+		log.error("login err ",pack_body)
 		return
 	end
 
@@ -49,13 +53,13 @@ function M.check(gate,fd,packname,req)
 end
 
 --登录失败
-function M.login_failed(gate,fd,player_id,errcode,errmsg)
+function M.login_failed(player_id,errcode,errmsg)
 	
 end
 
 --登录成功
-function M.login_succ(gate,fd,player_id,login_res)
-
+function M.login_succ(player_id,login_res)
+	g_instance:send_msg(player_id,'.login.LoginRes',login_res)
 end
 
 --登出回调
@@ -64,17 +68,17 @@ function M.login_out(player_id)
 end
 
 --掉线回调
-function M.disconnect(gate,fd,player_id)
-	log.info('disconnect:',fd,player_id)
+function M.disconnect(player_id)
+	log.info('disconnect:',player_id)
 end
 
 --正在登录中
-function M.logining(gate,fd,player_id)
+function M.logining(player_id)
 
 end
 
 --重复登录
-function M.repeat_login(gate,fd,player_id)
+function M.repeat_login(player_id)
 
 end
 

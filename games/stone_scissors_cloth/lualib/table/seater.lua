@@ -1,6 +1,5 @@
 local skynet = require "skynet"
 local SEAT_STATE = require "SEAT_STATE"
-local pbnet_util = require "pbnet_util"
 local log = require "log"
 local setmetatable = setmetatable
 local assert = assert
@@ -20,9 +19,10 @@ function M:new()
 end
 
 --坐下
-function M:enter(player)
-	assert(player)
-	self.player = player
+function M:enter(player_id)
+	self.player = {
+		player_id = player_id
+	}
 	self.state = SEAT_STATE.waitting
 end
 
@@ -39,21 +39,7 @@ end
 
 --是否可以离开
 function M:is_can_leave()
-	--return self.state ~= SEAT_STATE.playing
-	return true
-end
-
---发送消息给客户端
-function M:send_msg(packname,pack)
-	if not self.player then
-		return nil
-	end
-
-	if self.player.fd > 0 then
-		pbnet_util.send(self.player.gate,self.player.fd,packname,pack)
-	else
-		log.info("send_msg not fd ",self.player_id)
-	end
+	return self.state ~= SEAT_STATE.playing
 end
 
 --获取玩家信息

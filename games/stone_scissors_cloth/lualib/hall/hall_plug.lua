@@ -2,39 +2,63 @@
 local log = require "log"
 local pbnet_util = require "pbnet_util"
 local pb_netpack = require "pb_netpack"
+local errors_msg = require "errors_msg"
+local timer = require "timer"
 
 local assert = assert
+
+local g_instance = nil
+
+local function match_table(player_id, packname, pack_body)
+	local ok,errorcode,errormsg = g_instance:match_join_table(player_id,pack_body.table_name)
+	if not ok then
+		log.error("dispatch err ",errorcode,errormsg)
+		errors_msg:errors(player_id,errorcode,errormsg,packname)
+	else
+		g_instance:send_msg(player_id,'.hall.MatchRes',{table_id = errorcode})
+	end
+end
 
 local M = {}
 
 --指定解包函数
 M.unpack = pbnet_util.unpack
+--指定发包函数
+M.send = pbnet_util.send
+
+M.disconn_time_out = timer.minute
 
 --初始化
-function M.init()
+function M.init(instance)
 	--加载协议
+	g_instance = instance
+	g_instance:handle('.hall.MatchReq',match_table)
 	pb_netpack.load("./proto")
-end
 
---处理请求
-function M.dispatch(gate,fd,packname,req,CMD)
-	--返回false转发给room服务
-	return false
+	errors_msg = errors_msg:new()
 end
 
 --连接成功
-function M.connect(gate,fd,player_id)
-	log.info("hall_plug connect ",fd,player_id)
+function M.connect(player_id)
+	log.info("hall_plug connect ",player_id)
+	return {
+		player_id = player_id,
+		table_id = g_instance:get_table_id(player_id),
+	}
 end
 
 --掉线
-function M.disconnect(gate,fd,player_id)
-	log.info("hall_plug disconnect ",fd,player_id)
+function M.disconnect(player_id)
+	log.info("hall_plug disconnect ",player_id)
 end
 
 --重连
-function M.reconnect(gate,fd,player_id)
-	log.info("hall_plug reconnect ",fd,player_id)
+function M.reconnect(player_id)
+	log.info("hall_plug reconnect ",player_id)
+	return {
+		player_id = player_id,
+		table_id = g_instance:get_table_id(player_id),
+	}
 end
 
 --登出
