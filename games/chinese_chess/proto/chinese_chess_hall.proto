@@ -1,0 +1,9 @@
+package chinese_chess_hall;
+
+message matchReq {
+	optional int32 player_id = 1;
+}
+
+message matchRes {
+	optional int32 table_id = 1;
+}

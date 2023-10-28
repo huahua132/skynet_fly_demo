@@ -118,13 +118,13 @@ local function send_game_state(seat_player)
 		player_id = seat_player.player_id
 	end
 	
-	game_msg:game_state_res(player_id,msg_body)
+	m_game_msg:game_state_res(player_id,msg_body)
 end
 
 --发送接下来谁操作
 local function send_next_doing()
 	log.error("send_next_doing:",m_next_doing)
-	game_msg:next_doing(m_next_doing)
+	m_game_msg:next_doing(m_next_doing)
 end
 
 -----------------------------------------------------------------------
@@ -295,7 +295,7 @@ end
 				chess_rule.move_chess(m_chess_list,m_chess_map,m_boss_chess_map,move_chess,{row = move_row,col = move_col})
 
 				log.error("moveRes:",pack_body)
-				game_msg:move_res(pack_body)
+				m_game_msg:move_res(pack_body)
 
 				local next_seat_id = (seat_id % 2) + 1
 				if set_next_doing(next_seat_id) then

@@ -43,6 +43,7 @@ return {
 		launch_num = 6, --启动6个
 		default_arg = {
 			table_plug = "table_plug",   --房间插件
+			instance_name = "default",
 			table_conf = {
 				player_num = 2,        --2个人玩
 			}
