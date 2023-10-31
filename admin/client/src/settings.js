@@ -1,6 +1,6 @@
 module.exports = {
 
-  title: 'Vue Admin Template',
+  title: 'skynet_fly admin',
 
   /**
    * @type {boolean} true | false

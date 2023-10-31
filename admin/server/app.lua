@@ -1,24 +1,29 @@
 local skynet = require "skynet"
-local log = require "log"
 local engine_web = require "engine_web"
-local logger_mid = require "logger_mid"
-local HTTP_STATUS = require "HTTP_STATUS"
-local assert = assert
+local router = require "router"
 
-local string = string
 local M = {}
 
 --初始化一个纯净版
 local app = engine_web:default()
 --请求处理
 M.dispatch = engine_web.dispatch(app)
-
 --初始化
 function M.init()
-	--设置前端入口路径
-	app:static_dir("/","../client/dist")
+    app:use(function(c)
+        c.res:set_header('X-Powered-By', 'wlua framework')
+        c.res:set_header('Access-Control-Allow-Origin', '*')
+        c.res:set_header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
+        c.res:set_header('Access-Control-Allow-Headers', 'DNT,X-Mx-ReqToken,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Authorization')
+        c:next()
+    end)
+
+    router(app)
+    --设置前端入口路径
+    app:static_dir("/","../client/dist")
     --设置前端入口
     app:static_file("/","../client/dist/index.html")
+
 	app:run()
 end
 
