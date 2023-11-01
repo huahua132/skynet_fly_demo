@@ -18,7 +18,7 @@ function M.create_token(username)
     local cur_time = time_util.time()
     local claim = {
         iss = "skynet_fly_admin", --签发者
-        exp = cur_time + 60,    --过期时间
+        exp = cur_time + 3600,    --过期时间
         nbf = cur_time,         --生效时间
     }
 
@@ -48,10 +48,24 @@ function M.auth(white_list) --验证白名单
 
             if not token then
                 context.res:set_json_rsp(rsp_body.error_rsp(CODE.ILLEGAL_TOKEN, "not token"))
+                context:abort()
                 return
             end
 
-            local payload = assert(jwt.verify(token, "HS256", g_signature), string.format("path:%s,token:%s",request_path,token))
+            local payload,msg = jwt.verify(token, "HS256", g_signature)
+            if not payload then
+                --token失效
+                if msg == "Not acceptable by exp" then
+                    context.res:set_json_rsp(rsp_body.error_rsp(CODE.TOKEN_EXPIRED, msg))
+                else
+                    context.res:set_json_rsp(rsp_body.error_rsp(CODE.ILLEGAL_TOKEN, msg))
+                end
+                log.error("token 失效:",msg)
+                context:abort()
+                return
+            end
+
+            log.error("token:",token)
             context.token_auth = payload
             context:next()
         end

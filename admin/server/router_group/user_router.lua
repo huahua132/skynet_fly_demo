@@ -20,6 +20,6 @@ return function(group)
     group:get('/info',function(c)
         local username = c.token_auth.username
         local info = model_user.get_info(username)
-        c.res:set_json_rsp(rsp_body.ok_rsp{data = info})
+        c.res:set_json_rsp(rsp_body.ok_rsp(info))
     end)
 end
