@@ -1,10 +1,12 @@
+local token_auth_mid = require "token_auth_mid"
+
 local M = {}
 
-function M.login()
-    return "ABC"
+function M.login(username, password)
+    return token_auth_mid.create_token(username)
 end
 
-function M.get_info()
+function M.get_info(username)
     return {
         username = "admin",
         roles = {"admin"},

@@ -1,6 +1,7 @@
 local skynet = require "skynet"
 local engine_web = require "engine_web"
 local router = require "router"
+local token_auth_mid = require "token_auth_mid"
 
 local M = {}
 
@@ -17,6 +18,14 @@ function M.init()
         c.res:set_header('Access-Control-Allow-Headers', 'DNT,X-Mx-ReqToken,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Authorization')
         c:next()
     end)
+
+    --设置token验证中间件
+    app:use(token_auth_mid.auth{
+        "/",
+        "/favicon.ico",
+        "/user/login",
+        "/static/*filepath",
+    })
 
     router(app)
     --设置前端入口路径
