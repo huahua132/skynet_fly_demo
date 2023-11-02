@@ -14,7 +14,23 @@ return {
 					maxclient = 2048,
 				},
 				login_plug = "login_plug",  --login加载的插件lua模块文件名
-			}
+			},
+
+			redis = {
+				--rpc连接配置
+				rpc = {
+					host = '127.0.0.1',
+					port = 6379,
+					auth = '123456',
+					db = 0,
+				},
+			},
+
+			--cluster_server用的配置
+			cluster_server = {
+				host = "127.0.0.1:9688",
+				register = "redis",        --连接信息注册到redis
+			},
 		}
 	},
 
@@ -48,5 +64,27 @@ return {
 				player_num = 2,        --2个人玩
 			}
 		}
+	},
+
+	--日志切割
+	logrotate_m = {
+        launch_seq = 5,
+        launch_num = 1,
+        default_arg = {
+            file_path = './',          --文件路径
+            filename = 'server.log',   --文件名
+            limit_size = 0,            --最小分割大小
+            max_age = 7,               --最大保留天数
+            max_backups = 7,           --最大保留文件数
+            sys_cmd = [[
+                /usr/bin/pkill -HUP -f skynet.chinese_chess_config.lua\n
+            ]],              --系统命令
+        }
+    },
+
+	--debug入口
+	debug_console_m = {
+		launch_seq = 6,
+		launch_num = 1,
 	},
 }
