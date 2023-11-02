@@ -22,4 +22,8 @@ return function(group)
         local info = model_user.get_info(username)
         c.res:set_json_rsp(rsp_body.ok_rsp(info))
     end)
+
+    group:post('/logout',function(c)
+        c.res:set_json_rsp(rsp_body.ok_rsp('success'))
+    end)
 end

@@ -6,15 +6,11 @@ local json = require "cjson"
 
 local string = string
 
-local mysql_client = nil
-
 local M = {}
 
 function M.login(username, password)
-    mysql_client = mysql_client or mysqlf:new()
-
     local sql = string.format("select password from users where username = '%s'\n", username)
-    local user_info = mysql_client:query(sql)
+    local user_info = mysqlf:instance():query(sql)
     if not user_info or #user_info <= 0 then
         log.info("can`t select user ",username)
         return CODE.NOT_USER,"not user"
@@ -30,10 +26,8 @@ function M.login(username, password)
 end
 
 function M.get_info(username)
-    mysql_client = mysql_client or mysqlf:new()
-
     local sql = string.format("select * from users where username = '%s'\n", username)
-    local user_info = mysql_client:query(sql)
+    local user_info = mysqlf:instance():query(sql)
     if not user_info or #user_info <= 0 then
         log.info("can`t select user ",username)
         return CODE.NOT_USER,"not user"
