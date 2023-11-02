@@ -74,7 +74,7 @@ function M.update_role(key,role)
 end
 
 function M.del_role(key)
-    local sql = string.format("delete from roles where key = %s';",key)
+    local sql = string.format("delete from roles where `key` = %s;",key)
     local sql_ret = mysqlf:instance():query(sql)
     if not sql_ret or sql_ret.errno then
         return nil,CODE.ERR_SERVER,"delete err"
