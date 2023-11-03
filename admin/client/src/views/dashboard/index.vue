@@ -1,30 +1,25 @@
 <template>
   <div class="dashboard-container">
-    <div class="dashboard-text">name: {{ username }}</div>
+    <component :is="curcomponent"></component>
   </div>
 </template>
 
 <script>
 import { mapGetters } from 'vuex'
-
+import monitorDashBoard from './monitor'
 export default {
   name: 'Dashboard',
+  components: {monitorDashBoard},
+
+  data() {
+    return {
+      curcomponent : 'monitorDashBoard',
+    }
+  },
+
   computed: {
     ...mapGetters([
-      'username'
     ])
   }
 }
 </script>
-
-<style lang="scss" scoped>
-.dashboard {
-  &-container {
-    margin: 30px;
-  }
-  &-text {
-    font-size: 30px;
-    line-height: 46px;
-  }
-}
-</style>
