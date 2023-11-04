@@ -66,7 +66,6 @@ local function monitor(svr_name)
             if name == "hot_containe" and split[5] then
                 name = split[5]
             end
-
             index = index + 1
             local launch_date = ""
             if split[7] then
@@ -100,7 +99,6 @@ local function monitor(svr_name)
             rigister_rotate(cluster_name, file_name)
             local date_info = {[cur_date] = info}
             local json_str = json.encode(date_info)
-            log.info("date_info:",date_info)
             local filepath = string.format("%s%s",g_monitor_log_dir, file_name)
             local file = io.open(filepath, 'a+')
             file:write(json_str .. '\n')
@@ -128,11 +126,16 @@ function CMD.start(config)
     return true
 end
 
-function CMD.exit()
+--确定会退出
+function CMD.fix_exit()
     for _,time_obj in pairs(g_time_map) do
         --取消定时器
         time_obj:cancel()
     end
+end
+
+--退出
+function CMD.exit()
     return true
 end
 
