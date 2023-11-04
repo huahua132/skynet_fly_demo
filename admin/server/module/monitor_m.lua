@@ -63,9 +63,10 @@ local function monitor(svr_name)
             local split = string_util.split(server_info,' ')
             local mem = tonumber(split[1])
             local name = split[4]:sub(1,#split[4] - 1)
-            if name == "hot_container" and split[5] then
+            if name == "hot_containe" and split[5] then
                 name = split[5]
             end
+
             index = index + 1
             local launch_date = ""
             if split[7] then
@@ -75,8 +76,8 @@ local function monitor(svr_name)
             if split[8] then
                 version = tonumber(split[8])
             end
-            server_name_map[server_id] = name..index
-            svr_info_map[cur_date][v.cluster_name][name..index] = {
+            server_name_map[server_id] = name.. '_' .. server_id
+            svr_info_map[cur_date][v.cluster_name][name .. '_' .. server_id] = {
                 mem = mem,
             }
         end
@@ -99,6 +100,7 @@ local function monitor(svr_name)
             rigister_rotate(cluster_name, file_name)
             local date_info = {[cur_date] = info}
             local json_str = json.encode(date_info)
+            log.info("date_info:",date_info)
             local filepath = string.format("%s%s",g_monitor_log_dir, file_name)
             local file = io.open(filepath, 'a+')
             file:write(json_str .. '\n')

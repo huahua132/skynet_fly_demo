@@ -1,42 +1,113 @@
 <template>
-    <el-row :gutter="40" class="panel-group">
-        <el-col :xs="12" :sm="12" :lg="6" class="card-panel-col" v-for="(cluster,index) in clusterList" :key="index">
-            <div class="card-panel" @click="handleSetLineChartData(cluster)">
-                <div class="card-panel_wrapper card-panel_hover">
-                    <div class="card-panel-text">
-                        {{cluster}}
+    <div>
+        <el-row :gutter="40" class="panel-group">
+            <el-col :xs="12" :sm="12" :lg="6" class="card-panel-col" v-for="(cluster,index) in clusterList" :key="index">
+                <div class="card-panel" @click="setCluterType(cluster)">
+                    <div class="card-panel_wrapper card-panel_hover">
+                        <div class="card-panel-text">
+                            {{cluster}}
+                        </div>
                     </div>
                 </div>
-            </div>
-        </el-col>
-    </el-row>
+            </el-col>
+        </el-row>
+
+        <el-row :gutter="40" class="panel-group">
+            <el-col :xs="12" :sm="12" :lg="6" class="card-panel-col" v-for="(option,index) in optionList" :key="index">
+                <div class="card-panel" @click="setOptionType(option)">
+                    <div class="card-panel_wrapper card-panel_hover">
+                        <div class="card-panel-text">
+                            {{option}}
+                        </div>
+                    </div>
+                </div>
+            </el-col>
+        </el-row>
+    </div>   
 </template>
 
 <script>
-const cluster_list = ['chinese_chess:1','chinese_chess:2']
-
-const lineChartData = {
-    ['chinese_chess:1']: {
-        expectedData: [100, 120, 161, 134, 105, 160, 165],
-        actualData: [120, 82, 91, 154, 162, 140, 145]
-    },
-    ['chinese_chess:2']: {
-        expectedData: [200, 192, 120, 144, 160, 130, 140],
-        actualData: [180, 160, 151, 106, 145, 150, 130]
-    },
-}
+import { get_cluster_list, getInfo } from '@/api/monitor'
+const option_list = ['mem','task','mqlen','cpu','message']
 
 export default {
     data() {
         return {
-            clusterList:cluster_list
+            cluster : null,
+            option : null,
+            clusterList:[],
+            optionList:option_list,
+            lineChartData : {},
         }
     },
 
+    created() {
+        this.getClusterList()
+    },
+   
     methods: {
-        handleSetLineChartData(type) {
-            this.$emit('handleSetLineChartData', lineChartData[type])
-        }
+        async getClusterList() {
+            const res = await get_cluster_list()
+            this.clusterList = res.data
+            
+        },
+
+        async getInfo() {
+            const res = await getInfo(this.cluster, 0)
+            let data = res.data
+            if (data.result != "OK") {
+                return
+            }
+            data = data.data
+            console.log(data)
+
+            let timeList = []
+            let servers = []
+            for (let i = 0; i < data.length; i++) {
+                let value = data[i]
+                for (let time in value) {
+                    timeList.push(time)
+                    let one_server = data[i][time]
+                    for (let server in one_server) {
+                        let opt_info = one_server[server]
+                        for (let opt in opt_info) {
+                            let num = opt_info[opt]
+                            if (!servers[opt]) {
+                                servers[opt] = {
+                                    time : timeList,
+                                    servers : {}
+                                }
+                            }
+                            if (!servers[opt].servers[server]) {
+                                servers[opt].servers[server] = []
+                            }
+                            servers[opt].servers[server].push(num)
+                        }
+                    }
+                }
+            }
+
+            console.log("servers:",servers)
+            this.lineChartData[this.cluster] = servers
+        },
+
+        handleSetLine() {
+            if (!this.cluster || !this.option){
+                return
+            }
+            this.getInfo()
+            this.$emit('handleSetLineChartData',this.lineChartData[this.cluster][this.option])
+        },
+
+        setCluterType(cluster) {
+            this.cluster = cluster
+            this.handleSetLine()
+        },
+
+        setOptionType(option) {
+            this.option = option
+            this.handleSetLine()
+        },
     }
 }
 </script>
