@@ -1,156 +1,114 @@
 <template>
     <div>
-        <el-row :gutter="40" class="panel-group">
-            <el-col :xs="12" :sm="12" :lg="6" class="card-panel-col" v-for="(cluster,index) in clusterList" :key="index">
-                <div class="card-panel" @click="setCluterType(cluster)">
-                    <div class="card-panel_wrapper card-panel_hover">
-                        <div class="card-panel-text">
-                            {{cluster}}
-                        </div>
-                    </div>
-                </div>
-            </el-col>
-        </el-row>
+        <el-select v-model="pre_day" placeholder="请选择哪天">
+            <el-option v-for="item in dayOption" :key="item.value" :label="item.label" :value="item.value">
+            </el-option>
+        </el-select>
 
-        <el-row :gutter="40" class="panel-group">
-            <el-col :xs="12" :sm="12" :lg="6" class="card-panel-col" v-for="(option,index) in optionList" :key="index">
-                <div class="card-panel" @click="setOptionType(option)">
-                    <div class="card-panel_wrapper card-panel_hover">
-                        <div class="card-panel-text">
-                            {{option}}
-                        </div>
-                    </div>
-                </div>
-            </el-col>
-        </el-row>
-    </div>   
+        <el-select v-model="cluster" placeholder="请选择集群服务节点">
+            <el-option v-for="(item, index) in clusterList" :key="index" :label="item" :value="item">
+            </el-option>
+        </el-select>
+
+        <el-select v-model="server" placeholder="请选择服务">
+            <el-option v-for="(item, index) in serverList" :key="index" :label="item" :value="item">
+            </el-option>
+        </el-select>
+    </div>
 </template>
 
 <script>
 import { get_cluster_list, getInfo } from '@/api/monitor'
-const option_list = ['mem','task','mqlen','cpu','message']
+
+const day_options = [
+    {value : 0, label : "当天"},
+    {value : 1, label : "昨天"},
+    {value : 2, label : "前天"},
+    {value : 3, label : "前第三天"},
+    {value : 4, label : "前第四天"},
+    {value : 5, label : "前第五天"},
+    {value : 6, label : "前第六天"},
+    {value : 7, label : "前第七天"},
+]
 
 export default {
     data() {
         return {
+            pre_day : null,
             cluster : null,
-            option : null,
+            server : null,
+            dayOption : day_options,
             clusterList:[],
-            optionList:option_list,
-            lineChartData : {},
+            serverList:[],
+            serverMap:{},
         }
     },
 
     created() {
         this.getClusterList()
     },
+
+    watch: {
+        cluster : {
+            handler(val) {
+                this.serverList = this.serverMap[val]
+                this.handleSetLine()
+            }
+        },
+        server : {
+            handler(val) {
+                this.handleSetLine()
+            }
+        }
+    },
    
     methods: {
         async getClusterList() {
             const res = await get_cluster_list()
-            this.clusterList = res.data
-            
+            console.log("getClusterList>>>",res)
+            this.clusterList = res.data.cluster_list
+            this.serverMap = res.data.server_map
         },
 
         async getInfo() {
-            const res = await getInfo(this.cluster, 0)
+            const res = await getInfo(this.cluster, this.server, this.pre_day)
             let data = res.data
+            console.log("getInfo>> ",data)
             if (data.result != "OK") {
                 return
             }
             data = data.data
-            console.log(data)
 
             let timeList = []
-            let servers = []
+            let opts = {}
             for (let i = 0; i < data.length; i++) {
                 let value = data[i]
                 for (let time in value) {
                     timeList.push(time)
-                    let one_server = data[i][time]
-                    for (let server in one_server) {
-                        let opt_info = one_server[server]
-                        for (let opt in opt_info) {
-                            let num = opt_info[opt]
-                            if (!servers[opt]) {
-                                servers[opt] = {
-                                    time : timeList,
-                                    servers : {}
-                                }
-                            }
-                            if (!servers[opt].servers[server]) {
-                                servers[opt].servers[server] = []
-                            }
-                            servers[opt].servers[server].push(num)
+                    let opt_info = data[i][time]
+                    for (let opt in opt_info) {
+                        let num = opt_info[opt]
+                        if (!opts[opt]) {
+                            opts[opt] = []
                         }
+                        opts[opt].push(num)
                     }
                 }
             }
 
-            console.log("servers:",servers)
-            this.lineChartData[this.cluster] = servers
+            console.log("opts:",opts)
+            this.$emit('handleSetLineChartData',{
+                time : timeList,
+                opts : opts
+            })
         },
 
         handleSetLine() {
-            if (!this.cluster || !this.option){
+            if (!this.cluster || !this.server){
                 return
             }
             this.getInfo()
-            this.$emit('handleSetLineChartData',this.lineChartData[this.cluster][this.option])
-        },
-
-        setCluterType(cluster) {
-            this.cluster = cluster
-            this.handleSetLine()
-        },
-
-        setOptionType(option) {
-            this.option = option
-            this.handleSetLine()
         },
     }
 }
 </script>
-
-<style lang="scss" scoped>
-.panel-group {
-  margin-top: 18px;
-
-  .card-panel-col {
-    margin-bottom: 32px;
-  }
-
-  .card-panel {
-    height: 108px;
-    cursor: pointer;
-    font-size: 12px;
-    position: relative;
-    overflow: hidden;
-    color: #666;
-    background: #fff;
-    box-shadow: 4px 4px 40px rgba(0, 0, 0, .05);
-    border-color: rgba(0, 0, 0, .05);
-
-    &:hover {
-        .card-panel_wrapper {
-            color: #fff;
-            float: none !important;
-            width: 100%;
-            height: 100%;
-            margin: 0 !important;
-        }
-
-        .card-panel_hover {
-            background: #40c9c6;
-        }
-    }
-    .card-panel-text {
-        line-height: 80px;
-        text-align: center;
-        color: rgba(0, 0, 0, 0.45);
-        font-size: 35px;
-    }
-  }
-}
-
-</style>

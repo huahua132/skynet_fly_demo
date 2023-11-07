@@ -105,7 +105,7 @@ export default {
     },
     height: {
       type: String,
-      default: '350px'
+      default: '550px'
     },
     autoResize: {
       type: Boolean,
@@ -157,10 +157,10 @@ export default {
       this.setOptions(this.chartData)
     },
 
-    setOptions({ time, servers } = {}) {
+    setOptions({ time, opts } = {}) {
       if (!time || time.length <= 0) {return}
       this.resetChart()
-      console.log("ddd",servers)
+      console.log("ddd",opts)
       let option = {
         xAxis: {
           data: time,
@@ -194,8 +194,8 @@ export default {
         series: [],
       }
       let index = 0
-      for (let key in servers) {
-        let value = servers[key]
+      for (let key in opts) {
+        let value = opts[key]
         let color = colorList[index]
 
         option.legend.data.push(key)
@@ -213,9 +213,9 @@ export default {
                 color: color,
                 width: 2
               },
-              areaStyle: {
-                color: color
-              }
+              // areaStyle: {
+              //   color: color
+              // }
             }
           }
         })

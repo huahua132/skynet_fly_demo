@@ -1,29 +1,24 @@
 
 const cluster_list = ['chinese_chess:1','chinese_chess:2']
+const server_map = {
+    ['chinese_chess:1'] : ['gate','hall','match'],
+    ['chinese_chess:2'] : ['gateddd','hallddd','matchdd'],
+}
 
 const lineChartData = [
     {
         ['00:00:00'] : {
-            cdummy12: {mqlen: 0, task: 0, mem: 76.73, cpu: 0.030258, message: 2171},
-            cdummy13: {mqlen: 0, task: 0, mem: 76.73, cpu: 0.030258, message: 2171},
-            cdummy14: {mqlen: 0, task: 0, mem: 76.73, cpu: 0.030258, message: 2171},
-            cdummy15: {mqlen: 0, task: 0, mem: 76.73, cpu: 0.030258, message: 2171},
+            mqlen: 0, task: 0, mem: 76.73, cpu: 0.030258, message: 2171,
         }
     },
     {
         ['00:01:00'] : {
-            cdummy12: {mqlen: 0, task: 0, mem: 76.73, cpu: 0.030258, message: 12171},
-            cdummy13: {mqlen: 0, task: 0, mem: 76.73, cpu: 0.030258, message: 12171},
-            cdummy14: {mqlen: 0, task: 0, mem: 76.73, cpu: 0.030258, message: 12171},
-            cdummy15: {mqlen: 0, task: 0, mem: 76.73, cpu: 0.030258, message: 12171},
+            mqlen: 0, task: 0, mem: 76.73, cpu: 0.030258, message: 2171,
         }
     },
     {
         ['00:02:00'] : {
-            cdummy12: {mqlen: 0, task: 0, mem: 76.73, cpu: 0.030258, message: 22171},
-            cdummy13: {mqlen: 0, task: 0, mem: 76.73, cpu: 0.030258, message: 22171},
-            cdummy14: {mqlen: 0, task: 0, mem: 76.73, cpu: 0.030258, message: 22171},
-            cdummy15: {mqlen: 0, task: 0, mem: 76.73, cpu: 0.030258, message: 22171},
+            mqlen: 0, task: 0, mem: 76.73, cpu: 0.030258, message: 2171,
         }
     },
 ]
@@ -36,7 +31,10 @@ module.exports = [
     console.log("user cluster_list>>>>>>>>>>>>>>>>>>>>>>>>>>")
     return {
         code: 20000,
-        data: cluster_list
+        data: {
+            cluster_list : cluster_list,
+            server_map : server_map,
+        }
     }
     }
 },

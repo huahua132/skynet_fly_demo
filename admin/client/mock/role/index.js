@@ -28,7 +28,7 @@ const roles = [
         {
           path: 'dashboard',
           name: 'Dashboard',
-          meta: { title: '首页'}
+          meta: { title: '服务监控'}
         }
       ]
     }]

@@ -26,21 +26,25 @@ local g_config = nil
 local g_time_map = {}
 local g_rigister_info = {}
 
-local function rigister_rotate(cluster_name,file_name)
-    if g_rigister_info[cluster_name] then
+local function rigister_rotate(cluster_name,server_name,file_path,file_name)
+    if g_rigister_info[cluster_name] and g_rigister_info[cluster_name][server_name] then
         return
+    end
+
+    if not g_rigister_info[cluster_name] then
+        g_rigister_info[cluster_name] = {}
     end
 
     local cfg = {
         filename = file_name,          --文件名
-        file_path = g_monitor_log_dir, --文件夹
+        file_path = file_path, --文件夹
         max_age = 7,                   --最大保留天数
     }
 
     if contriner_client:instance("logrotate_m"):mod_call("add_rotate", cfg) then
-        g_rigister_info[cluster_name] = file_name
+        g_rigister_info[cluster_name][server_name] = file_name
     else
-        log.error("rigister_rotate err ",cluster_name, file_name)
+        log.error("rigister_rotate err ",cluster_name,server_name,file_path,file_name)
     end
 end
 
@@ -51,14 +55,14 @@ local function monitor(svr_name)
 
     local cur_date = os.date("%H:%M:%S", time_util.time())
     local svr_debug_console = cluster_client:instance(svr_name,"debug_console_m")
-    local svr_info_map = {[cur_date] = {}}
+    local svr_info_map = {}
     local ret = svr_debug_console:all_mod_call('call','mem')
     local index = 0
 
     local server_name_map = {}
 
     for _,v in ipairs(ret) do
-        svr_info_map[cur_date][v.cluster_name] = {}
+        svr_info_map[v.cluster_name] = {}
         for server_id,server_info in pairs(v.result[1]) do
             local split = string_util.split(server_info,' ')
             local mem = tonumber(split[1])
@@ -76,7 +80,7 @@ local function monitor(svr_name)
                 version = tonumber(split[8])
             end
             server_name_map[server_id] = name.. '_' .. server_id
-            svr_info_map[cur_date][v.cluster_name][name .. '_' .. server_id] = {
+            svr_info_map[v.cluster_name][name .. '_' .. server_id] = {
                 mem = mem,
             }
         end
@@ -86,24 +90,31 @@ local function monitor(svr_name)
 
     for _,v in ipairs(ret) do
         for server_id,server_info in pairs(v.result[1]) do
-            svr_info_map[cur_date][v.cluster_name][server_name_map[server_id]].task = server_info.task
-            svr_info_map[cur_date][v.cluster_name][server_name_map[server_id]].mqlen = server_info.mqlen
-            svr_info_map[cur_date][v.cluster_name][server_name_map[server_id]].cpu = server_info.cpu
-            svr_info_map[cur_date][v.cluster_name][server_name_map[server_id]].message = server_info.message
+            svr_info_map[v.cluster_name][server_name_map[server_id]].task = server_info.task
+            svr_info_map[v.cluster_name][server_name_map[server_id]].mqlen = server_info.mqlen
+            svr_info_map[v.cluster_name][server_name_map[server_id]].cpu = server_info.cpu
+            svr_info_map[v.cluster_name][server_name_map[server_id]].message = server_info.message
         end
     end
 
-    for _,info_map in pairs(svr_info_map) do
-        for cluster_name,info in pairs(info_map) do
-            local file_name = cluster_name .. '.log'
-            rigister_rotate(cluster_name, file_name)
-            local date_info = {[cur_date] = info}
-            local json_str = json.encode(date_info)
-            local filepath = string.format("%s%s",g_monitor_log_dir, file_name)
-            local file = io.open(filepath, 'a+')
-            file:write(json_str .. '\n')
-            file:flush()
-            file:close()
+    for cluster_name,server_info in pairs(svr_info_map) do
+        for server_name,info in pairs(server_info) do
+            local file_path = g_monitor_log_dir .. cluster_name .. '/'
+            local file_name = server_name .. '.log'
+            rigister_rotate(cluster_name,server_name,file_path,file_name)
+            local fname = string.format("%s%s",file_path,file_name)
+            if not os.execute("mkdir -p " .. file_path) then
+                error("create g_monitor_log_dir err")
+            end        
+            local file = io.open(fname,'a+')
+            if file then
+                local info_json = json.encode({[cur_date] = info})
+                file:write(info_json .. '\n')
+                file:flush()
+                file:close()
+            else
+                log.error("open file err ",fname)
+            end
         end
     end
 end
