@@ -13,8 +13,19 @@ export function getInfo(cluster,server,pre_day) {
     method: 'get',
     params: { 
       server_name : server,
-        cluster_name : cluster,
-        pre_day : pre_day
+      cluster_name : cluster,
+      pre_day : pre_day
+    }
+  })
+}
+
+export function serverinfo(cluster,server) {
+  return request({
+    url: '/monitor/serverinfo',
+    method: 'get',
+    params: {
+      cluster_name : cluster,
+      server_name : server,
     }
   })
 }

@@ -52,4 +52,18 @@ module.exports = [
     }
     }
 },
+
+{
+    url: '/monitor/serverinfo',
+    type: 'get',
+    response: config => {
+    return {
+        code: 20000,
+        data: {
+            run_time : 3600,
+        }
+    }
+    }
+},
+
 ]

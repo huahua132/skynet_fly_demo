@@ -1,5 +1,6 @@
 local rsp_body = require "rsp_body"
 local contriner_client = require "contriner_client"
+local cluster_client = require "cluster_client"
 local cache_help = require "cache_help"
 local timer = require "timer"
 local time_util = require "time_util"
@@ -7,6 +8,7 @@ local file_util = require "file_util"
 local log = require "log"
 local cjson_safe = require 'cjson.safe'
 local table_util = require "table_util"
+local string_util = require "string_util"
 
 local assert = assert
 local next = next
@@ -31,9 +33,9 @@ local function get_log_file_info(cluster_name, server_name, pre_day)
     if pre_day == 0 then --今天
         file_path = string.format('%s%s.log',file_path,server_name)
     else
-        local pre_time = time_util.day_time(-pre_day)     --前几天
-        local date = os.date(pre_time)
-        file_path = string.format('%s%s%s.log',file_path,date,server_name)
+        local pre_time = time_util.day_time(-pre_day + 1,0,0,0)     --前几天
+        local date = os.date("%Y%m%d",pre_time)
+        file_path = string.format('%s%s_%s.log',file_path,date,server_name)
     end
 
     log.info("get_log_file >>> ",file_path)
@@ -87,7 +89,6 @@ return function(group)
     group:get('/info',function(c)
         get_register_map()
         local query = c.req.query
-        log.info(query)
         local cluster_name = assert(query.cluster_name, "not cluster_name") --集群服务的名字
         local server_name = assert(query.server_name, "not server_name")    --服务名字
         local pre_day = assert(query.pre_day,"not pre_day")                 --前几天
@@ -100,6 +101,31 @@ return function(group)
         c.res:set_json_rsp(rsp_body.ok_rsp{
             result = ret,
             data = info_list,
+        })
+    end)
+
+    group:get('/serverinfo', function(c)
+        get_register_map()
+        local query = c.req.query
+        local cluster_name = assert(query.cluster_name, "not cluster_name") --集群服务的名字
+        local server_name = assert(query.server_name, "not server_name")    --服务名字
+        local split_str = string_util.split(cluster_name,':')
+        assert(#split_str == 2, "err cluster_name " .. cluster_name)
+        local svr_name,svr_id = split_str[1],tonumber(split_str[2])
+        split_str = string_util.split(server_name,':')
+        assert(#split_str == 2, "err server_name " .. cluster_name)
+        local address = ':'..split_str[2]
+
+        local instance = cluster_client:instance(svr_name,"debug_console_m"):set_svr_id(svr_id)
+        local ret = instance:byid_mod_call('run_time')
+        
+        local server_ret = instance:byid_mod_call('call','info',address)
+        log.error("server_id:>>>>>>>>>>>>>>>>",split_str,address)
+        log.error("server_ret:>>",server_ret)
+
+        c.res:set_json_rsp(rsp_body.ok_rsp{
+            run_time = ret.result[1],
+            server_info = server_ret.result[1],
         })
     end)
 end

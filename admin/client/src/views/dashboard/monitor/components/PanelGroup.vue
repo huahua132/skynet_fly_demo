@@ -100,7 +100,7 @@ export default {
             this.$emit('handleSetLineChartData',{
                 time : timeList,
                 opts : opts
-            })
+            },this.cluster,this.server)
         },
 
         handleSetLine() {

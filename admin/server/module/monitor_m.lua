@@ -22,6 +22,7 @@ contriner_client:register("logrotate_m")
 
 local g_monitor_log_dir = "./monitor_log/"
 
+local SELF_ADDRESS
 local g_config = nil
 local g_time_map = {}
 local g_rigister_info = {}
@@ -41,7 +42,7 @@ local function rigister_rotate(cluster_name,server_name,file_path,file_name)
         max_age = 7,                   --最大保留天数
     }
 
-    if contriner_client:instance("logrotate_m"):mod_call("add_rotate", cfg) then
+    if contriner_client:instance("logrotate_m"):mod_call("add_rotate", SELF_ADDRESS, cfg) then
         g_rigister_info[cluster_name][server_name] = file_name
     else
         log.error("rigister_rotate err ",cluster_name,server_name,file_path,file_name)
@@ -126,6 +127,7 @@ function CMD.get_rigister_info()
 end
 
 function CMD.start(config)
+    SELF_ADDRESS = skynet.self()
     g_config = config
     local node_list = config.node_list
     skynet.fork(function()
@@ -139,6 +141,7 @@ end
 
 --确定会退出
 function CMD.fix_exit()
+    contriner_client:instance("logrotate_m"):mod_send("cancel", SELF_ADDRESS)
     for _,time_obj in pairs(g_time_map) do
         --取消定时器
         time_obj:cancel()
