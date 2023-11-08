@@ -1,0 +1,1 @@
+(window["webpackJsonp"]=window["webpackJsonp"]||[]).push([["chunk-2d226cab"],{e9bc:function(t,e,n){"use strict";n.r(e);var l=function(){var t=this,e=t._self._c;return e("div",{staticStyle:{padding:"30px"}},[e("el-alert",{attrs:{closable:!1,title:"menu 1"}},[e("router-view")],1)],1)},a=[],c=n("2877"),u={},i=Object(c["a"])(u,l,a,!1,null,null,null);e["default"]=i.exports}}]);

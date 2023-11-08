@@ -1,5 +1,7 @@
 <template>
-  <div :class="className" :style="{height:height,width:width}" />
+  <div v-if="isNotdata" :style="{height:height,width:width}">暂无数据</div>
+  <div v-else :class="className" :style="{height:height,width:width}">
+  </div>
 </template>
 
 <script>
@@ -114,11 +116,15 @@ export default {
     chartData: {
       type: Object,
       required: true
+    },
+    isNotdata : {
+      tpye: Boolean,
+      default: true,
     }
   },
   data() {
     return {
-      chart: null
+      chart: null,
     }
   },
   watch: {
@@ -128,13 +134,23 @@ export default {
         console.log("handler>>>",val)
         this.setOptions(val)
       }
+    },
+    isNotdata : {
+      handler(val) {
+        console.log("isNotdata:",this.isNotdata,val)
+        if (this.isNotdata) {
+          if (!this.chart) {
+            return
+          }
+          this.chart.dispose()
+          this.chart = null
+        }
+      }
     }
   },
   mounted() {
-    this.$nextTick(() => {
-      this.initChart()
-    })
   },
+  
   beforeDestroy() {
     if (!this.chart) {
       return
@@ -145,22 +161,18 @@ export default {
   methods: {
     resetChart() {
       if (!this.chart) {
-        return
+        this.chart = echarts.init(this.$el, 'macarons')
+      } else {
+        this.chart.dispose()
+        this.chart = null
+        this.chart = echarts.init(this.$el, 'macarons')
       }
-      this.chart.dispose()
-      this.chart = null
-      this.chart = echarts.init(this.$el, 'macarons')
-    },
-
-    initChart() {
-      this.chart = echarts.init(this.$el, 'macarons')
-      this.setOptions(this.chartData)
     },
 
     setOptions({ time, opts } = {}) {
       if (!time || time.length <= 0) {return}
       this.resetChart()
-      console.log("ddd",opts)
+      console.log("ddd",opts,this.isNotdata)
       let option = {
         xAxis: {
           data: time,

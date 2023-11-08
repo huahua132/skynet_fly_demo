@@ -59,7 +59,12 @@ export default {
             handler(val) {
                 this.handleSetLine()
             }
-        }
+        },
+        pre_day : {
+            handler(val) {
+                this.handleSetLine()
+            }
+        },
     },
    
     methods: {
@@ -75,6 +80,7 @@ export default {
             let data = res.data
             console.log("getInfo>> ",data)
             if (data.result != "OK") {
+                this.$emit('handleNotData')
                 return
             }
             data = data.data
@@ -100,7 +106,7 @@ export default {
             this.$emit('handleSetLineChartData',{
                 time : timeList,
                 opts : opts
-            },this.cluster,this.server)
+            },this.cluster,this.server,this.pre_day)
         },
 
         handleSetLine() {

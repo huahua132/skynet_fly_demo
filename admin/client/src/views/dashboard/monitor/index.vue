@@ -1,11 +1,11 @@
 <template>
     <div class="dashboard-monitor-container">
-        <panel-group @handleSetLineChartData="handleSetLineChartData" />
+        <panel-group @handleSetLineChartData="handleSetLineChartData" @handleNotData="handleNotData" />
         <el-row style="background:#fff;padding:16px 16px 0;margin-bottom:32px;">
-            <line-chart :chart-data="lineChartData" />
+            <line-chart :chart-data="lineChartData" :is-notdata = "isNotData" />
         </el-row>
         
-        <el-row>
+        <el-row v-show="isCurDay">
             <server-info :cluster="cluster" :server="server">
             </server-info>
         </el-row>
@@ -29,15 +29,29 @@ export default {
             lineChartData: {},
             cluster : null,
             server : null,
+            isNotData : true,
+            isCurDay : false,
         }
     },
 
     methods: {
-        handleSetLineChartData(data,cluster,server) {
+        handleSetLineChartData(data,cluster,server,day) {
             console.log("handleSetLineChartData:",data,cluster,server)
             this.lineChartData = data
             this.cluster = cluster
             this.server = server
+            this.isNotData = false
+            if (day == 0) {
+                this.isCurDay = true
+            } else {
+                this.isCurDay = false
+            }
+        },
+
+        //没有数据
+        handleNotData() {
+            console.log("没有数据>>>>>")
+            this.isNotData = true
         }
     }
 }
