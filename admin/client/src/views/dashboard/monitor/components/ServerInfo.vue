@@ -10,11 +10,30 @@
             <el-descriptions-item label="退出剩余时间"> {{ exitRemainTime }}</el-descriptions-item>
         </el-descriptions>
 
-        <h3 v-show="sourceList">访问者列表</h3>
-        <el-table v-if="sourceList" :data="sourceList" height="250" border style="width: 100%;">
-            <el-table-column prop="name" label="服务名称" width="180"></el-table-column>
-            <el-table-column prop="address" label="服务地址" width="180"></el-table-column>
-        </el-table>
+        <el-row :gutter="20">
+            <el-col :span="6">
+                <h3 style="text-align: center;">访问者列表</h3>
+                <el-table v-if="sourceList" :data="sourceList" height="250" border style="width: 100%;">
+                    <el-table-column prop="name" label="服务名称" border style="width: 50%;"></el-table-column>
+                    <el-table-column prop="address" label="服务地址" border style="width: 50%;"></el-table-column>
+                </el-table>
+            </el-col>
+
+            <el-col :span="4">
+                <h3 style="text-align: center;">弱访问者列表</h3>
+                <el-table v-if="weekVisitorList" :data="weekVisitorList" height="250" border style="width: 100%;">
+                    <el-table-column prop="name" label="服务名称" border style="width: 100%;"></el-table-column>
+                </el-table>
+            </el-col>
+
+            <el-col :span="14">
+                <h3 style="text-align: center;">访问列表</h3>
+                <el-table v-if="needVisitorList" :data="needVisitorList" height="250" border style="width: 100%;">
+                    <el-table-column prop="name" label="服务名称" width="180"></el-table-column>
+                    <el-table-column prop="idsList" label="服务地址列表" border style="width: 75%;"></el-table-column>
+                </el-table>
+            </el-col>
+        </el-row>
     </div>
 </template>
 
@@ -39,7 +58,9 @@ export default {
             module_info : null,
             server_state : null,
             exit_remain_time : 0,
-            sourceList : null,
+            sourceList : [],
+            weekVisitorList : [],
+            needVisitorList : [],
         }
     },
 
@@ -121,21 +142,61 @@ export default {
             console.log("serverInfo 2",this.cluster,this.server)
             const res = await serverinfo(this.cluster,this.server)
             this.run_time = res.data.run_time
-            this.module_info = res.data.server_info.module_info
-            this.server_state = res.data.server_info.server_state
-            this.exit_remain_time = res.data.server_info.exit_remain_time
-            let source_map = res.data.server_info.source_map
-            this.sourceList = null
-            if (source_map) {
-                for(let address in source_map) {
-                    let name = source_map[address]
-                    if (!this.sourceList) {
-                        this.sourceList = []
+            if (res.data.server_info && res.data.server_info.hot_container) {
+                let hot_container = res.data.server_info.hot_container
+
+                this.module_info = hot_container.module_info
+                this.server_state = hot_container.server_state
+                this.exit_remain_time = hot_container.exit_remain_time
+                let source_map = hot_container.source_map
+                //来访者列表
+                this.sourceList = []
+                if (source_map) {
+                    for(let address in source_map) {
+                        let name = source_map[address]
+                        this.sourceList.push({address : address, name : name})
                     }
-                    this.sourceList.push({address : address, name : name})
                 }
+                
+                //弱访问者
+                this.weekVisitorList = []
+                let week_visitor_map = hot_container.week_visitor_map
+                if (week_visitor_map) {
+                    for (let name in week_visitor_map) {
+                        this.weekVisitorList.push({name : name})
+                    }
+                }
+
+                //访问列表
+                this.needVisitorList = []
+                let need_visitor_map = hot_container.need_visitor_map
+                if (need_visitor_map) {
+                    for (let name in need_visitor_map) {
+                        let idsList = need_visitor_map[name]
+                        let idsListStr = ""
+                        for (let i = 0; i < idsList.length; i++) {
+                            idsListStr += '['
+                            for (let j = 0; j < idsList[i].length; j++) {
+                                idsListStr += idsList[i][j]
+                                if (j < idsList[i].length - 1) {
+                                    idsListStr += ','
+                                }
+                            }
+                            idsListStr += ']'
+                        }
+                        this.needVisitorList.push({name : name,idsList : idsListStr})
+                    }
+                }
+            } else {
+                this.module_info = null
+                this.server_state = null
+                this.exit_remain_time = 0
+                this.sourceList = []
+                this.weekVisitorList = []
+                this.needVisitorList = []
             }
-            console.log("serverInfo 3",this.cluster,this.server,this.module_info,!this.module_info)
+            
+            console.log("serverInfo 3",this.cluster,this.server,res)
         }
     }
 }

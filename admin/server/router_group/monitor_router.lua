@@ -123,10 +123,11 @@ return function(group)
         log.error("server_id:>>>>>>>>>>>>>>>>",split_str,address)
         log.error("server_ret:>>",server_ret)
 
-        if server_ret.result[1] and server_ret.result[1].source_map then
-            for source,name in pairs(server_ret.result[1].source_map) do
-                server_ret.result[1].source_map['' .. source] = name
-                server_ret.result[1].source_map[source] = nil
+        if server_ret.result[1] and server_ret.result[1].hot_container and server_ret.result[1].hot_container.source_map then
+            local source_map = server_ret.result[1].hot_container.source_map
+            for source,name in pairs(source_map) do
+                source_map['' .. source] = name
+                source_map[source] = nil
             end
         end
 
