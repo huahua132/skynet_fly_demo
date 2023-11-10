@@ -123,6 +123,13 @@ return function(group)
         log.error("server_id:>>>>>>>>>>>>>>>>",split_str,address)
         log.error("server_ret:>>",server_ret)
 
+        if server_ret.result[1] and server_ret.result[1].source_map then
+            for source,name in pairs(server_ret.result[1].source_map) do
+                server_ret.result[1].source_map['' .. source] = name
+                server_ret.result[1].source_map[source] = nil
+            end
+        end
+
         c.res:set_json_rsp(rsp_body.ok_rsp{
             run_time = ret.result[1],
             server_info = server_ret.result[1],

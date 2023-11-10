@@ -60,7 +60,22 @@ module.exports = [
     return {
         code: 20000,
         data: {
-            run_time : 3600,
+            run_time : 895110,
+            server_info : {
+                // module_info : {
+                //     launch_date : '2023-11-08[16:59:55]',
+                //     module_name : 'room_game',
+                //     version : 1,
+                //     index : 1,
+                // },
+                server_state : 'starting',
+                exit_remain_time : 0,
+                source_map : {
+                    "22" : "room_game",
+                    "33" : "hall",
+                    "44" : "alloc",
+                }
+            }
         }
     }
     }

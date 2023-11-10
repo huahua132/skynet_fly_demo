@@ -135,7 +135,7 @@ function CMD.start(config)
             g_time_map[svr_name] = timer_point:new(timer_point.EVERY_MINUTE):builder(monitor,svr_name)
         end
     end)
-   
+    
     return true
 end
 
