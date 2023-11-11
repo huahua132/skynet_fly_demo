@@ -58,7 +58,6 @@ local function monitor(svr_name)
     local svr_debug_console = cluster_client:instance(svr_name,"debug_console_m")
     local svr_info_map = {}
     local ret = svr_debug_console:all_mod_call('call','mem')
-    local index = 0
 
     local server_name_map = {}
 
@@ -71,7 +70,6 @@ local function monitor(svr_name)
             if name == "hot_containe" and split[5] then
                 name = split[5]
             end
-            index = index + 1
             local launch_date = ""
             if split[7] then
                 launch_date = split[7]
@@ -135,7 +133,7 @@ function CMD.start(config)
             g_time_map[svr_name] = timer_point:new(timer_point.EVERY_MINUTE):builder(monitor,svr_name)
         end
     end)
-    
+
     return true
 end
 

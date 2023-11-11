@@ -47,12 +47,27 @@ export const constantRoutes = [
     path: '/',
     component: Layout,
     redirect: '/dashboard',
-    children: [{
-      path: 'dashboard',
-      name: 'Dashboard',
-      component: () => import('@/views/dashboard/index'),
-      meta: { title: '服务监控'}
-    }]
+    children: [
+      {
+        path: 'dashboard',
+        name: 'Dashboard',
+        component: () => import('@/views/dashboard/index'),
+        meta: { title: '服务监控'}
+      },
+    ]
+  },
+
+  {
+    path: '/realtimelist',
+    component: Layout,
+    children: [
+      {
+        path : 'index',
+        name : 'Realtimelist',
+        component: () => import('@/views/realtimelist/index'),
+        meta: {title: '实时列表'},
+      }
+    ]
   },
 
   {
