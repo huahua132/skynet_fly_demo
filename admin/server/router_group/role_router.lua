@@ -2,7 +2,10 @@ local model_role = require "model_role"
 local rsp_body = require "rsp_body"
 local CODE = require "CODE"
 local log = require "log"
+local permission_mid = require "permission_mid"
 local assert = assert
+
+local client_path = '/permission'
 
 return function(group)
     group:get('/roles',function(c)
@@ -15,6 +18,7 @@ return function(group)
         c.res:set_json_rsp(rsp_body.ok_rsp(roles))
     end)
 
+    permission_mid.set('post',group:calculate_absolute_path('/role'),client_path .. '/role')
     group:post('/role',function(c)
         local new_role = c.req.body
 
@@ -28,6 +32,7 @@ return function(group)
         end
     end)
 
+    permission_mid.set('put',group:calculate_absolute_path('/role/:key'),client_path .. '/role')
     group:put('/role/:key',function(c)
         local role = c.req.body
         local params = c.params
@@ -42,6 +47,7 @@ return function(group)
         end
     end)
 
+    permission_mid.set('delete',group:calculate_absolute_path('/role/:key'),client_path .. '/role')
     group:delete('/role/:key',function(c)
         local params = c.params
 		local key = params.key

@@ -19,8 +19,12 @@ return function(group)
 
     group:get('/info',function(c)
         local username = c.token_auth.username
-        local info = model_user.get_info(username)
-        c.res:set_json_rsp(rsp_body.ok_rsp(info))
+        local info,code,msg = model_user.get_info(username)
+        if info then
+            c.res:set_json_rsp(rsp_body.ok_rsp(info))
+        else
+            c.res:set_json_rsp(rsp_body.error_rsp(code, msg))
+        end
     end)
 
     group:post('/logout',function(c)

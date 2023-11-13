@@ -2,6 +2,7 @@ local skynet = require "skynet"
 local engine_web = require "engine_web"
 local router = require "router"
 local token_auth_mid = require "token_auth_mid"
+local permission_mid = require "permission_mid"
 
 local M = {}
 
@@ -26,6 +27,9 @@ function M.init()
         "/user/login",
         "/static/*filepath",
     })
+
+    --权限校验
+    app:use(permission_mid.auth())
 
     router(app)
     --设置前端入口路径

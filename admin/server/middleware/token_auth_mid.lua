@@ -14,7 +14,7 @@ local g_signature = "dsfjisdhfiudgytuierh348dchug234879a" --私钥
 
 local M = {}
 
-function M.create_token(username)
+function M.create_token(username,roles,routes_map)
     local cur_time = time_util.time()
     local claim = {
         iss = "skynet_fly_admin", --签发者
@@ -23,6 +23,8 @@ function M.create_token(username)
     }
 
     claim.username = username
+    claim.roles = roles
+    claim.routes_map = routes_map
      -- Create a token.
     local token = assert(jwt.encode(claim, g_signature, "HS256"))
     assert(type(token) == "string")
@@ -39,6 +41,9 @@ function M.auth(white_list) --验证白名单
         local request_path = context.req.path
         local in_white_list = w_router:match(request_path, "GET")
         if in_white_list then
+            context.token_auth = {
+                is_white = true   --白名单
+            }
             context:next()
         else
             local token = context.req.header['x-token']

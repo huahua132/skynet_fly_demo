@@ -3,8 +3,8 @@ const tokens = {
   admin: {
     token: 'admin-token'
   },
-  editor: {
-    token: 'editor-token'
+  developer: {
+    token: 'developer-token'
   }
 }
 
@@ -15,11 +15,11 @@ const users = {
     avatar: 'https://wpimg.wallstcn.com/f778738c-e4f8-4870-b634-56703b4acafe.gif',
     username: 'Super Admin'
   },
-  'editor-token': {
-    roles: ['editor'],
-    introduction: 'I am an editor',
+  'developer-token': {
+    roles: ['developer'],
+    introduction: 'I am an developer',
     avatar: 'https://wpimg.wallstcn.com/f778738c-e4f8-4870-b634-56703b4acafe.gif',
-    username: 'Normal Editor'
+    username: 'Normal developer'
   }
 }
 

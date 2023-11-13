@@ -26,12 +26,12 @@
       </el-table-column>
     </el-table>
 
-    <el-dialog :visible.sync="dialogVisible" :title="dialogType==='edit'?'Edit Role':'New Role'">
+    <el-dialog :visible.sync="dialogVisible" :title="dialogType==='edit'?'编辑角色':'新建角色'">
       <el-form :model="role" label-width="80px" label-position="left">
-        <el-form-item label="Name">
+        <el-form-item label="名称">
           <el-input v-model="role.name" placeholder="Role Name" />
         </el-form-item>
-        <el-form-item label="Desc">
+        <el-form-item label="描述">
           <el-input
             v-model="role.description"
             :autosize="{ minRows: 2, maxRows: 4}"
@@ -39,11 +39,22 @@
             placeholder="Role Description"
           />
         </el-form-item>
-        <el-form-item label="Menus">
+        <el-form-item label="读权限">
           <el-tree
-            ref="tree"
+            ref="read_tree"
             :check-strictly="checkStrictly"
-            :data="routesData"
+            :data="readRoutesData"
+            :props="defaultProps"
+            show-checkbox
+            node-key="path"
+            class="permission-tree"
+          />
+        </el-form-item>
+        <el-form-item label="写权限">
+          <el-tree
+            ref="write_tree"
+            :check-strictly="checkStrictly"
+            :data="writeRoutesData"
             :props="defaultProps"
             show-checkbox
             node-key="path"
@@ -52,8 +63,8 @@
         </el-form-item>
       </el-form>
       <div style="text-align:right;">
-        <el-button type="danger" @click="dialogVisible=false">Cancel</el-button>
-        <el-button type="primary" @click="confirmRole">Confirm</el-button>
+        <el-button type="danger" @click="dialogVisible=false">取消</el-button>
+        <el-button type="primary" @click="confirmRole">提交</el-button>
       </div>
     </el-dialog>
   </div>
@@ -76,7 +87,8 @@ export default {
   data() {
     return {
       role: Object.assign({}, defaultRole),
-      routes: [],
+      readRoutes: [],
+      writeRoutes : [],
       rolesList: [],
       dialogVisible: false,
       dialogType: 'new',
@@ -88,8 +100,11 @@ export default {
     }
   },
   computed: {
-    routesData() {
-      return this.routes
+    readRoutesData() {
+      return this.readRoutes
+    },
+    writeRoutesData() {
+      return this.writeRoutes
     }
   },
   created() {
@@ -100,7 +115,9 @@ export default {
   methods: {
     async getRoutes() {
       this.serviceRoutes = asyncRoutes
-      this.routes = this.generateRoutes(asyncRoutes)
+      let routes = this.generateRoutes(asyncRoutes)
+      this.readRoutes = routes
+      this.writeRoutes = routes
     },
     async getRoles() {
       const res = await getRoles()
@@ -108,7 +125,7 @@ export default {
     },
 
     // Reshape the routes structure so that it looks the same as the sidebar
-    generateRoutes(routes, basePath = '/') {
+    generateRoutes(routes, basePath = '/', is_write = false) {
       const res = []
       if (!routes.length) {
         return res
@@ -116,22 +133,16 @@ export default {
       for (let route of routes) {
         // skip some route
         if (route.hidden) { continue }
-
-        const onlyOneShowingChild = this.onlyOneShowingChild(route.children, route)
-
-        if (route.children && onlyOneShowingChild && !route.alwaysShow) {
-          route = onlyOneShowingChild
-        }
+        if (is_write && !route.w) { continue }
 
         const data = {
           path: path.resolve(basePath, route.path),
           title: route.meta && route.meta.title
-
         }
 
         // recursive child routes
         if (route.children) {
-          data.children = this.generateRoutes(route.children, data.path)
+          data.children = this.generateRoutes(route.children, data.path, is_write)
         }
         res.push(data)
       }
@@ -152,8 +163,11 @@ export default {
     },
     handleAddRole() {
       this.role = Object.assign({}, defaultRole)
-      if (this.$refs.tree) {
-        this.$refs.tree.setCheckedNodes([])
+      if (this.$refs.read_tree) {
+        this.$refs.read_tree.setCheckedNodes([])
+      }
+      if (this.$refs.write_tree) {
+        this.$refs.write_tree.setCheckedNodes([])
       }
       this.dialogType = 'new'
       this.dialogVisible = true
@@ -165,41 +179,55 @@ export default {
       this.role = deepClone(scope.row)
       this.$nextTick(() => {
         console.log("roles:",this.role.routes)
-        const routes = this.generateRoutes(this.role.routes)
-        this.$refs.tree.setCheckedNodes(this.generateArr(routes))
+        const readRoutes = this.generateRoutes(this.role.routes)
+        this.$refs.read_tree.setCheckedNodes(this.generateArr(readRoutes))
+        const writeRoutes = this.generateRoutes(this.role.routes,'/',true)
+        this.$refs.write_tree.setCheckedNodes(this.generateArr(writeRoutes))
         // set checked state of a node not affects its father and child nodes
         this.checkStrictly = false
       })
     },
     handleDelete({ $index, row }) {
-      this.$confirm('Confirm to remove the role?', 'Warning', {
-        confirmButtonText: 'Confirm',
-        cancelButtonText: 'Cancel',
+      this.$confirm('你确定要删除这个角色?', '警告', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
         type: 'warning'
       })
         .then(async() => {
           await deleteRole(row.key)
           this.rolesList.splice($index, 1)
           this.$message({
-            type: 'success',
-            message: 'Delete succed!'
+            type: '成功',
+            message: '删除成功'
           })
         })
         .catch(err => { console.error(err) })
     },
-    generateTree(routes, basePath = '/', checkedKeys) {
-      const res = []
+    generateTree(routes, basePath = '/', checkedKeys, writeCheckedKeys) {
+      const res = {
+        routes : [],
+        isw : false,
+      }
 
       for (const route of routes) {
         const routePath = path.resolve(basePath, route.path)
 
         // recursive child routes
+        let cres = {
+          isw : false
+        }
         if (route.children) {
-          route.children = this.generateTree(route.children, routePath, checkedKeys)
+          cres = this.generateTree(route.children, routePath, checkedKeys, writeCheckedKeys)
+          route.children = cres.routes
+        }
+        
+        if (cres.isw || writeCheckedKeys.includes(routePath)) {
+          route.w = true
+          res.isw = true
         }
 
         if (checkedKeys.includes(routePath) || (route.children && route.children.length >= 1)) {
-          res.push(route)
+          res.routes.push(route)
         }
       }
       return res
@@ -207,9 +235,10 @@ export default {
     async confirmRole() {
       const isEdit = this.dialogType === 'edit'
 
-      const checkedKeys = this.$refs.tree.getCheckedKeys()
-      this.role.routes = this.generateTree(deepClone(this.serviceRoutes), '/', checkedKeys)
-
+      const readCheckedKeys = this.$refs.read_tree.getCheckedKeys()
+      const writeCheckedKeys = this.$refs.write_tree.getCheckedKeys()
+      this.role.routes = this.generateTree(deepClone(this.serviceRoutes), '/', readCheckedKeys, writeCheckedKeys).routes
+      console.log("confirmRole>>> ", this.role.routes, writeCheckedKeys)
       if (isEdit) {
         await updateRole(this.role.key, this.role)
         for (let index = 0; index < this.rolesList.length; index++) {
@@ -227,36 +256,16 @@ export default {
       const { description, key, name } = this.role
       this.dialogVisible = false
       this.$notify({
-        title: 'Success',
+        title: '成功',
         dangerouslyUseHTMLString: true,
         message: `
             <div>Role Key: ${key}</div>
             <div>Role Name: ${name}</div>
             <div>Description: ${description}</div>
           `,
-        type: 'success'
+        type: '成功'
       })
     },
-    // reference: src/view/layout/components/Sidebar/SidebarItem.vue
-    onlyOneShowingChild(children = [], parent) {
-      let onlyOneChild = null
-      const showingChildren = children.filter(item => !item.hidden)
-
-      // When there is only one child route, the child route is displayed by default
-      if (showingChildren.length === 1) {
-        onlyOneChild = showingChildren[0]
-        onlyOneChild.path = path.resolve(parent.path, onlyOneChild.path)
-        return onlyOneChild
-      }
-
-      // Show parent if there are no child route to display
-      if (showingChildren.length === 0) {
-        onlyOneChild = { ... parent, path: '', noShowingChildren: true }
-        return onlyOneChild
-      }
-
-      return false
-    }
   }
 }
 </script>
