@@ -91,5 +91,10 @@ return {
                 'chinese_chess',             --象棋
             }
         }
-    }
+    },
+	--私钥
+    signature_m = {
+        launch_seq = 8,
+        launch_num = 1,
+    },
 }

@@ -3,18 +3,34 @@ local rax = require "rax"
 local time_util = require "time_util"
 local CODE = require "CODE"
 local rsp_body = require "rsp_body"
+local contriner_client = require "contriner_client"
 local log = require "log"
 local string = require "string"
+local skynet = require "skynet"
+
+contriner_client:register("signature_m")
 
 local assert = assert
 local type = type
 local pairs = pairs
 
-local g_signature = "dsfjisdhfiudgytuierh348dchug234879a" --私钥
+local g_is_eixt = false
+local g_signature = nil --私钥
+
+local old_skynet_exit = skynet.exit
+
+function skynet.exit()
+    g_is_eixt = true
+    contriner_client:instance("signature_m"):mod_call("unwatch",skynet.self())
+end
 
 local M = {}
 
 function M.create_token(username,roles,routes_map)
+    if not g_signature then
+        log.error("not g_signature ")
+        return 
+    end
     local cur_time = time_util.time()
     local claim = {
         iss = "skynet_fly_admin", --签发者
@@ -36,6 +52,13 @@ function M.auth(white_list) --验证白名单
     for _,path in pairs(white_list) do
         w_router:insert("GET", path, true)
     end
+
+    skynet.fork(function()
+        while not g_is_eixt do
+            g_signature = contriner_client:instance("signature_m"):mod_call("watch",skynet.self(),g_signature)
+            log.info("watch g_signature:",g_signature)
+        end
+    end)
 
     return function(context)
         local request_path = context.req.path

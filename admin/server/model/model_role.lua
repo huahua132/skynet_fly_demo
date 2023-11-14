@@ -3,6 +3,9 @@ local log = require "log"
 local json = require "cjson"
 local CODE = require "CODE"
 local mysql = require "mysql"
+local contriner_client = require "contriner_client"
+
+contriner_client:register("signature_m")
 
 local string = string
 local ipairs = ipairs
@@ -128,6 +131,7 @@ function M.update_role(key,role)
         return nil,CODE.ERR_SERVER,"update err"
     end
 
+    contriner_client:instance("signature_m"):mod_call("refresh")   --刷新密钥，使之前的token失效
     log.info("sql_ret:",sql_ret)
     return true
 end
