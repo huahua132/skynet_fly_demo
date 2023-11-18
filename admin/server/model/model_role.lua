@@ -116,7 +116,9 @@ function M.add_role(new_role)
     end
 
     log.info("sql_ret:",sql_ret)
-    return sql_ret.insert_id
+    return {
+        key = sql_ret.insert_id
+    }
 end
 
 function M.update_role(key,role)
@@ -133,7 +135,7 @@ function M.update_role(key,role)
 
     contriner_client:instance("signature_m"):mod_call("refresh")   --刷新密钥，使之前的token失效
     log.info("sql_ret:",sql_ret)
-    return true
+    return "success"
 end
 
 function M.del_role(key)
@@ -143,7 +145,7 @@ function M.del_role(key)
         return nil,CODE.ERR_SERVER,"delete err"
     end
 
-    return true
+    return "success"
 end
 
 return M

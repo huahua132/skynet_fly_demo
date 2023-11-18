@@ -39,7 +39,7 @@ end
 return function(group)
     group:get('/cluster_list',function(c)
         local _,cluster_list = get_register_map()
-        c.res:set_json_rsp(rsp_body.ok_rsp{
+        rsp_body.set_rsp(c,{
             cluster_list = cluster_list
         })
     end)
@@ -90,6 +90,6 @@ return function(group)
             info_list[server_id].message = server_info.message
         end
         
-        c.res:set_json_rsp(rsp_body.ok_rsp(info_list))
+        rsp_body.set_rsp(c,info_list)
     end)
 end

@@ -30,7 +30,7 @@ function M.auth()
         local method = params._method
         method = string.upper(method)
         local pathmap = g_path_map[method]
-        if not pathmap then
+        if not pathmap or not pathmap[path] then
             context:next()
             return
         end
@@ -40,13 +40,14 @@ function M.auth()
         if not routes_map[client_path] then
             --没有权限
             log.info("没有权限>>>>>>>>>>>>>>>>>>>", path)
-            rsp_body.error_rsp(CODE.NOT_PERMISSION, "not ready permission")
+            rsp_body.set_rsp(context, nil ,CODE.NOT_PERMISSION, "not ready permission")
             context:abort()
         else
             if method ~= 'GET' and not routes_map[client_path].w then
                 --没有写权限
                 log.info("没有写权限>>>>>>>>>>>>>>>>>", path)
-                rsp_body.error_rsp(CODE.NOT_PERMISSION, "not write permission")
+                rsp_body.set_rsp(context, nil ,CODE.NOT_PERMISSION, "not write permission")
+                log.info("self.body>>> ",context.res.body)
                 context:abort()
             end
         end

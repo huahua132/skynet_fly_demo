@@ -8,26 +8,17 @@ return function(group)
     group:post('/login',function(c)
         local username = assert(c.req.body.username,"not username")
         local password = assert(c.req.body.password,"not password")
-        local token, code, msg = model_user.login(username, password)
-
-        if token then
-            c.res:set_json_rsp(rsp_body.ok_rsp {token = token})
-        else
-            c.res:set_json_rsp(rsp_body.error_rsp(code, msg))
-        end
+        local data, code, msg = model_user.login(username, password)
+        rsp_body.set_rsp(c,data,code,msg)
     end)
 
     group:get('/info',function(c)
         local username = c.token_auth.username
-        local info,code,msg = model_user.get_info(username)
-        if info then
-            c.res:set_json_rsp(rsp_body.ok_rsp(info))
-        else
-            c.res:set_json_rsp(rsp_body.error_rsp(code, msg))
-        end
+        local data,code,msg = model_user.get_info(username)
+        rsp_body.set_rsp(c,data,code,msg)
     end)
 
     group:post('/logout',function(c)
-        c.res:set_json_rsp(rsp_body.ok_rsp('success'))
+        rsp_body.set_rsp(c,'success')
     end)
 end

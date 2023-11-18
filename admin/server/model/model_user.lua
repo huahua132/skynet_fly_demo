@@ -51,7 +51,7 @@ function M.login(username, password)
     end
 
     log.info("login>>", user_info.roles, routes_map)
-    return token_auth_mid.create_token(username,user_info.roles,routes_map)
+    return {token = token_auth_mid.create_token(username,user_info.roles,routes_map)} 
 end
 
 function M.get_info(username)

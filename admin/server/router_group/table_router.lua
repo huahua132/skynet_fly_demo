@@ -4,10 +4,8 @@ local rsp_body = require "rsp_body"
 return function(group)
     group:get("/list",function(c)
         local items = model_table.generate_items()
-        
-        local rsp = rsp_body.ok_rsp({
+        rsp_body.set_rsp(c,{
             items = items
         })
-        c.res:set_json_rsp(rsp)
     end)
 end

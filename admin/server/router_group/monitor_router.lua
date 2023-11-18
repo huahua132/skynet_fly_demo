@@ -80,7 +80,7 @@ end
 return function(group)
     group:get('/cluster_list',function(c)
         local _,cluster_list,server_map = get_register_map()
-        c.res:set_json_rsp(rsp_body.ok_rsp{
+        rsp_body.set_rsp(c,{
             cluster_list = cluster_list,
             server_map = server_map,
         })
@@ -98,7 +98,7 @@ return function(group)
         
         local ret,info_list = get_log_file_info(cluster_name, server_name, pre_day)
 
-        c.res:set_json_rsp(rsp_body.ok_rsp{
+        rsp_body.set_rsp(c,{
             result = ret,
             data = info_list,
         })
@@ -131,7 +131,7 @@ return function(group)
             end
         end
 
-        c.res:set_json_rsp(rsp_body.ok_rsp{
+        rsp_body.set_rsp(c,{
             run_time = ret.result[1],
             server_info = server_ret.result[1],
         })

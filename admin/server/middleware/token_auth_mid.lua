@@ -75,7 +75,7 @@ function M.auth(white_list) --验证白名单
             end
 
             if not token then
-                context.res:set_json_rsp(rsp_body.error_rsp(CODE.ILLEGAL_TOKEN, "not token"))
+                rsp_body.set_rsp(context, nil ,CODE.ILLEGAL_TOKEN, "not token")
                 context:abort()
                 return
             end
@@ -84,9 +84,9 @@ function M.auth(white_list) --验证白名单
             if not payload then
                 --token失效
                 if msg == "Not acceptable by exp" then
-                    context.res:set_json_rsp(rsp_body.error_rsp(CODE.TOKEN_EXPIRED, msg))
+                    rsp_body.set_rsp(context, nil ,CODE.TOKEN_EXPIRED, msg)
                 else
-                    context.res:set_json_rsp(rsp_body.error_rsp(CODE.ILLEGAL_TOKEN, msg))
+                    rsp_body.set_rsp(context, nil ,CODE.ILLEGAL_TOKEN, msg)
                 end
                 log.error("token 失效:",msg)
                 context:abort()
