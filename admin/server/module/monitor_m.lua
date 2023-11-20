@@ -44,6 +44,11 @@ local function rigister_rotate(cluster_name,server_name,file_path,file_name)
 
     if contriner_client:instance("logrotate_m"):mod_call("add_rotate", SELF_ADDRESS, cfg) then
         g_rigister_info[cluster_name][server_name] = file_name
+
+        --logrotate的服务更新之后需要重新发送切割任务
+        contriner_client:add_updated_cb("logrotate_m",function()
+            contriner_client:instance("logrotate_m"):mod_call("add_rotate", SELF_ADDRESS, cfg)
+        end)
     else
         log.error("rigister_rotate err ",cluster_name,server_name,file_path,file_name)
     end
