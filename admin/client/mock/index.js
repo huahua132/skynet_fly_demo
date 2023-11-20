@@ -3,14 +3,12 @@ const { param2Obj } = require('./utils')
 
 const user = require('./user')
 const role = require('./role')
-const table = require('./table')
 const monitor = require('./monitor')
 const realtimelist = require('./realtimelist')
 
 const mocks = [
   ...user,
   ...role,
-  ...table,
   ...monitor,
   ...realtimelist,
 ]
