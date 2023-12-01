@@ -94,7 +94,7 @@ return {
 		launch_num = 1,
 		default_arg = {
 			node_map = {
-				['admin_server'] = true,   --连接后台节点
+				['logserver'] = true,
 			},
 			watch = 'redis',  --监听redis的方式做服务发现
 		}
