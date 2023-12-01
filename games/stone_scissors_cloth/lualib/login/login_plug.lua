@@ -23,6 +23,8 @@ M.unpack = pbnet_util.unpack
 --指定发包函数
 M.send = pbnet_util.send
 
+M.broadcast = pbnet_util.broadcast
+
 --登录检测函数 packname,pack_body是解包函数返回的
 --登入成功后返回玩家id
 function M.check(packname,pack_body)

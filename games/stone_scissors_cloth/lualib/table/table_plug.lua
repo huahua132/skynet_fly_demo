@@ -19,6 +19,7 @@ local g_instance = nil
 local g_table_conf = module_cfg.table_conf
 
 M.send = pbnet_util.send
+M.broadcast = pbnet_util.broadcast
 
 function M.init(instance)
 	g_instance = instance

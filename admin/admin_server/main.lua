@@ -4,5 +4,8 @@ local contriner_launcher = require "contriner_launcher"
 skynet.start(function()
 	skynet.error("start admin server !!!>>>>>>>>>>>>>>>>>")
 	contriner_launcher.run()
+
+	--启动集群连接入口
+	skynet.uniqueservice("cluster_server")
 	skynet.exit()
 end)

@@ -31,6 +31,7 @@ function M.init(interface_mgr)
 end
 
 M.send = ws_pbnet_util.send
+M.broadcast = ws_pbnet_util.broadcast
 
 --游戏桌子创建者
 function M.table_creator(table_id)

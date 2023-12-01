@@ -2,7 +2,9 @@ local skynet = require "skynet"
 local contriner_launcher = require "contriner_launcher"
 
 skynet.start(function()
+	skynet.call('.logger','lua','add_hook','log_hook')
 	skynet.error("start chinese_chess>>>>>>>>>>>>>>>>>")
+
 	contriner_launcher.run()
 
 	--启动集群连接入口

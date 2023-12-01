@@ -13,6 +13,12 @@ return {
 					db = 0,
 				},
 			},
+
+			--cluster_server用的配置
+			cluster_server = {
+				host = "127.0.0.1:9688",
+				register = "redis",        --连接信息注册到redis
+			},
 		}
 	},
 
@@ -97,4 +103,7 @@ return {
         launch_seq = 8,
         launch_num = 1,
     },
+
+	--集群服务端
+	
 }

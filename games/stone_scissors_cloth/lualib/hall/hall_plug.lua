@@ -26,6 +26,8 @@ M.unpack = pbnet_util.unpack
 --指定发包函数
 M.send = pbnet_util.send
 
+M.broadcast = pbnet_util.broadcast
+
 M.disconn_time_out = timer.minute
 
 --初始化

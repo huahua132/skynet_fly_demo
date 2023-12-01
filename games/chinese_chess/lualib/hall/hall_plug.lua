@@ -15,6 +15,7 @@ local M = {}
 --指定解包函数
 M.unpack = ws_pbnet_util.unpack
 M.send = ws_pbnet_util.send
+M.broadcast = ws_pbnet_util.broadcast
 M.disconn_time_out = timer.minute                   --掉线一分钟就清理
 
 local function matchReq(player_id,packname,pack_body)

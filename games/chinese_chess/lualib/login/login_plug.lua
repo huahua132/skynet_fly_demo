@@ -20,6 +20,8 @@ M.unpack = ws_pbnet_util.unpack
 --发包函数
 M.send = ws_pbnet_util.send
 
+M.broadcast = ws_pbnet_util.broadcast
+
 function M.init(interface_mgr)
 	--加载pb文件
 	pb_netpack.load('../../common/proto')
