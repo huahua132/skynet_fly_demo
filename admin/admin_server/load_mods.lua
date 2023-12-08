@@ -94,7 +94,8 @@ return {
         launch_num = 1,
         default_arg = {
             node_list = {
-                'chinese_chess',             --象棋
+                'chinese_chess',             --象棋游戏
+				'logserver',                 --日志服务
             }
         }
     },
@@ -103,7 +104,4 @@ return {
         launch_seq = 8,
         launch_num = 1,
     },
-
-	--集群服务端
-	
 }
