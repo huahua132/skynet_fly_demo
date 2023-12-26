@@ -15,17 +15,17 @@ export function addRole(data) {
   })
 }
 
-export function updateRole(id, data) {
+export function updateRole(name, data) {
   return request({
-    url: `/role/role/${id}`,
+    url: `/role/role/${name}`,
     method: 'put',
     data
   })
 }
 
-export function deleteRole(id) {
+export function deleteRole(name) {
   return request({
-    url: `/role/role/${id}`,
+    url: `/role/role/${name}`,
     method: 'delete'
   })
 }

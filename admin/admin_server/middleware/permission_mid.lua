@@ -1,6 +1,7 @@
 local log = require "log"
 local CODE = require "CODE"
 local rsp_body = require "rsp_body"
+local table_util = require "table_util"
 
 local string = string
 
@@ -30,7 +31,14 @@ function M.auth()
         local method = params._method
         method = string.upper(method)
         local pathmap = g_path_map[method]
+        --没有权限控制
         if not pathmap or not pathmap[path] then
+            context:next()
+            return
+        end
+        local roles = token_auth.roles
+        log.info("roles>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>",roles, table_util.inlist(roles, "admin"))
+        if table_util.inlist(roles, "admin") then
             context:next()
             return
         end

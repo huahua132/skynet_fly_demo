@@ -3,11 +3,6 @@
     <el-button type="primary" @click="handleAddRole">新建角色</el-button>
 
     <el-table :data="rolesList" style="width: 100%;margin-top:30px;" border>
-      <el-table-column align="center" label="Role Key" width="220">
-        <template slot-scope="scope">
-          {{ scope.row.key }}
-        </template>
-      </el-table-column>
       <el-table-column align="center" label="Role Name" width="220">
         <template slot-scope="scope">
           {{ scope.row.name }}
@@ -77,7 +72,6 @@ import { asyncRoutes } from '@/router'
 import { getRoles, addRole, deleteRole, updateRole } from '@/api/role'
 
 const defaultRole = {
-  key: '',
   name: '',
   description: '',
   routes: []
@@ -121,7 +115,12 @@ export default {
     },
     async getRoles() {
       const res = await getRoles()
-      this.rolesList = res.data
+      console.log("getRoles >>> ",res.data, Array.isArray(res.data))
+      if (Array.isArray(res.data)) {
+        this.rolesList = res.data
+      } else {
+        this.rolesList = []
+      }
     },
 
     // Reshape the routes structure so that it looks the same as the sidebar
@@ -194,7 +193,7 @@ export default {
         type: 'warning'
       })
         .then(async() => {
-          await deleteRole(row.key)
+          await deleteRole(row.name)
           this.rolesList.splice($index, 1)
           this.$message({
             type: '成功',
@@ -240,26 +239,26 @@ export default {
       this.role.routes = this.generateTree(deepClone(this.serviceRoutes), '/', readCheckedKeys, writeCheckedKeys).routes
       console.log("confirmRole>>> ", this.role.routes, writeCheckedKeys)
       if (isEdit) {
-        await updateRole(this.role.key, this.role)
+        await updateRole(this.role.name, this.role)
         for (let index = 0; index < this.rolesList.length; index++) {
-          if (this.rolesList[index].key === this.role.key) {
+          if (this.rolesList[index].name === this.role.name) {
             this.rolesList.splice(index, 1, Object.assign({}, this.role))
             break
           }
         }
       } else {
         const { data } = await addRole(this.role)
-        this.role.key = data.key
+        console.log("add succ>>>>>>>>>>>>>>>>>", data.name)
+        this.role.name = data.name
         this.rolesList.push(this.role)
       }
 
-      const { description, key, name } = this.role
+      const { description, name } = this.role
       this.dialogVisible = false
       this.$notify({
         title: '成功',
         dangerouslyUseHTMLString: true,
         message: `
-            <div>Role Key: ${key}</div>
             <div>Role Name: ${name}</div>
             <div>Description: ${description}</div>
           `,

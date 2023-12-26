@@ -1,11 +1,12 @@
-local mysqlf = require "mysqlf"
 local log = require "log"
 local json = require "cjson"
 local CODE = require "CODE"
-local mysql = require "mysql"
 local contriner_client = require "contriner_client"
+local orm_table_client = require "orm_table_client"
 
 contriner_client:register("signature_m")
+
+local g_roles_client = orm_table_client:new("roles")
 
 local string = string
 local ipairs = ipairs
@@ -89,59 +90,40 @@ function M.merge_routes(one_routes,two_routes)
     return merge_routes(one_routes,two_routes)
 end
 
+--查询所有角色
 function M.get_all_roles()
-    local sql = "select * from roles"
-    local sql_ret = mysqlf:instance():query(sql)
-    if not sql_ret then
-        log.info("sql err ",sql)
-        return 
-    end
-
-    for i,one_rote in ipairs(sql_ret) do
+    local res = g_roles_client:get_all()
+    for i,one_rote in ipairs(res) do
         one_rote.routes = json.decode(one_rote.routes)
     end
-    
-    return sql_ret
+    return res
 end
 
+--添加角色
 function M.add_role(new_role)
     new_role.routes = json.encode(trim_routes(new_role.routes))
-
-    log.info("new_role>>",new_role)
-
-    local sql = string.format("insert into roles(`name`,`description`,`routes`) value('%s','%s','%s');",new_role.name,new_role.description,new_role.routes)
-    local sql_ret = mysqlf:instance():query(sql)
-    if not sql_ret or sql_ret.errno then
-        return nil,CODE.ERR_SERVER,"insert err"
-    end
-
-    log.info("sql_ret:",sql_ret)
+    log.info("add_role>>",new_role)
+    
     return {
-        key = sql_ret.insert_id
+        name = g_roles_client:add(new_role)
     }
 end
 
-function M.update_role(key,role)
+function M.update_role(name,role)
     role.routes = json.encode(trim_routes(role.routes))
 
     log.info("update_role>>",role)
-    
-    local sql = string.format("update roles set `name`='%s',`description`='%s',`routes`= '%s' where `key`= %s;",role.name,role.description,role.routes,key)
-    log.info("sql:",sql)
-    local sql_ret = mysqlf:instance():query(sql)
-    if not sql_ret or sql_ret.errno then
+    if not g_roles_client:update(role) then
         return nil,CODE.ERR_SERVER,"update err"
     end
 
     contriner_client:instance("signature_m"):mod_call("refresh")   --刷新密钥，使之前的token失效
-    log.info("sql_ret:",sql_ret)
+
     return "success"
 end
 
-function M.del_role(key)
-    local sql = string.format("delete from roles where `key` = %s;",key)
-    local sql_ret = mysqlf:instance():query(sql)
-    if not sql_ret or sql_ret.errno then
+function M.del_role(name)
+    if not g_roles_client:delete(name) then
         return nil,CODE.ERR_SERVER,"delete err"
     end
 

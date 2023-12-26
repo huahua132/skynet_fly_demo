@@ -21,22 +21,22 @@ return function(group)
         rsp_body.set_rsp(c,data,code,msg)
     end)
 
-    permission_mid.set('put',group:calculate_absolute_path('/role/:key'),client_path .. '/role')
-    group:put('/role/:key',function(c)
+    permission_mid.set('put',group:calculate_absolute_path('/role/:name'),client_path .. '/role')
+    group:put('/role/:name',function(c)
         local role = c.req.body
         local params = c.params
-		local key = params.key
-        assert(key, "not key")
+		local name = params.name
+        assert(name, "not name")
         assert(role, "not role")
-        local data,code,msg = model_role.update_role(key, role)
+        local data,code,msg = model_role.update_role(name, role)
         rsp_body.set_rsp(c,data,code,msg)
     end)
 
-    permission_mid.set('delete',group:calculate_absolute_path('/role/:key'),client_path .. '/role')
-    group:delete('/role/:key',function(c)
+    permission_mid.set('delete',group:calculate_absolute_path('/role/:name'),client_path .. '/role')
+    group:delete('/role/:name',function(c)
         local params = c.params
-		local key = params.key
-        local data,code,msg = model_role.del_role(key)
+		local name = params.name
+        local data,code,msg = model_role.del_role(name)
         rsp_body.set_rsp(c,data,code,msg)
     end)
 end

@@ -36,7 +36,9 @@ function M.login(username, password)
 
     for _,one_role in ipairs(user_info.roles) do
         local one_route = role_info_map[one_role]
-        routes = model_role.merge_routes(routes, one_route.routes)
+        if one_route then
+            routes = model_role.merge_routes(routes, one_route.routes)
+        end
     end
 
     local routes_map = {}
