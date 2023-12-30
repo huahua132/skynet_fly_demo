@@ -4,6 +4,9 @@ local mysqlf = require "mysqlf"
 local log = require "log"
 local CODE = require "CODE"
 local json = require "cjson"
+local orm_table_client = require "orm_table_client"
+
+local g_users_client = orm_table_client:new("users")
 
 local string = string
 local ipairs = ipairs
@@ -57,14 +60,11 @@ function M.login(username, password)
 end
 
 function M.get_info(username)
-    local sql = string.format("select * from users where username = '%s'\n", username)
-    local user_info = mysqlf:instance():query(sql)
-    if not user_info or #user_info <= 0 then
-        log.info("can`t select user ",username)
-        return nil,CODE.NOT_USER,"not user"
+    local user_info = g_users_client:get(username)
+    if not user_info then
+        return
     end
-
-    user_info = user_info[1]
+    
     user_info.roles = json.decode(user_info.roles)
     log.info("user_info>>",user_info)
     return user_info

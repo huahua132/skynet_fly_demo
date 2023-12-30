@@ -79,12 +79,10 @@ return {
 	-- orm
 	orm_table_m = {
 		launch_seq = 5500,
-		launch_num = 1,
+		launch_num = 2,
 		mod_args = {
-			{
-				instance_name = "roles",
-				orm_plug = "roles_entity",
-			}
+			{instance_name = "roles",orm_plug = "roles_entity"},
+			{instance_name = "users",orm_plug = "users_entity"},
 		}
 	},
 
