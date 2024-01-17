@@ -27,8 +27,9 @@ function M.auth()
 
         local routes_map = token_auth.routes_map
         local params = context.params
-        local path = params._path
-        local method = params._method
+        local matched = context.matched
+        local path = matched.path
+        local method = context.req.method
         method = string.upper(method)
         local pathmap = g_path_map[method]
         --没有权限控制

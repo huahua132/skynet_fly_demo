@@ -13,7 +13,7 @@ return function(group)
         rsp_body.set_rsp(c,roles,CODE.ERR_SERVER,"")
     end)
 
-    permission_mid.set('post',group:calculate_absolute_path('/role'),client_path .. '/role')
+    permission_mid.set('post',group:calculate_absolute_convert_path('/role'),client_path .. '/role')
     group:post('/role',function(c)
         local new_role = c.req.body
 
@@ -21,7 +21,7 @@ return function(group)
         rsp_body.set_rsp(c,data,code,msg)
     end)
 
-    permission_mid.set('put',group:calculate_absolute_path('/role/:name'),client_path .. '/role')
+    permission_mid.set('put',group:calculate_absolute_convert_path('/role/:name'),client_path .. '/role')
     group:put('/role/:name',function(c)
         local role = c.req.body
         local params = c.params
@@ -32,7 +32,7 @@ return function(group)
         rsp_body.set_rsp(c,data,code,msg)
     end)
 
-    permission_mid.set('delete',group:calculate_absolute_path('/role/:name'),client_path .. '/role')
+    permission_mid.set('delete',group:calculate_absolute_convert_path('/role/:name'),client_path .. '/role')
     group:delete('/role/:name',function(c)
         local params = c.params
 		local name = params.name
