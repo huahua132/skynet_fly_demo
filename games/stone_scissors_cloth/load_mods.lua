@@ -17,7 +17,7 @@ return {
 			},
 
 			server_cfg = {
-				debug_port = 8002,
+				debug_port = 8012,
 			}
 		}
 	},
