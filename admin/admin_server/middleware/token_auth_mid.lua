@@ -1,5 +1,5 @@
 local jwt = require "luajwtjitsi"
-local rax = require "rax"
+local radix_router = require "radix-router"
 local time_util = require "time_util"
 local CODE = require "CODE"
 local rsp_body = require "rsp_body"
@@ -13,6 +13,7 @@ contriner_client:register("signature_m")
 local assert = assert
 local type = type
 local pairs = pairs
+local tinsert = table.insert
 
 local g_is_eixt = false
 local g_signature = nil --私钥
@@ -48,9 +49,15 @@ function M.create_token(username,roles,routes_map)
 end
  
 function M.auth(white_list) --验证白名单
-    local w_router = rax:new()
+    local routes = {}
     for _,path in pairs(white_list) do
-        w_router:insert("GET", path, true)
+        tinsert(routes, {paths = {path}, handler = true})
+    end
+
+    local w_router,err = radix_router.new(routes)
+    if not w_router then
+        log.fatal("radix_router.new err ", err)
+        return
     end
 
     skynet.fork(function()
@@ -62,7 +69,7 @@ function M.auth(white_list) --验证白名单
 
     return function(context)
         local request_path = context.req.path
-        local in_white_list = w_router:match(request_path, "GET")
+        local in_white_list = w_router:match(request_path)
         if in_white_list then
             context.token_auth = {
                 is_white = true   --白名单
