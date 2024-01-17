@@ -19,6 +19,10 @@ return {
 				host = "127.0.0.1:9689",
 				register = "redis",        --连接信息注册到redis
 			},
+
+			server_cfg = {
+				debug_port = 10001,
+			}
 		}
 	},
 

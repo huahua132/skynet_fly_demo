@@ -14,6 +14,10 @@ return {
 					maxclient = 2048,
 				},
 				login_plug = "login_plug",  --login加载的插件lua模块文件名
+			},
+
+			server_cfg = {
+				debug_port = 8002,
 			}
 		}
 	},
