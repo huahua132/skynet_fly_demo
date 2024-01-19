@@ -7,6 +7,7 @@ local contriner_client = require "contriner_client"
 local log = require "log"
 local string = require "string"
 local skynet = require "skynet"
+local file_util = require "file_util"
 
 contriner_client:register("signature_m")
 
@@ -51,7 +52,7 @@ end
 function M.auth(white_list) --验证白名单
     local routes = {}
     for _,path in pairs(white_list) do
-        tinsert(routes, {paths = {path}, handler = true})
+        tinsert(routes, {paths = {file_util.convert_path(path)}, handler = true})
     end
 
     local w_router,err = radix_router.new(routes)
@@ -70,6 +71,7 @@ function M.auth(white_list) --验证白名单
     return function(context)
         local request_path = context.req.path
         local in_white_list = w_router:match(request_path)
+        log.info("token_auth_mid:", request_path, in_white_list)
         if in_white_list then
             context.token_auth = {
                 is_white = true   --白名单
