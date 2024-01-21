@@ -1,3 +1,6 @@
+local redis_cfg = require "redis_cfg"
+local mysql_cfg = require "mysql_cfg"
+
 return {
     --共享配置
 	share_config_m = {
@@ -6,12 +9,7 @@ return {
 		default_arg = {     --默认配置
 			redis = {
 				--rpc连接配置
-				rpc = {
-					host = '127.0.0.1',
-					port = 6379,
-					auth = '123456',
-					db = 0,
-				},
+				rpc = redis_cfg.rpc,
 			},
 
 			--cluster_server用的配置
@@ -69,14 +67,7 @@ return {
 		launch_seq = 5000,
 		launch_num = 6, --启动6个
         default_arg = {
-            db_conf = {
-                host = '127.0.0.1',
-                port = '3306',
-                max_packet_size = 1048576,
-                user = 'root',
-                password = '123456',
-                database = 'admin',
-            }
+            db_conf = mysql_cfg.admin,
         }
 	},
 
