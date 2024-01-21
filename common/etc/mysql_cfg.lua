@@ -1,4 +1,4 @@
-local table_util = require "table_util"
+--mysql的配置
 
 local db1 = {
     host = '127.0.0.1',

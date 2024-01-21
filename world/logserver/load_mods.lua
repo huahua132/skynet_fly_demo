@@ -1,3 +1,7 @@
+local server_cfg = loadfile("../../common/etc/server_cfg.lua")()
+local redis_cfg = loadfile("../../common/etc/redis_cfg.lua")()
+local cluster_server_cfg = loadfile("../../common/etc/cluster_server_cfg.lua")()
+
 return {
         --共享配置
 	share_config_m = {
@@ -6,23 +10,13 @@ return {
 		default_arg = {     --默认配置
 			redis = {
 				--rpc连接配置
-				rpc = {
-					host = '127.0.0.1',
-					port = 6379,
-					auth = '123456',
-					db = 0,
-				},
+				rpc = redis_cfg.rpc
 			},
 
 			--cluster_server用的配置
-			cluster_server = {
-				host = "127.0.0.1:9901",
-				register = "redis",        --连接信息注册到redis
-			},
+			cluster_server = cluster_server_cfg.world.logserver,
 
-			server_cfg = {
-				debug_port = 9001,
-			}
+			server_cfg = server_cfg.world.logserver
 		}
 	},
     	--debug入口

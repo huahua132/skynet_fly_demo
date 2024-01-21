@@ -1,3 +1,8 @@
+local redis_cfg = loadfile("../../common/etc/redis_cfg.lua")()
+local server_cfg = loadfile("../../common/etc/server_cfg.lua")()
+local gate_cfg = loadfile("../../common/etc/gate_cfg.lua")()
+local cluster_server_cfg = loadfile("../../common/etc/cluster_server_cfg.lua")()
+
 return {
 	--共享配置
 	share_config_m = {
@@ -8,33 +13,19 @@ return {
 			room_game_login = {
 				gateservice = "ws_gate", --gate 或者 ws_gate
 				--gate连接配置
-				gateconf = {
-					address = '0.0.0.0',
-					port = 8001,
-					maxclient = 2048,
-				},
+				gateconf = gate_cfg.games.chinese_chess,
 				login_plug = "login_plug",  --login加载的插件lua模块文件名
 			},
 
 			redis = {
 				--rpc连接配置
-				rpc = {
-					host = '127.0.0.1',
-					port = 6379,
-					auth = '123456',
-					db = 0,
-				},
+				rpc = redis_cfg.rpc,
 			},
 
 			--cluster_server用的配置
-			cluster_server = {
-				host = "127.0.0.1:9688",
-				register = "redis",        --连接信息注册到redis
-			},
+			cluster_server = cluster_server_cfg.games.chinese_chess,
 
-			server_cfg = {
-				debug_port = 8011,
-			}
+			server_cfg = server_cfg.games.chinese_chess,
 		}
 	},
 

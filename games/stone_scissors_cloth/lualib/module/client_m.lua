@@ -8,6 +8,7 @@ local table_util = require "table_util"
 local DOGIN_TYPE = require "DOGIN_TYPE"
 
 local net_util = require "pbnet_util"
+local gate_cfg = require "gate_cfg"
 
 local CMD = {}
 
@@ -18,7 +19,7 @@ local function dispatch(fd,packname,res)
 end
 
 local function connnect(handle)
-	local fd = socket.open('127.0.0.1',8001)
+	local fd = socket.open('127.0.0.1',gate_cfg.games.stone_scissors_cloth.port)
 	if not fd then
 		log.error("connect faild ")
 		return

@@ -24,7 +24,7 @@ return function(log_str,msg)
 
         if not warn_cache:get_cache(substr) then
             warn:one_mod_send("report",svr_name,svr_id,log_str)
-            warn_cache:set_cache(substr)
+            warn_cache:set_cache(substr, true)
         end
     end
 end

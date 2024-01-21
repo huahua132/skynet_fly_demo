@@ -1,5 +1,7 @@
-local redis_cfg = require "redis_cfg"
-local mysql_cfg = require "mysql_cfg"
+local redis_cfg = loadfile("../../common/etc/redis_cfg.lua")()
+local mysql_cfg = loadfile("../../common/etc/mysql_cfg.lua")()
+local server_cfg = loadfile("../../common/etc/server_cfg.lua")()
+local cluster_server_cfg = loadfile("../../common/etc/cluster_server_cfg.lua")()
 
 return {
     --共享配置
@@ -13,10 +15,7 @@ return {
 			},
 
 			--cluster_server用的配置
-			cluster_server = {
-				host = "127.0.0.1:9689",
-				register = "redis",        --连接信息注册到redis
-			},
+			cluster_server = cluster_server_cfg.admin.admin_server,
 
 			server_cfg = {
 				debug_port = 10001,
@@ -68,6 +67,7 @@ return {
 		launch_num = 6, --启动6个
         default_arg = {
             db_conf = mysql_cfg.admin,
+			is_create = true,				--数据库不存在就创建
         }
 	},
 

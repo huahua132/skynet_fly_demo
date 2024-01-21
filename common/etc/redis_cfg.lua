@@ -1,3 +1,5 @@
+--redis的配置
+
 local db1 = {
     host = '127.0.0.1',
     port = 6379,
@@ -8,4 +10,5 @@ local db1 = {
 local M = {}
 
 M.rpc = db1
+
 return M

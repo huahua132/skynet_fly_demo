@@ -1,3 +1,8 @@
+local redis_cfg = loadfile("../../common/etc/redis_cfg.lua")()
+local server_cfg = loadfile("../../common/etc/server_cfg.lua")()
+local gate_cfg = loadfile("../../common/etc/gate_cfg.lua")()
+local cluster_server_cfg = loadfile("../../common/etc/cluster_server_cfg.lua")()
+
 return {
 	--共享配置
 	share_config_m = {
@@ -8,17 +13,11 @@ return {
 			room_game_login = {
 				gateservice = "gate", --gate 或者 wsgate
 				--gate连接配置
-				gateconf = {
-					address = '127.0.0.1',
-					port = 8001,
-					maxclient = 2048,
-				},
+				gateconf = gate_cfg.games.stone_scissors_cloth,
 				login_plug = "login_plug",  --login加载的插件lua模块文件名
 			},
 
-			server_cfg = {
-				debug_port = 8012,
-			}
+			server_cfg = server_cfg.games.stone_scissors_cloth,
 		}
 	},
 
