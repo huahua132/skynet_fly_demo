@@ -60,7 +60,7 @@ function M.login(username, password)
 end
 
 function M.get_info(username)
-    local user_info = g_users_client:get(username)
+    local user_info = g_users_client:get_one_entry(username)
     if not user_info then
         return
     end

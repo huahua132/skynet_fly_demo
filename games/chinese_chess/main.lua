@@ -1,5 +1,8 @@
 local skynet = require "skynet"
 local contriner_launcher = require "contriner_launcher"
+local timer_point = require "timer_point"
+local time_util = require "time_util"
+local log = require "log"
 
 skynet.start(function()
 	skynet.error("start chinese_chess>>>>>>>>>>>>>>>>>")
@@ -10,6 +13,9 @@ skynet.start(function()
 	skynet.uniqueservice("room_game_login")
 
 	skynet.call('.logger','lua','add_hook','log_hook')
-	
-	skynet.exit()
+
+	timer_point:new(timer_point.EVERY_MINUTE)
+    :builder(function()
+        log.info("每分钟:", os.date("[%Y%m%d %H:%M:%S",time_util.time()))
+    end)
 end)

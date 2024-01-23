@@ -92,7 +92,7 @@ end
 
 --查询所有角色
 function M.get_all_roles()
-    local res = g_roles_client:get_all()
+    local res = g_roles_client:get_all_entry()
     for i,one_rote in ipairs(res) do
         one_rote.routes = json.decode(one_rote.routes)
     end
@@ -104,16 +104,14 @@ function M.add_role(new_role)
     new_role.routes = json.encode(trim_routes(new_role.routes))
     log.info("add_role>>",new_role)
     
-    return {
-        name = g_roles_client:add(new_role)
-    }
+    return g_roles_client:create_one_entry(new_role)
 end
 
 function M.update_role(name,role)
     role.routes = json.encode(trim_routes(role.routes))
 
     log.info("update_role>>",role)
-    if not g_roles_client:update(role) then
+    if not g_roles_client:change_save_one_entry(role) then
         return nil,CODE.ERR_SERVER,"update err"
     end
 
@@ -123,7 +121,7 @@ function M.update_role(name,role)
 end
 
 function M.del_role(name)
-    if not g_roles_client:delete(name) then
+    if not g_roles_client:delete_entry(name) then
         return nil,CODE.ERR_SERVER,"delete err"
     end
 
