@@ -7,6 +7,7 @@ local timer = require "timer"
 
 local pairs = pairs
 local next = next
+local assert = assert
 
 local NOT_RET = {}
 local CMD = {}
@@ -27,6 +28,7 @@ local function create_signature()
 end
 
 function CMD.watch(source, oldsignature)
+    assert(not g_watch_map[source])
     log.info("watch ", skynet.self(), source, not oldsignature, oldsignature ~= g_random_signature)
     if not oldsignature or oldsignature ~= g_random_signature then
         return g_random_signature
