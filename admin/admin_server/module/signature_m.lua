@@ -4,12 +4,14 @@ local skynet_util = require "skynet_util"
 local skynet = require "skynet"
 local log = require "log"
 local timer = require "timer"
+local watch_syn = require "watch_syn"
 
 local pairs = pairs
 local next = next
 local assert = assert
 
-local NOT_RET = {}
+local watch_server = nil
+
 local CMD = {}
 
 local g_watch_map = {}
@@ -22,32 +24,7 @@ local function create_signature()
     local randomstr = crypt.randomkey()
     g_random_signature = g_signature .. randomstr .. time_util.time()
 
-    for src,rsp in pairs(g_watch_map) do
-        CMD.unwatch(src)
-    end
-end
-
-function CMD.watch(source, oldsignature)
-    assert(not g_watch_map[source])
-    log.info("watch ", skynet.self(), source, not oldsignature, oldsignature ~= g_random_signature)
-    if not oldsignature or oldsignature ~= g_random_signature then
-        return g_random_signature
-    end
-
-    g_watch_map[source] = skynet.response()
-
-    return NOT_RET
-end
-
-function CMD.unwatch(source)
-    local rsp = g_watch_map[source]
-    if not rsp then
-        return false
-    end
-
-    rsp(true, g_random_signature)
-    g_watch_map[source] = nil
-    return true
+    watch_server:publish("signature", g_random_signature)
 end
 
 function CMD.refresh()
@@ -55,33 +32,16 @@ function CMD.refresh()
 end
 
 function CMD.start()
-    skynet_util.lua_dispatch(CMD,NOT_RET)
+    watch_server:register("signature", g_signature)
+    skynet_util.lua_dispatch(CMD)
     create_signature()
     return true
-end
-
-function CMD.fix_exit()
-    log.error("signature_m 确认要退出")
-    timer:new(timer.second * 5,timer.loop,function()
-        for src,rsp in pairs(g_watch_map) do
-            log.error("确认要退出 signature src ",src)
-            CMD.unwatch(src)
-        end
-    end)
-end
-
-function CMD.check_exit()
-    log.error("signature_m 检测是否可以退出")
-    if not next(g_watch_map) then
-        log.error("signature_m 检测可以退出")
-        return true
-    else
-        return false
-    end
 end
 
 function CMD.exit()
     return true
 end
+
+watch_server = watch_syn.new_server(CMD)
 
 return CMD

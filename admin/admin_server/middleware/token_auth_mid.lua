@@ -8,6 +8,8 @@ local log = require "log"
 local string = require "string"
 local skynet = require "skynet"
 local file_util = require "file_util"
+local watch_syn = require "watch_syn"
+local contriner_watch_interface = require "contriner_watch_interface"
 
 contriner_client:register("signature_m")
 
@@ -16,15 +18,8 @@ local type = type
 local pairs = pairs
 local tinsert = table.insert
 
-local g_is_eixt = false
+local watch_client = nil
 local g_signature = nil --私钥
-
-local old_skynet_exit = skynet.exit
-
-function skynet.exit()
-    g_is_eixt = true
-    contriner_client:instance("signature_m"):mod_call("unwatch",skynet.self())
-end
 
 local M = {}
 
@@ -62,8 +57,11 @@ function M.auth(white_list) --验证白名单
     end
 
     skynet.fork(function()
-        while not g_is_eixt do
-            g_signature = contriner_client:instance("signature_m"):mod_call("watch",skynet.self(),g_signature)
+        watch_client = watch_syn.new_client(contriner_watch_interface:new("signature_m"))
+        watch_client:watch("signature")
+        g_signature = watch_client:await_get("signature")
+        while watch_client:is_watch("signature") do
+            g_signature = watch_client:await_update("signature")
             log.info("watch g_signature:",g_signature)
         end
     end)
