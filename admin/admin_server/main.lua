@@ -10,8 +10,16 @@ skynet.start(function()
 
 	--启动集群连接入口
 	skynet.uniqueservice("cluster_server")
+
+	skynet.call('.logger','lua','add_hook','log_hook')
+
 	timer_point:new(timer_point.EVERY_MINUTE)
     :builder(function()
         log.info("每分钟:", os.date("[%Y%m%d %H:%M:%S",time_util.time()))
     end)
+
+	timer_point:new(timer_point.EVERY_MINUTE)
+	:builder(function()
+		log.fatal("测试错误日志上报:", os.date("[%Y%m%d %H:%M:%S",time_util.time()))
+	end)
 end)

@@ -5,12 +5,14 @@ const user = require('./user')
 const role = require('./role')
 const monitor = require('./monitor')
 const realtimelist = require('./realtimelist')
+const warnlog = require('./warnlog')
 
 const mocks = [
   ...user,
   ...role,
   ...monitor,
   ...realtimelist,
+  ...warnlog,
 ]
 
 // for front mock

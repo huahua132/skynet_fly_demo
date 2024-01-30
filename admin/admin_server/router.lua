@@ -2,10 +2,12 @@ local user_router = require "user_router"
 local role_router = require "role_router"
 local monitor_router = require "monitor_router"
 local realtimelist_router = require "realtimelist_router"
+local warnlog_router = require "warnlog_router"
 
 return function(app)
-    user_router(app:group("/user"))
-    role_router(app:group("/role"))
-    monitor_router(app:group("/monitor"))
-    realtimelist_router(app:group("/realtimelist"))
+    user_router(app:group("/user"))                     --用户模块
+    role_router(app:group("/role"))                     --角色模块
+    monitor_router(app:group("/monitor"))               --服务监控
+    realtimelist_router(app:group("/realtimelist"))     --服务实时信息
+    warnlog_router(app:group("/warnlog"))               --警告日志
 end

@@ -69,6 +69,19 @@ export const constantRoutes = [
       }
     ]
   },
+
+  {
+    path: '/warnlog',
+    component: Layout,
+    children: [
+      {
+        path : 'index',
+        name : 'WarnLog',
+        component: () => import('@/views/warnlog/index'),
+        meta: {title: '警告日志'},
+      }
+    ]
+  },
 ]
 
 /**
