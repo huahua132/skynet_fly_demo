@@ -5,6 +5,8 @@ local log = require "log"
 local CODE = require "CODE"
 local json = require "cjson"
 local orm_table_client = require "orm_table_client"
+local crypt_util = require "crypt_util"
+local crypt = require "skynet.crypt"
 
 local g_users_client = orm_table_client:new("users")
 
@@ -14,11 +16,14 @@ local ipairs = ipairs
 local M = {}
 
 function M.login(username, password)
-    local user_info,code,msg = M.get_info(username)
+    local user_info,code,msg = g_users_client:get_one_entry(username)
     if not user_info then
-        return user_info,code,msg
+        log.info("use not exists ", username)
+        return
     end
-
+    log.info("login:>>>", username, password)
+    password = crypt_util.HMAC.SHA256(password, crypt.base64decode(user_info.key))
+    log.info("login:>>>", user_info, password)
     if user_info.password ~= password then
         log.error("err password")
         return nil,CODE.ERR_PASSWORD, "err password"
@@ -64,7 +69,8 @@ function M.get_info(username)
     if not user_info then
         return
     end
-    
+    user_info.password = nil                        --密码不能发给客户端
+    user_info.key = nil                             --密钥也是
     user_info.roles = json.decode(user_info.roles)
     log.info("user_info>>",user_info)
     return user_info

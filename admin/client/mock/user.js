@@ -1,4 +1,7 @@
 
+
+const crypto = require('crypto');
+
 const tokens = {
   admin: {
     token: 'admin-token'
@@ -23,7 +26,45 @@ const users = {
   }
 }
 
+let challenge = ''
+let clinet_key = ''
+let server_key = ''
+let share_secret = ''
+
+
 module.exports = [
+  
+  {
+    url: '/user/handshake',
+    type: 'post',
+    response: config => {
+      console.log("user handshake>>>>>>>>>>>>>>>>>>>>>>>>>>", config.body)
+      let data = ''
+      if (challenge.length <= 0) {
+        challenge = crypto.randomBytes(8)
+        data = challenge.toString('base64')
+      }else if (clinet_key.length <= 0) {
+        clinet_key = Buffer.from(config.body.key, 'base64')
+        server_key = config.body.server_key
+        data = server_key
+        share_secret = Buffer.from(config.body.server_secret, 'base64')
+        console.log("server server_key:",server_key)
+        console.log("server share_secret:",share_secret.toString('base64'))
+      } else {
+        let clg = config.body.challenge
+        const hmac = crypto.createHmac('sha256', share_secret)
+        hmac.update(challenge)
+        const hash = hmac.digest('base64');
+        console.log('clg:', clg, hash)
+        data = "OK"
+      }
+
+      return {
+        code: 20000,
+        data: data
+      }
+    }
+  },
   // user login
   {
     url: '/user/login',
