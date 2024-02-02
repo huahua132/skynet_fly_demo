@@ -21,9 +21,7 @@ function M.login(username, password)
         log.info("use not exists ", username)
         return
     end
-    log.info("login:>>>", username, password)
     password = crypt_util.HMAC.SHA256(password, crypt.base64decode(user_info.key))
-    log.info("login:>>>", user_info, password)
     if user_info.password ~= password then
         log.error("err password")
         return nil,CODE.ERR_PASSWORD, "err password"
