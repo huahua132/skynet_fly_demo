@@ -24,6 +24,7 @@ function M.init()
     app:use(token_auth_mid.auth{
         "/",
         "/favicon.ico",
+        "/user/handshake",
         "/user/login",
         "/static/*filepath",
     })

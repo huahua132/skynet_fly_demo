@@ -1,5 +1,13 @@
 import request from '@/utils/request'
 
+export function handshake(data) {
+  return request({
+    url: '/user/handshake',
+    method: 'post',
+    data
+  })
+}
+
 export function login(data) {
   return request({
     url: '/user/login',
