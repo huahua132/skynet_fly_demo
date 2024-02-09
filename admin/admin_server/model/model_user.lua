@@ -21,12 +21,14 @@ function M.login(username, password)
         log.info("use not exists ", username)
         return
     end
+    
     password = crypt_util.HMAC.SHA256(password, crypt.base64decode(user_info.key))
     if user_info.password ~= password then
         log.error("err password")
         return nil,CODE.ERR_PASSWORD, "err password"
     end
-
+    
+    user_info.roles = json.decode(user_info.roles)
     local role_info = model_role.get_all_roles()
     if not role_info then
         log.error("get_all_roles err ")
@@ -57,8 +59,10 @@ function M.login(username, password)
             end
         end
     end
-
+    user_info.password = nil                        --密码不能发给客户端
+    user_info.key = nil                             --密钥也是
     log.info("login>>", user_info.roles, routes_map)
+
     return {token = token_auth_mid.create_token(username,user_info.roles,routes_map)} 
 end
 

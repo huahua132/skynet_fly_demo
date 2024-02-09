@@ -54,7 +54,7 @@ local function handshake(c)
 
         session.secret = serverec:compute_key(clientec)
 
-        log.info("secret:", crypt.base64encode(session.secret))
+        log.info("secret:", crypt.base64encode(session.secret), server_key)
     else
         
         -- stop 6 C2S : base64(HMAC(challenge, secret)) 回应服务器第一步握手的挑战码，确认握手正常。
