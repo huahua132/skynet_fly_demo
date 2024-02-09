@@ -2,15 +2,6 @@
 
 const crypto = require('crypto');
 
-const tokens = {
-  admin: {
-    token: 'admin-token'
-  },
-  developer: {
-    token: 'developer-token'
-  }
-}
-
 const users = {
   'admin-token': {
     roles: ['admin'],
@@ -70,20 +61,15 @@ module.exports = [
     url: '/user/login',
     type: 'post',
     response: config => {
-      const { username } = config.body
-      const token = tokens[username]
-      console.log("user login>>>>>>>>>>>>>>>>>>>>>>>>>>")
-      // mock error
-      if (!token) {
-        return {
-          code: 60204,
-          message: 'Account and password are incorrect.'
-        }
-      }
-
+      challenge = ''
+      clinet_key = ''
+      server_key = ''
+      share_secret = ''
       return {
         code: 20000,
-        data: token
+        data: {
+          token : "admin-token"
+        }
       }
     }
   },

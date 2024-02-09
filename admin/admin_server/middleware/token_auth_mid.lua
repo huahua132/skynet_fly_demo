@@ -8,8 +8,7 @@ local log = require "log"
 local string = require "string"
 local skynet = require "skynet"
 local file_util = require "file_util"
-local watch_syn = require "watch_syn"
-local contriner_watch_interface = require "contriner_watch_interface"
+local ENUM = require "ENUM"
 
 contriner_client:register("signature_m")
 
@@ -19,27 +18,25 @@ local pairs = pairs
 local tinsert = table.insert
 
 local watch_client = nil
-local g_signature = nil --私钥
 
 local M = {}
 
 function M.create_token(username,roles,routes_map)
-    if not g_signature then
-        log.error("not g_signature ")
-        return 
-    end
+    local signature = contriner_client:instance("signature_m"):mod_call("create", username)
+    assert(signature, "can`t create signature")
+
     local cur_time = time_util.time()
     local claim = {
-        iss = "skynet_fly_admin", --签发者
-        exp = cur_time + 3600,    --过期时间
-        nbf = cur_time,         --生效时间
+        iss = "skynet_fly_admin",               --签发者
+        exp = cur_time + ENUM.TOKEN_TIMEOUT,    --过期时间
+        nbf = cur_time,                         --生效时间
     }
 
     claim.username = username
     claim.roles = roles
     claim.routes_map = routes_map
      -- Create a token.
-    local token = assert(jwt.encode(claim, g_signature, "HS256"))
+    local token = assert(jwt.encode(claim, signature, "HS256"))
     assert(type(token) == "string")
     return token
 end
@@ -56,16 +53,6 @@ function M.auth(white_list) --验证白名单
         return
     end
 
-    skynet.fork(function()
-        watch_client = watch_syn.new_client(contriner_watch_interface:new("signature_m"))
-        watch_client:watch("signature")
-        g_signature = watch_client:await_get("signature")
-        while watch_client:is_watch("signature") do
-            g_signature = watch_client:await_update("signature")
-            log.info("watch g_signature:",g_signature)
-        end
-    end)
-
     return function(context)
         local request_path = context.req.path
         local in_white_list = w_router:match(request_path)
@@ -77,17 +64,16 @@ function M.auth(white_list) --验证白名单
             context:next()
         else
             local token = context.req.header['x-token']
-            if not token then
-                token = context.req.query["token"]
-            end
-
-            if not token then
+            local username = context.req.header['x-username']
+            log.info("token_auth_mid>>>>>>>>>>>>>>:", username)
+            if not token or not username then
                 rsp_body.set_rsp(context, nil ,CODE.ILLEGAL_TOKEN, "not token")
                 context:abort()
                 return
             end
 
-            local payload,msg = jwt.verify(token, "HS256", g_signature)
+            local signature = contriner_client:instance("signature_m"):mod_call("get", username)
+            local payload,msg = jwt.verify(token, "HS256", signature)
             if not payload then
                 --token失效
                 if msg == "Not acceptable by exp" then
