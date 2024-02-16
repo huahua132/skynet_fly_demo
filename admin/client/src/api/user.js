@@ -30,3 +30,33 @@ export function logout() {
     method: 'post'
   })
 }
+
+export function list() {
+  return request({
+    url: '/user/list',
+    method: 'get'
+  })
+}
+
+export function addUser(user) {
+  return request({
+    url: '/user/add',
+    method: 'post',
+    user
+  })
+}
+
+export function updateUser(name, data) {
+  return request({
+    url: `/user/up/${name}`,
+    method: 'put',
+    data
+  })
+}
+
+export function deleteUser(name) {
+  return request({
+    url: `/user/del/${name}`,
+    method: 'delete'
+  })
+}

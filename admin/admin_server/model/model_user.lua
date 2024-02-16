@@ -78,4 +78,16 @@ function M.get_info(username)
     return user_info
 end
 
+function M.list()
+    local user_list = g_users_client:get_all_entry()
+    for i = 1, #user_list do
+        local user_info = user_list[i]
+        user_info.password = nil                        --密码不能发给客户端
+        user_info.key = nil                             --密钥也是
+        user_info.roles = json.decode(user_info.roles)
+    end
+
+    return user_list
+end
+
 return M

@@ -112,9 +112,16 @@ local function logout(c)
     rsp_body.set_rsp(c,'success')
 end
 
+--用户列表
+local function list(c)
+    local data = model_user.list()
+    rsp_body.set_rsp(c, data)
+end
+
 return function(group)
     group:post('/handshake', handshake)
     group:post('/login',check_handshake, login)
-    group:get('/info',check_handshake, info)
-    group:post('/logout',check_handshake, logout)
+    group:get('/info', info)
+    group:post('/logout', logout)
+    group:get('/list', list)
 end

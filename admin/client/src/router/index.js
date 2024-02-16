@@ -98,7 +98,6 @@ export var asyncRoutes = [
     name: 'Permission',
     meta: {
       title: '权限管理',
-      icon: 'lock',
       roles: ['admin', 'developer'] // you can set roles in root nav
     },
     children: [
@@ -128,6 +127,26 @@ export var asyncRoutes = [
           title: '角色权限',
           roles: ['admin']
         }
+      },
+    ]
+  },
+  {
+    path: '/user',
+    component: Layout,
+    name: 'User',
+    meta: {
+      title: '用户管理',
+      roles: ['admin', 'developer'] // you can set roles in root nav
+    },
+    children: [
+      {
+        path : 'index',
+        name : 'UserList',
+        component: () => import('@/views/user/index'),
+        meta: {
+          title: '用户管理',
+          roles: ['admin']
+        },
       }
     ]
   },
