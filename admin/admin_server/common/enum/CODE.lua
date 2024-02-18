@@ -8,6 +8,7 @@ local code = {
     ERR_SERVER = 50020,           --服务器出错
     NOT_PERMISSION = 50022,       --没有权限
     NOT_HANDSHAKE = 50023,        --还没有握手
+    ERR_PARAM = 50033,            --参数错误
 }
 
 return code

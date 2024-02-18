@@ -37,9 +37,12 @@
         </el-table>
 
         <el-dialog :visible.sync="dialogVisible" :title="dialogType==='edit'?'编辑用户':'新建用户'">
-            <el-form :model="user" label-width="80px" label-position="left">
-                <el-form-item label="用户名">
+            <el-form :model="user" :rules="rules" label-width="80px" label-position="left">
+                <el-form-item v-show="dialogType=='new'" label="用户名">
                     <el-input v-model="user.username" placeholder="用户名" />
+                </el-form-item>
+                <el-form-item label="密码" prop="password">
+                    <el-input v-model="user.password" placeholder="密码" show-password/>
                 </el-form-item>
                 <el-form-item label="头像">
                     <el-input
@@ -86,6 +89,13 @@ const defaultUser = {
 
 export default {
     data() {
+        const validatePassword = (rule, value, callback) => {
+            if (value.length < 6) {
+                callback(new Error('The password can not be less than 6 digits'))
+            } else {
+                callback()
+            }
+        }
         return {
             usersList: [],
             dialogVisible: false,
@@ -93,6 +103,10 @@ export default {
             user: Object.assign({}, defaultUser),
             rolesbox: [],
             rolesList: [],
+
+            rules: {
+                password: [{ required: true, trigger: 'blur', validator: validatePassword }]
+            },
         }
     },
 
@@ -159,7 +173,7 @@ export default {
             const isEdit = this.dialogType === 'edit'
             this.dialogVisible = false
             this.user.roles = this.rolesbox
-
+            console.log("confirmUser:", this.user)
             if (isEdit) {
                 await updateUser(this.user.username, this.user)
                 for (let index = 0; index < this.usersList.length; index++) {

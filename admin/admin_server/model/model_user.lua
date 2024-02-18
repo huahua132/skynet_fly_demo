@@ -90,4 +90,55 @@ function M.list()
     return user_list
 end
 
+function M.add(new_user)
+    log.info("add", new_user)
+    local username = new_user.username
+    local old_user = g_users_client:get_one_entry(username)
+    if old_user then
+        return nil, CODE.ERR_PARAM, "username repeat"
+    end
+
+    local key = crypt.randomkey()
+    new_user.password = crypt_util.HMAC.SHA256(new_user.password, key)
+    new_user.roles = json.encode(new_user.roles)
+    new_user.key = crypt.base64encode(key)
+
+    local user_info = g_users_client:create_one_entry(new_user)
+    if not user_info then
+        return nil, CODE.ERR_SERVER, "create err"
+    end
+    user_info.password = nil                        --密码不能发给客户端
+    user_info.key = nil                             --密钥也是
+    return user_info
+end
+
+function M.update(username, user)
+    local user_info = g_users_client:get_one_entry(username)
+    if not user_info then
+        return nil, CODE.ERR_PARAM, "user not exists"
+    end
+
+    if user.password and user.password ~= '' then
+        user.password = crypt_util.HMAC.SHA256(user.password, user_info.key)
+    end
+    user.roles = json.encode(user.roles)
+    if not g_users_client:change_save_one_entry(user) then
+        return nil, CODE.ERR_SERVER, "save err"
+    end
+
+    return "success"
+end
+
+function M.delete(username)
+    if username == 'admin' then
+        return nil, CODE.ERR_PARAM, "can`t del admin user"
+    end
+
+    if not g_users_client:delete_entry(username) then
+        return nil, CODE.ERR_SERVER, "delete err"
+    end
+
+    return "success"
+end
+
 return M
