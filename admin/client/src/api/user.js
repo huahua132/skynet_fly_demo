@@ -38,11 +38,11 @@ export function list() {
   })
 }
 
-export function addUser(user) {
+export function addUser(data) {
   return request({
     url: '/user/add',
     method: 'post',
-    user
+    data
   })
 }
 

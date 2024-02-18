@@ -248,7 +248,7 @@ export default {
         }
       } else {
         const { data } = await addRole(this.role)
-        console.log("add succ>>>>>>>>>>>>>>>>>", data.name)
+        console.log("add succ>>>>>>>>>>>>>>>>>", data.name, this.role)
         this.role.name = data.name
         this.rolesList.push(this.role)
       }

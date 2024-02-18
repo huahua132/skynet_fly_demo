@@ -2,10 +2,11 @@ local model_role = require "model_role"
 local rsp_body = require "rsp_body"
 local CODE = require "CODE"
 local log = require "log"
+local ENUM = require "ENUM"
 local permission_mid = require "permission_mid"
 local assert = assert
 
-local client_path = '/permission'
+local client_path = ENUM.client_path
 
 return function(group)
     group:get('/roles',function(c)
@@ -36,6 +37,7 @@ return function(group)
     group:delete('/role/:name',function(c)
         local params = c.params
 		local name = params.name
+        assert(name, "not name")
         local data,code,msg = model_role.del_role(name)
         rsp_body.set_rsp(c,data,code,msg)
     end)

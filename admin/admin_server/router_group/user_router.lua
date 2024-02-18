@@ -4,6 +4,8 @@ local log = require "log"
 local CODE = require "CODE"
 local crypt = require "skynet.crypt"
 local crypt_util = require "crypt_util"
+local permission_mid = require "permission_mid"
+local ENUM = require "ENUM"
 local openssl = require('openssl')
 local pkey = openssl.pkey
 local bio = openssl.bio
@@ -11,6 +13,7 @@ local ec = openssl.ec
 
 local assert = assert
 local error = error
+local client_path = ENUM.client_path
 
 --检查是否握手了
 local function check_handshake(c)
@@ -76,12 +79,12 @@ local function login(c)
     local iv = assert(req.body.iv, "not iv")
     local tag = assert(req.body.tag, "not tag")
 
-    log.info("login1 >>>", token_str, iv, tag)
+    --log.info("login1 >>>", token_str, iv, tag)
     iv = crypt.base64decode(iv)
     token_str = crypt.base64decode(token_str)
     tag = crypt.base64decode(tag)
     local evp = openssl.cipher.get('aes-256-gcm')
-    log.info("login2 >>>> ",evp)
+    --log.info("login2 >>>> ",evp)
     local e = evp:decrypt_new()
     assert(e:ctrl(openssl.cipher.EVP_CTRL_GCM_SET_IVLEN, #iv))
     assert(e:init(session.secret, iv))
@@ -91,12 +94,12 @@ local function login(c)
     assert(e:ctrl(openssl.cipher.EVP_CTRL_GCM_SET_TAG, tag))
     token = token .. assert(e:final())
     assert(#token == #token_str)
-    log.info("login3 >>>> ",evp, token)
+    --log.info("login3 >>>> ",evp, token)
     -- local token = crypt.desdecode(session.secret, crypt.base64decode(token_str))
     local username, password = token:match("(.+)@(.+)")
     username = crypt.base64decode(username)
     password = crypt.base64decode(password)
-    log.info("login4 >>>> ", username, password)
+    --log.info("login4 >>>> ", username, password)
 
     local data, code, msg = model_user.login(username, password)
     rsp_body.set_rsp(c,data,code,msg)
@@ -118,10 +121,45 @@ local function list(c)
     rsp_body.set_rsp(c, data)
 end
 
+--新增用户
+local function add(c)
+    local new_user = c.req.body
+    assert(new_user, "not user")
+    local data,code,msg = model_user.add(new_user)
+    rsp_body.set_rsp(c,data,code,msg)
+end
+
+--修改
+local function update(c)
+    local user = c.req.body
+    local params = c.params
+    local username = params.username
+    assert(username, "not username")
+    assert(user, "not user")
+    local data,code,msg = model_user.update(username, user)
+    rsp_body.set_rsp(c,data,code,msg)
+end
+
+--删除
+local function delete(c)
+    local params = c.params
+    local username = params.username
+    assert(username, "not username")
+    local data,code,msg = model_user.delete(username)
+    rsp_body.set_rsp(c,data,code,msg)
+end
+
 return function(group)
     group:post('/handshake', handshake)
     group:post('/login',check_handshake, login)
     group:get('/info', info)
     group:post('/logout', logout)
+    permission_mid.set('get',group:calculate_absolute_convert_path('/list'),client_path .. '/user')
     group:get('/list', list)
+    permission_mid.set('post',group:calculate_absolute_convert_path('/add'),client_path .. '/user')
+    group:post('/add', add)
+    permission_mid.set('put',group:calculate_absolute_convert_path('/up/:username'),client_path .. '/user')
+    group:put('/up/:username', update)
+    permission_mid.set('delete',group:calculate_absolute_convert_path('/del/:username'),client_path .. '/user')
+    group:delete('/del/:username', delete)
 end
