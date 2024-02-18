@@ -17,6 +17,9 @@ return function(group)
         local result = nil
         if context then
             result = "OK"
+            context = context[1]
+        else
+            context = "无"
         end
         rsp_body.set_rsp(c,{
             result = result,

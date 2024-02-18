@@ -25,7 +25,7 @@
             </el-table-column>
             <el-table-column align="center" label="最后登录时间" width="220">
                 <template slot-scope="scope">
-                {{ scope.row.last_login_time }}
+                {{ localeTime(scope.row.last_login_time) }}
                 </template>
             </el-table-column>
             <el-table-column align="center" label="Operations">
@@ -195,6 +195,14 @@ export default {
                 `,
                 type: '成功'
             })
+        },
+
+        localeTime(time) {
+            if (time == 0) {
+                return "从未登录"
+            }
+            let d = new Date(time * 1000)
+            return d.toLocaleString()
         }
     }
 }

@@ -7,6 +7,7 @@ local json = require "cjson"
 local orm_table_client = require "orm_table_client"
 local crypt_util = require "crypt_util"
 local crypt = require "skynet.crypt"
+local time_util = require "time_util"
 
 local g_users_client = orm_table_client:new("users")
 
@@ -62,6 +63,7 @@ function M.login(username, password)
     user_info.password = nil                        --密码不能发给客户端
     user_info.key = nil                             --密钥也是
     log.info("login>>", user_info.roles, routes_map)
+    g_users_client:change_save_one_entry({username = user_info.username, last_login_time = time_util.time()})
 
     return {token = token_auth_mid.create_token(username,user_info.roles,routes_map)} 
 end

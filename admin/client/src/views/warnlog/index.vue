@@ -5,7 +5,7 @@
             </el-option>
         </el-select>
 
-        <div>{{ context }}</div>
+        <div style="white-space: pre-wrap;">{{context}}</div>
     </div>
 </template>
 
