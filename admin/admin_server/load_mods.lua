@@ -94,8 +94,9 @@ return {
 		launch_num = 1,
 		default_arg = {
 			node_map = {
-				['chinese_chess'] = true,   --连接象棋游戏节点
+				['centerserver'] = true,    --连接中心服节点
 				['logserver'] = true,       --连接日志服务节点
+				['chinese_chess'] = true,   --连接象棋游戏节点
 			},
 			watch = 'redis',  --监听redis的方式做服务发现
 		}

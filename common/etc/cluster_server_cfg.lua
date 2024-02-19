@@ -17,9 +17,15 @@ M.admin = {
     }
 }
 
+--世界配置 11开头
 M.world = {
     logserver = {
         host = "127.0.0.1:11013",
+        register = "redis",        --连接信息注册到redis
+    },
+
+    centerserver = {
+        host = "127.0.0.1:11023",
         register = "redis",        --连接信息注册到redis
     }
 }

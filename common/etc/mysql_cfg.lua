@@ -1,3 +1,4 @@
+local table_util = dofile("../../skynet_fly/lualib/utils/table_util.lua")
 --mysql的配置
 
 local db1 = {
@@ -12,5 +13,8 @@ local db1 = {
 local M = {}
 
 M.admin = db1
+
+M.center = table_util.deep_copy(db1)
+M.center.database = 'center'
 
 return M

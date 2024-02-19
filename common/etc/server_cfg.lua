@@ -22,7 +22,11 @@ M.admin = {
 M.world = {
     logserver = {
         debug_port = 11011,
-    }
+    },
+
+    centerserver = {
+        debug_port = 11021,
+    },
 }
 
 return M
