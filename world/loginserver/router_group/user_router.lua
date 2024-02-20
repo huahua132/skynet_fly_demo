@@ -1,7 +1,12 @@
 local cluster_client = require "cluster_client"
+local jwt = require "luajwtjitsi"
 local rsp_body = require "rsp_body"
+local crypt = require "skynet.crypt"
+local C_ENUM = require "C_ENUM"
+local time_util = require "time_util"
 
 local assert = assert
+local type = type
 
 local function login(c)
     local req = c.req
@@ -20,8 +25,30 @@ local function login(c)
         rsp_body.set_rsp(c, nil, errcode, errmsg)
     else
         local player_id, hall_server_id = errcode, errmsg
-        --生成登录token
+        local rand_key = crypt.randomkey()
         
+        local hallcli = cluster_client:instance("hallserver", "player_m")
+        hallcli:set_svr_id(hall_server_id)
+        hallcli:set_mod_num(player_id)
+        local ret = hallcli:one_mod_call("advance_login", player_id, rand_key)
+        local host = ret.result[1]
+        --生成登录token
+        local cur_time = time_util.time()
+        local claim = {
+            iss = "skynet_fly_admin",               --签发者
+            exp = cur_time + C_ENUM.TOKEN_TIMEOUT,  --过期时间
+            nbf = cur_time,                         --生效时间
+        }
+
+        claim.player_id = player_id
+        -- Create a token.
+        local token = assert(jwt.encode(claim, rand_key, "HS256"))
+        assert(type(token) == "string")
+        
+        rsp_body:set_rsp(c, {
+            token = token,
+            host = host
+        })
     end
 end
 

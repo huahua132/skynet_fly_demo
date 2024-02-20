@@ -22,11 +22,13 @@ M.world = {
         address = '0.0.0.0',
         port = 11012,
         maxclient = 6000,
+        host = '127.0.0.1:11012',
     },
     hallserver_2 = {
         address = '0.0.0.0',
         port = 11022,
         maxclient = 6000,
+        host = '127.0.0.1:11022',
     },
 }
 
