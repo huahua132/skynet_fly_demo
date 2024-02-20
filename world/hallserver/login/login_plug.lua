@@ -2,7 +2,6 @@ local log = require "log"
 local ws_pbnet_util = require "ws_pbnet_util"
 local pb_netpack = require "pb_netpack"
 local errors_msg = require "errors_msg"
-local login_msg = require "login_msg"
 local errorcode = require "errorcode"
 local timer = require "timer"
 
@@ -27,7 +26,6 @@ function M.init(interface_mgr)
 	pb_netpack.load('../../common/proto')
 	pb_netpack.load('./proto')
 	g_interface_mgr = interface_mgr
-	login_msg = login_msg:new(interface_mgr)
 	errors_msg = errors_msg:new(interface_mgr)
 end
 

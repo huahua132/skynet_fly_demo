@@ -13,7 +13,7 @@ M.dispatch = engine_web.dispatch(app)
 --初始化
 function M.init()
     app:use(function(c)
-        c.res:set_header('X-Powered-By', 'wlua framework')
+        c.res:set_header('X-Powered-By', 'skynet_fly framework')
         c.res:set_header('Access-Control-Allow-Origin', '*')
         c.res:set_header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
         c.res:set_header('Access-Control-Allow-Headers', 'DNT,X-Mx-ReqToken,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Authorization')
