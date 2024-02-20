@@ -20,12 +20,34 @@ M.admin = {
 
 --世界配置 11开头
 M.world = {
-    logserver = {
+    centerserver = {
         debug_port = 11011,
     },
 
-    centerserver = {
+    logserver = {
         debug_port = 11021,
+    },
+
+    loginserver_1 = {
+        svr_id = 1,
+        logpath = './logs_1/',
+        debug_port = 11111,
+    },
+    loginserver_2 = {
+        svr_id = 2,
+        logpath = './logs_2/',
+        debug_port = 11121,
+    },
+
+    hallserver_1 = {
+        svr_id = 1,
+        logpath = './logs_1/',
+        debug_port = 11211,
+    },
+    hallserver_2 = {
+        svr_id = 2,
+        logpath = './logs_2/',
+        debug_port = 11221,
     },
 }
 

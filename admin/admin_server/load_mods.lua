@@ -2,6 +2,7 @@ local redis_cfg = loadfile("../../common/etc/redis_cfg.lua")()
 local mysql_cfg = loadfile("../../common/etc/mysql_cfg.lua")()
 local server_cfg = loadfile("../../common/etc/server_cfg.lua")()
 local cluster_server_cfg = loadfile("../../common/etc/cluster_server_cfg.lua")()
+local http_cfg = loadfile("../../common/etc/http_cfg.lua")()
 
 return {
     --共享配置
@@ -34,24 +35,13 @@ return {
 	web_agent_m = {
 		launch_seq = 2000,
 		launch_num = 6,
-		default_arg = {
-			protocol = 'http',
-			dispatch = 'app',			   --APP入口 app.lua
-			keep_alive_time = 300,         --最长保活时间
-			second_req_limit = 2000,       --1秒内请求数量限制
-		}
+		default_arg = http_cfg.admin.admin_server.agent
 	},
     --web服务master
 	web_master_m = {
 		launch_seq = 3000,
 		launch_num = 1,
-		default_arg = {
-			protocol = 'http',
-			port = 80,         --端口
-			max_client = 2048, --最大连接数
-			second_conn_limit = 2000, --相同ip 1秒内建立连接数限制
-			keep_live_limit = 2000,  --相同ip 保持活跃数量限制
-		}
+		default_arg = http_cfg.admin.admin_server.master
 	},
     --日志切割
     logrotate_m = {

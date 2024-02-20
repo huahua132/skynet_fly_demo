@@ -25,7 +25,7 @@ return {
         launch_seq = 2000,
         launch_num = 6, --启动6个
         default_arg = {
-            db_conf = mysql_cfg.center,
+            db_conf = mysql_cfg.world.centerserver,
             is_create = true,				--数据库不存在就创建
         }
     },
@@ -65,11 +65,26 @@ return {
             {instance_name = "account_8",orm_plug  = "account_entity"},
             {instance_name = "account_9",orm_plug  = "account_entity"},
             {instance_name = "account_10",orm_plug = "account_entity"},
+
+            --自增id分配
+            {instance_name = "allocid",   orm_plug = "allocid_entity"},
 		}
 	},
 
     account_m = {
         launch_seq = 6000,
         launch_num = 10,
-    }
+    },
+
+    --集群客户端
+    cluster_client_m = {
+		launch_seq = 7000,
+		launch_num = 1,
+		default_arg = {
+			node_map = {
+				['hallserver'] = true,      --大厅服
+			},
+			watch = 'redis',  --监听redis的方式做服务发现
+		}
+	},
 }
