@@ -67,7 +67,7 @@ return {
 		launch_num = 1,
 		default_arg = {
 			node_map = {
-				
+				['logserver'] = true,       --日志服
 			},
 			watch = 'redis',  --监听redis的方式做服务发现
 		}
@@ -115,5 +115,5 @@ return {
     player_m = {
         launch_seq = 8000,
         launch_num = 6,
-    }
+    },
 }
