@@ -60,7 +60,6 @@ end
 --登录成功
 function M.login_succ(player_id,login_res)
 	log.info("login_succ:",player_id,login_res)
-	login_msg:login_res(player_id,login_res)
 end
 
 --登出回调
