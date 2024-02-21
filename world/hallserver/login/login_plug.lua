@@ -4,11 +4,17 @@ local pb_netpack = require "pb_netpack"
 local errors_msg = require "errors_msg"
 local errorcode = require "errorcode"
 local timer = require "timer"
+local jwt = require "luajwtjitsi"
+local contriner_client = require "contriner_client"
+
+contriner_client:register("player_m")
 
 local assert = assert
 local x_pcall = x_pcall
 
 local g_interface_mgr = nil   --接口
+
+local g_player_map = {}
 
 local M = {}
 
@@ -37,23 +43,46 @@ function M.check(packname,pack_body)
 		return false,errorcode.PROTOCOL_ERR,"PROTOCOL_ERR"
 	end
 	--检测是不是登录请求
-	if packname ~= '.chinese_chess_login.LoginReq' then
+	if packname ~= '.hallserver_login.LoginReq' then
 		log.error("login_check msg err ",packname)
 		return false,errorcode.NOT_LOGIN,"not login",packname
 	end
 
+	local token = pack_body.token
 	local player_id = pack_body.player_id
-	if not player_id then
-		log.error("req err ",pack_body)
-		return false,errorcode.REQ_PARAM_ERR,"not player_id",packname
+	if not token or not player_id then
+		log.error("login check err ",pack_body)
+		return false,errorcode.REQ_PARAM_ERR,"not token",packname
 	end
-
+	local player = g_player_map[player_id]
+	local randkey = nil
+	if player then
+		randkey = player.randkey
+	else
+		local cli = contriner_client:instance("player_m")
+		cli:set_mod_num(player_id)
+		randkey = cli:mod_call("get_randkey", player_id)
+		if not randkey then
+			log.error("login check err not randkey ")
+			return false, errorcode.TOPEN_ERR, "not randkey"
+		end
+	end
+	-- jwt 认证
+	local payload, msg = jwt.verify(token, "HS256", randkey)
+	if not payload then
+		log.info("login check verify failed", player_id)
+		return false, errorcode.TOPEN_ERR, "token err"
+	end
 	--成功返回玩家id
+	g_player_map[player_id] = {
+		randkey = randkey
+	}
 	return player_id
 end
 
 --登录失败
 function M.login_failed(player_id,errcode,errmsg)
+	g_player_map[player_id] = nil
 	errmsg:errors(errcode,errmsg)
 end
 
@@ -64,6 +93,7 @@ end
 
 --登出回调
 function M.login_out(player_id)
+	g_player_map[player_id] = nil
 	log.info("login_out ",player_id)
 end
 

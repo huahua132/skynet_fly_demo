@@ -11,4 +11,5 @@ return {
 	PLAYING = 8,             --游戏进行中
 	PROTOCOL_ERR = 9,        --协议出错
 	ACCOUNT_NOT_EXISTS = 10, --账号不存在
+	TOPEN_ERR = 11,          --token失效
 }
