@@ -8,6 +8,7 @@ local time_util = require "time_util"
 local assert = assert
 local type = type
 
+--登录
 local function login(c)
     local req = c.req
     local body = req.body
@@ -52,6 +53,30 @@ local function login(c)
     end
 end
 
+--注册
+local function signup(c)
+    local req = c.req
+    local body = req.body
+    local account = body.account
+    local password = body.password
+    assert(account, "not account")
+    assert(password, "not passwword")
+    local cli = cluster_client:instance("centerserver", "account_m")
+    local ret = cli:one_balance_call("register", {
+        account = account,
+        password = password,
+    })
+    if not ret then return end
+    local result = ret.result
+    local isok, errcode, errmsg = result[1], result[2], result[3]
+    if isok then
+        rsp_body:set_rsp(c, "success")
+    else
+        rsp_body:set_rsp(c, nil, errcode, errmsg)
+    end
+end
+
 return function(group)
     group:post('/login', login)
+    group:post('/signup', signup)
 end
