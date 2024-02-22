@@ -37,6 +37,10 @@ local MAX_INCRID = 9999999999
 function CMD.register(account_info)
     local account = account_info.account --账号
     assert(account:len() >= 6, "account not long enough")
+    local orm_clinet = get_orm_by_account(account)
+    if orm_clinet:get_one_entry(account) then
+        return nil, errorcode.ACCOUNT_EXISTS, "ACCOUNT_EXISTS"
+    end
 
     local cli = cluster_client:instance("hallserver", "player_m")
     local ret = cli:one_balance_call("get_module_id")
@@ -55,11 +59,10 @@ function CMD.register(account_info)
     account_info.key = crypt.randomkey()
     account_info.password = crypt_util.HMAC.SHA256(account_info.password, account_info.key)
 
-    local orm_clinet = get_orm_by_account(account)
     if orm_clinet:create_one_entry(account_info) then
         return true
     else
-        return false
+        return nil
     end
 end
 
@@ -68,12 +71,12 @@ function CMD.auth(account, password)
     local orm_clinet = get_orm_by_account(account)
     local account_info = orm_clinet:get_one_entry(account)
     if not account_info then
-        return false, errorcode.ACCOUNT_NOT_EXISTS, "ACCOUNT_NOT_EXISTS"
+        return nil, errorcode.ACCOUNT_NOT_EXISTS, "ACCOUNT_NOT_EXISTS"
     end
 
     password = crypt_util.HMAC.SHA256(password, crypt.base64decode(account_info.key))
     if account_info.password ~= password then
-        return false, errorcode.LOGIN_PASS_ERR, "LOGIN_PASS_ERR"
+        return nil, errorcode.LOGIN_PASS_ERR, "LOGIN_PASS_ERR"
     end
 
     return true, account_info.player_id, account_info.hall_server_id
