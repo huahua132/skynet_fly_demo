@@ -32,7 +32,7 @@
 
 [介绍文档](https://huahua132.github.io/2024/02/17/think/skynet_fly_demo/)
 
-# docker 部署
+# docker 部署(暂时行不通)
 
 运行mysql
 `docker run --net="host" -d --name=mysql_container -e MYSQL_ROOT_PASSWORD=123456 mysql`
