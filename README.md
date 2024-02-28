@@ -35,8 +35,8 @@
 # docker 部署
 
 运行mysql
-`docker run -d -p 3306:3306 --name=mysql_container -e MYSQL_ROOT_PASSWORD=123456 mysql`
-`docker run -p 80:80 -d huahua132/skynet_fly_demo:master`
+`docker run --net="host" -d --name=mysql_container -e MYSQL_ROOT_PASSWORD=123456 mysql`
+`docker run --net="host" -d huahua132/skynet_fly_demo:master`
 
 访问后台
 `http://127.0.0.1`
