@@ -7,7 +7,7 @@
 5. 完成中国象棋游戏。
 6. 后续添加球球大作战，自走棋等等游戏。
 
-# 快速开始
+# 本地部署
 拉取skynet_fly仓库
 `git submodule update --init`
 [编译skynet_fly仓库](https://huahua132.github.io/2023/02/25/skynet_fly_word/word_1/C_builder/)
@@ -31,3 +31,10 @@
 `http://127.0.0.1`
 
 [介绍文档](https://huahua132.github.io/2024/02/17/think/skynet_fly_demo/)
+
+# docker 部署
+
+`docker run -p 80:80 -d huahua132/skynet_fly_demo:master`
+
+访问后台
+`http://127.0.0.1`
