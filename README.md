@@ -14,6 +14,8 @@
 
 安装数据库
 `cd dbinstall`
+`sh setup.sh`
+`sh run.sh`
 
 启动mysql
 启动redis
