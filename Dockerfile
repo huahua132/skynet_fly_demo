@@ -7,24 +7,21 @@ LABEL description="This is Docker Image for skynet_fly_demo"
 RUN git clone https://github.com/huahua132/skynet_fly_demo \
 && cd skynet_fly_demo \
 && git submodule update --init \
-&& cd ..
+&& cd dbinstall \
+&& bash setup.sh \
+&& bash run.sh \
+&& cd ../../
 
-# RUN cd skynet_fly_demo/dbinstall \
-# && bash setup.sh \
-# && bash run.sh \
-# && cd ../../
+# 安装必要的依赖和devtoolset-9
+RUN yum install -y git gcc wget zlib-devel openssl openssl-devel autoconf automake libtool curl centos-release-scl && \
+    yum install -y devtoolset-9
 
-# 安装必要的依赖
-RUN yum install -y git gcc wget zlib-devel openssl openssl-devel autoconf automake libtool curl && \
-    yum install -y centos-release-scl && \
-    yum install -y devtoolset-9-gcc*
+# 设置环境变量以使用devtoolset-9的gcc和相关工具
+ENV PATH=/opt/rh/devtoolset-9/root/usr/bin:$PATH
+ENV LD_LIBRARY_PATH=/opt/rh/devtoolset-9/root/usr/lib64:/opt/rh/devtoolset-9/root/usr/lib:$LD_LIBRARY_PATH
 
-# 启用devtoolset-9
-SHELL ["/bin/bash", "-c"]
-RUN source /opt/rh/devtoolset-9/enable
-
-# 克隆代码并编译
-RUN cd skynet_fly_demo/skynet_fly && git submodule update --init && make linux && cd ../../
+# 编译
+RUN cd skynet_fly_demo/skynet_fly && git submodule update --init && make linux && yum clean all && cd ../../
 
 ENTRYPOINT ["/skynet_fly_demo/script/all_restart.sh"]
 
