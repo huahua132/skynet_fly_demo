@@ -12,15 +12,22 @@
 `git submodule update --init`
 [编译skynet_fly仓库](https://huahua132.github.io/2023/02/25/skynet_fly_word/word_1/C_builder/)
 
-安装数据库
+安装 mysql redis
 `cd dbinstall`
 `sh setup.sh`
+
+启动 mysql redis
 `sh run.sh`
 
-启动mysql
-启动redis
-
 启动所有服务
-`sh script all_restart.sh`
+`cd ..`
+`sh script/all_restart.sh`
+
+查看后台启动日志
+`cd admin/admin_server`
+`tail -f logs/server.log`
+
+访问后台
+`http://127.0.0.1`
 
 [介绍文档](https://huahua132.github.io/2024/02/17/think/skynet_fly_demo/)
