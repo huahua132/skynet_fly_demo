@@ -18,10 +18,10 @@ RUN git clone https://github.com/huahua132/skynet_fly_demo \
 && cd dbinstall \
 && bash setup.sh
 
-# # 编译
-# RUN cd skynet_fly_demo/skynet_fly && git submodule update --init && make linux && yum clean all \
-# && cd ../../ \
-# && chmod -R 777 skynet_fly_demo
+# 编译
+RUN cd skynet_fly_demo/skynet_fly && git submodule update --init && make linux && yum clean all \
+&& cd ../../ \
+&& chmod -R 777 skynet_fly_demo
 
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
