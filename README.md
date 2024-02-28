@@ -10,10 +10,10 @@
 # 快速开始
 拉取skynet_fly仓库
 `git submodule update --init`
-编译skynet_fly仓库
+[编译skynet_fly仓库](https://huahua132.github.io/2023/02/25/skynet_fly_word/word_1/C_builder/)
 
 安装数据库
-`sh dbinstall/setup.sh`
+`cd dbinstall`
 
 启动mysql
 启动redis
