@@ -1,7 +1,7 @@
 #!/bin/bash
 cd redis
-bash run.sh
+bash setup.sh
 cd ..
 cd mysql
-bash run.sh
+bash setup.sh
 cd ..
