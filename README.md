@@ -8,6 +8,8 @@
 6. 后续添加球球大作战，自走棋等等游戏。
 
 # 本地部署
+拉取代码
+`git clone https://github.com/huahua132/skynet_fly_demo`
 拉取skynet_fly仓库
 `git submodule update --init`
 [编译skynet_fly仓库](https://huahua132.github.io/2023/02/25/skynet_fly_word/word_1/C_builder/)
