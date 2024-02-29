@@ -48,8 +48,10 @@ const mutations = {
 }
 
 const actions = {
-  async generateRoutes({ commit }, roles) {
-    console.log("generateRoutes>>> ", roles)
+  async generateRoutes({ commit }, userinfo) {
+    console.log("generateRoutes>>> ", userinfo)
+    let roles = userinfo.roles
+    let username = userinfo.username
     let ret = await getRoles()
     let all_roles = ret.data                               //角色可访问目录信息
     console.log("generateRoutes2>>> ", all_roles, asyncRoutes)
@@ -103,7 +105,7 @@ const actions = {
     console.log("generateRoutes5>>> ", asyncRoutes)
     return new Promise(resolve => {
       let accessedRoutes
-      if (roles.includes('admin')) {
+      if (username == 'admin') {
         accessedRoutes = asyncRoutes || []
       } else {
         accessedRoutes = filterAsyncRoutes(asyncRoutes, roles)

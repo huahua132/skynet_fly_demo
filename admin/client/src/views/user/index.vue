@@ -90,10 +90,18 @@ const defaultUser = {
 export default {
     data() {
         const validatePassword = (rule, value, callback) => {
-            if (value.length < 6) {
+            if (this.dialogType == 'new') {
+                if (value.length < 6) {
                 callback(new Error('The password can not be less than 6 digits'))
+                } else {
+                    callback()
+                }
             } else {
-                callback()
+                if (value.length > 1 && value.length < 6) {
+                callback(new Error('The password can not be less than 6 digits'))
+                } else {
+                    callback()
+                }
             }
         }
         return {
@@ -149,6 +157,7 @@ export default {
             this.dialogType = 'edit'
             this.dialogVisible = true
             this.user = deepClone(scope.row)
+            //console.log("handleEdit >>>>>>> ", scope.row.roles, this.rolesList, this.rolesbox)
             this.rolesbox = scope.row.roles
         },
 
