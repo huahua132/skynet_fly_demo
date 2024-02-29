@@ -51,3 +51,6 @@ FLUSH PRIVILEGES;
 
 访问后台
 `http://127.0.0.1`
+
+# 客户端
+[中国象棋](https://github.com/huahua132/chinesechess)
