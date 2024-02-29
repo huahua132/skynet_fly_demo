@@ -99,6 +99,11 @@ function M.get_all_roles()
     return res
 end
 
+--查询角色
+function M.get_role(role)
+    return g_roles_client:get_one_entry(role)
+end
+
 --添加角色
 function M.add_role(new_role)
     new_role.routes = json.encode(trim_routes(new_role.routes))

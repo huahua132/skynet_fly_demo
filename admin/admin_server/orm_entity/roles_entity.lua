@@ -1,5 +1,8 @@
 local ormtable = require "ormtable"
 local ormadapter_mysql = require "ormadapter_mysql"
+local ENUM = require "ENUM"
+local log = require "log"
+local json = require "cjson"
 
 local pairs = pairs
 local ipairs = ipairs
@@ -19,6 +22,16 @@ function M.init()
     :set_keys("name")
     :set_cache(0,100)    --永久缓存，1秒同步一次更改
     :builder(adapter)
+
+    local entry = g_ormobj:get_one_entry(ENUM.DEFAULT_ROLE)
+    if not entry then --默认角色
+        g_ormobj:create_one_entry({
+            name = ENUM.DEFAULT_ROLE,
+            routes = json.encode({})
+        })
+        log.info("default role", ENUM.DEFAULT_ROLE)
+    end
+
     return g_ormobj
 end
 

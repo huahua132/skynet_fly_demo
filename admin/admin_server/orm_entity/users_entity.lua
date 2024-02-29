@@ -4,6 +4,7 @@ local crypt = require "skynet.crypt"
 local crypt_util = require "crypt_util"
 local json = require "cjson"
 local log = require "log"
+local ENUM = require "ENUM"
 
 local pairs = pairs
 local ipairs = ipairs
@@ -28,14 +29,14 @@ function M.init()
     :set_cache(0,100)    --永久缓存，1秒同步一次更改
     :builder(adapter)
 
-    local entry = g_ormobj:get_one_entry("admin")
+    local entry = g_ormobj:get_one_entry(ENUM.ADMIN_USER)
     if not entry then --还没有admin用户 创建一个
         local key = crypt.randomkey()
         local password = "skynet_fly123456"
         g_ormobj:create_one_entry({
-            username = "admin",
+            username = ENUM.ADMIN_USER,
             password = crypt_util.HMAC.SHA256(password, key),
-            roles = json.encode({"admin"}),
+            roles = json.encode({ENUM.DEFAULT_ROLE}),
             key = crypt.base64encode(key),
         })
         log.info("init admin password:", password)

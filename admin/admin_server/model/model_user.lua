@@ -13,6 +13,8 @@ local g_users_client = orm_table_client:new("users")
 
 local string = string
 local ipairs = ipairs
+local assert = assert
+local type = type
 
 local M = {}
 
@@ -22,7 +24,7 @@ function M.login(username, password)
         log.info("use not exists ", username)
         return
     end
-    
+    log.info("login:", password, user_info)
     password = crypt_util.HMAC.SHA256(password, crypt.base64decode(user_info.key))
     if user_info.password ~= password then
         log.error("err password")
@@ -42,7 +44,6 @@ function M.login(username, password)
     end
 
     local routes = {}
-
     for _,one_role in ipairs(user_info.roles) do
         local one_route = role_info_map[one_role]
         if one_route then
@@ -88,13 +89,25 @@ function M.list()
         user_info.key = nil                             --密钥也是
         user_info.roles = json.decode(user_info.roles)
     end
-
     return user_list
 end
 
 function M.add(new_user)
-    log.info("add", new_user)
     local username = new_user.username
+    if not username or username == "" then
+        return nil, CODE.ERR_PARAM, "not username"
+    end
+
+    if not new_user.roles or #new_user.roles <= 0 then
+        return nil, CODE.ERR_PARAM, "not roles"
+    end
+
+    for _,role in ipairs(new_user.roles) do
+        if not model_role.get_role(role) then
+            return nil, CODE.ERR_PARAM, "not exists role: " .. role
+        end
+    end
+
     local old_user = g_users_client:get_one_entry(username)
     if old_user then
         return nil, CODE.ERR_PARAM, "username repeat"
@@ -104,7 +117,7 @@ function M.add(new_user)
     new_user.password = crypt_util.HMAC.SHA256(new_user.password, key)
     new_user.roles = json.encode(new_user.roles)
     new_user.key = crypt.base64encode(key)
-
+    
     local user_info = g_users_client:create_one_entry(new_user)
     if not user_info then
         return nil, CODE.ERR_SERVER, "create err"
@@ -115,14 +128,25 @@ function M.add(new_user)
 end
 
 function M.update(username, user)
+    if not user.roles or #user.roles <= 0 then
+        return nil, CODE.ERR_PARAM, "not roles"
+    end
+
+    for _,role in ipairs(user.roles) do
+        if not model_role.get_role(role) then
+            return nil, CODE.ERR_PARAM, "not exists role: " .. role
+        end
+    end
+
     local user_info = g_users_client:get_one_entry(username)
     if not user_info then
         return nil, CODE.ERR_PARAM, "user not exists"
     end
-
+    
     if user.password and user.password ~= '' then
-        user.password = crypt_util.HMAC.SHA256(user.password, user_info.key)
+        user.password = crypt_util.HMAC.SHA256(user.password, crypt.base64decode(user_info.key))
     end
+
     user.roles = json.encode(user.roles)
     if not g_users_client:change_save_one_entry(user) then
         return nil, CODE.ERR_SERVER, "save err"

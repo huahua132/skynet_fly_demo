@@ -112,6 +112,8 @@ local function info(c)
 end
 
 local function logout(c)
+    local req = c.req
+    req.session = {}
     rsp_body.set_rsp(c,'success')
 end
 
@@ -136,6 +138,7 @@ local function update(c)
     local username = params.username
     assert(username, "not username")
     assert(user, "not user")
+    log.info("update:", user)
     local data,code,msg = model_user.update(username, user)
     rsp_body.set_rsp(c,data,code,msg)
 end

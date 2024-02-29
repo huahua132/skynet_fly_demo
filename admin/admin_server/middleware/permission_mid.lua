@@ -2,6 +2,7 @@ local log = require "log"
 local CODE = require "CODE"
 local rsp_body = require "rsp_body"
 local table_util = require "table_util"
+local ENUM = require "ENUM"
 
 local string = string
 
@@ -37,9 +38,9 @@ function M.auth()
             context:next()
             return
         end
-        local roles = token_auth.roles
-        log.info("roles>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>",roles, table_util.inlist(roles, "admin"))
-        if table_util.inlist(roles, "admin") then
+        local username = token_auth.username
+        --超级管理员
+        if username == ENUM.ADMIN_USER then
             context:next()
             return
         end
@@ -49,7 +50,7 @@ function M.auth()
         if not routes_map[client_path] then
             --没有权限
             log.info("没有权限>>>>>>>>>>>>>>>>>>>", path)
-            rsp_body.set_rsp(context, nil ,CODE.NOT_PERMISSION, "not ready permission")
+            rsp_body.set_rsp(context, nil ,CODE.NOT_PERMISSION, "not read permission")
             context:abort()
         else
             if method ~= 'GET' and not routes_map[client_path].w then

@@ -8,7 +8,7 @@ const users = {
     roles: ['admin'],
     introduction: 'I am a super administrator',
     avatar: 'https://wpimg.wallstcn.com/f778738c-e4f8-4870-b634-56703b4acafe.gif',
-    username: 'Super Admin',
+    username: 'admin',
     last_login_time: 0,
   },
   'developer-token': {
@@ -25,7 +25,7 @@ const userList = [
     roles: ['admin'],
     introduction: 'I am a super administrator',
     avatar: 'https://wpimg.wallstcn.com/f778738c-e4f8-4870-b634-56703b4acafe.gif',
-    username: 'Super Admin',
+    username: 'admin',
     last_login_time: 0,
   },
   {
