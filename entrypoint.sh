@@ -1,6 +1,7 @@
 #!/bin/bash
 
 cd skynet_fly_demo
+git pull
 cd dbinstall
 bash run.sh
 cd ..
