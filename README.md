@@ -47,7 +47,7 @@ FLUSH PRIVILEGES;
 ```
 
 运行skynet_fly_demo
-`docker run --net="host" -d huahua132/skynet_fly_demo:master`
+`docker run --net="host" -d huahua132/skynet_fly_demo:main`
 
 访问后台
 `http://127.0.0.1`
