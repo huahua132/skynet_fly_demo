@@ -3,6 +3,7 @@
 cd skynet_fly_demo
 git reset --hard
 git pull
+git submodule update --remote
 cd dbinstall
 bash run.sh
 cd ..
