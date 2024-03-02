@@ -35,7 +35,7 @@ function handle.incr(module_id)
     end
 
     local incr = entry:get('incr')
-    assert(incr >= math_util.int64max, "incr overflow")  --要溢出了
+    assert(incr < math_util.int64max, "incr overflow")  --要溢出了
     incr = incr + 1
     entry:set('incr', incr)
 

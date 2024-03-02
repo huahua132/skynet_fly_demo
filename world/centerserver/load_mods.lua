@@ -53,7 +53,7 @@ return {
     -- orm
 	orm_table_m = {
 		launch_seq = 5000,
-		launch_num = 10,
+		launch_num = 11,
 		mod_args = {
 			{instance_name = "account_1",orm_plug  = "account_entity"},
             {instance_name = "account_2",orm_plug  = "account_entity"},

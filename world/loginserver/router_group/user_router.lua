@@ -4,6 +4,7 @@ local rsp_body = require "rsp_body"
 local crypt = require "skynet.crypt"
 local C_ENUM = require "C_ENUM"
 local time_util = require "time_util"
+local log = require "log"
 
 local assert = assert
 local type = type
@@ -36,9 +37,9 @@ local function login(c)
         --生成登录token
         local cur_time = time_util.time()
         local claim = {
-            iss = "skynet_fly_admin",               --签发者
-            exp = cur_time + C_ENUM.TOKEN_TIMEOUT,  --过期时间
-            nbf = cur_time,                         --生效时间
+            iss = "skynet_fly_admin",                       --签发者
+            exp = cur_time + C_ENUM.LOGIN_TOKEN_TIME_OUT,   --过期时间
+            nbf = cur_time,                                 --生效时间
         }
 
         claim.player_id = player_id
@@ -46,7 +47,7 @@ local function login(c)
         local token = assert(jwt.encode(claim, rand_key, "HS256"))
         assert(type(token) == "string")
         
-        rsp_body:set_rsp(c, {
+        rsp_body.set_rsp(c, {
             token = token,
             host = host
         })
@@ -59,6 +60,7 @@ local function signup(c)
     local body = req.body
     local account = body.account
     local password = body.password
+
     assert(account, "not account")
     assert(password, "not passwword")
     local cli = cluster_client:instance("centerserver", "account_m")
@@ -70,9 +72,9 @@ local function signup(c)
     local result = ret.result
     local isok, errcode, errmsg = result[1], result[2], result[3]
     if isok then
-        rsp_body:set_rsp(c, "success")
+        rsp_body.set_rsp(c, "success")
     else
-        rsp_body:set_rsp(c, nil, errcode, errmsg)
+        rsp_body.set_rsp(c, nil, errcode, errmsg)
     end
 end
 
