@@ -51,14 +51,14 @@ function CMD.register(account_info)
     cli:set_svr_id(svr_id)
 
     local incrid = g_alloc_clinet:incr(module_id)
-    assert(incrid > MAX_INCRID, "incr overflow")
+    assert(incrid <= MAX_INCRID, "incr overflow")
     local player_id = tonumber(string.format("1%04d%04d%010d", 1, svr_id, incrid))
     ret = cli:byid_balance_call("register", player_id)
     local result = ret.result[1]
     assert(result, "register err")
     account_info.key = crypt.randomkey()
     account_info.password = crypt_util.HMAC.SHA256(account_info.password, account_info.key)
-
+    account_info.key = crypt.base64encode(account_info.key)
     if orm_clinet:create_one_entry(account_info) then
         return true
     else
