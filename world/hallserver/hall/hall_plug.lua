@@ -4,8 +4,6 @@ local ws_pbnet_util = require "ws_pbnet_util"
 local pb_netpack = require "pb_netpack"
 local timer = require "timer"
 local errors_msg = require "errors_msg"
-local hall_cmd = require "hall_cmd"
-
 local assert = assert
 
 local g_interface_mgr = nil

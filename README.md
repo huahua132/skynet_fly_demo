@@ -12,10 +12,34 @@
 `git clone https://github.com/huahua132/skynet_fly_demo`
 拉取skynet_fly仓库
 `git submodule update --init`
+拉取skynet仓库
+```shell
+cd skynet_sly
+git submodule update --init
+```
+拉取jemalloc仓库
+```shell
+cd skynet
+git submodule update --init
+cd ../../
+chmod -R 777 skynet_fly
+```
 [编译skynet_fly仓库](https://huahua132.github.io/2023/02/25/skynet_fly_word/word_1/C_builder/)
 
 安装 mysql redis
 `cd dbinstall`
+
+* **ubuntu**
+```shell
+sh setup_ubuntu.sh
+
+mysql -uroot -p1
+ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY '123456';
+FLUSH PRIVILEGES;
+quit
+```
+
+* **centos**
 `sh setup.sh`
 
 启动 mysql redis
