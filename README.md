@@ -43,6 +43,11 @@ quit
 `sh setup.sh`
 
 启动 mysql redis
+
+* **ubuntu**
+`sh run_ubuntu.sh`
+
+* **centos**
 `sh run.sh`
 
 启动所有服务

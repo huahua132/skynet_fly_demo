@@ -28,11 +28,11 @@ local function login(c)
     else
         local player_id, hall_server_id = errcode, errmsg
         local rand_key = crypt.randomkey()
-        
+        log.info("login >>>>>> ", player_id, hall_server_id, rand_key)
         local hallcli = cluster_client:instance("hallserver", "player_m")
         hallcli:set_svr_id(hall_server_id)
         hallcli:set_mod_num(player_id)
-        local ret = hallcli:one_mod_call("advance_login", player_id, rand_key)
+        local ret = hallcli:byid_mod_call("advance_login", player_id, rand_key)
         local host = ret.result[1]
         --生成登录token
         local cur_time = time_util.time()
@@ -49,7 +49,8 @@ local function login(c)
         
         rsp_body.set_rsp(c, {
             token = token,
-            host = host
+            host = host,
+            player_id = player_id,
         })
     end
 end
