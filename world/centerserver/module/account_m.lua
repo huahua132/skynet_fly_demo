@@ -31,7 +31,7 @@ end
 local CMD = {}
 -- 注册账号
 -- 玩家id生成
---   9,   223,3   72,03  6,854,775,807
+--   92,   23,3   72,03  6,854,775,807
 -- 预留位 渠道id   服务id    自增id
 local MAX_INCRID = 9999999999
 function CMD.register(account_info)
@@ -52,13 +52,15 @@ function CMD.register(account_info)
 
     local incrid = g_alloc_clinet:incr(module_id)
     assert(incrid <= MAX_INCRID, "incr overflow")
-    local player_id = tonumber(string.format("1%04d%04d%010d", 1, svr_id, incrid))
-    ret = cli:byid_balance_call("register", player_id)
+    local player_id = tonumber(string.format("1%03d%04d%010d", 1, svr_id, incrid))
+    ret = cli:byid_balance_call("register", player_id, account)
     local result = ret.result[1]
     assert(result, "register err")
     account_info.key = crypt.randomkey()
     account_info.password = crypt_util.HMAC.SHA256(account_info.password, account_info.key)
     account_info.key = crypt.base64encode(account_info.key)
+    account_info.player_id = player_id
+    account_info.hall_server_id = svr_id
     if orm_clinet:create_one_entry(account_info) then
         return true
     else
@@ -78,7 +80,7 @@ function CMD.auth(account, password)
     if account_info.password ~= password then
         return nil, errorcode.LOGIN_PASS_ERR, "LOGIN_PASS_ERR"
     end
-
+    log.info("auth >>>>> :", account_info)
     return true, account_info.player_id, account_info.hall_server_id
 end
 

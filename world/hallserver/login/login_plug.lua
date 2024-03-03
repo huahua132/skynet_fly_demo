@@ -6,6 +6,7 @@ local errorcode = require "errorcode"
 local timer = require "timer"
 local jwt = require "luajwtjitsi"
 local contriner_client = require "contriner_client"
+local login_msg = require "login_msg"
 
 contriner_client:register("player_m")
 
@@ -33,6 +34,7 @@ function M.init(interface_mgr)
 	pb_netpack.load('./proto')
 	g_interface_mgr = interface_mgr
 	errors_msg = errors_msg:new(interface_mgr)
+	login_msg = login_msg:new(interface_mgr)
 end
 
 --登录检测函数 packname,pack_body是解包函数返回的
@@ -50,6 +52,7 @@ function M.check(packname,pack_body)
 
 	local token = pack_body.token
 	local player_id = pack_body.player_id
+	log.info("login check >>>> ",pack_body)
 	if not token or not player_id then
 		log.error("login check err ",pack_body)
 		return false,errorcode.REQ_PARAM_ERR,"not token",packname
@@ -61,6 +64,7 @@ function M.check(packname,pack_body)
 	else
 		local cli = contriner_client:instance("player_m")
 		cli:set_mod_num(player_id)
+		log.info("mod_call get_randkey >>>>> ",player_id)
 		randkey = cli:mod_call("get_randkey", player_id)
 		if not randkey then
 			log.error("login check err not randkey ")
@@ -83,12 +87,14 @@ end
 --登录失败
 function M.login_failed(player_id,errcode,errmsg)
 	g_player_map[player_id] = nil
-	errmsg:errors(errcode,errmsg)
+	log.info("login_failed >>>> ", player_id, errcode, errmsg)
+	errors_msg:errors(player_id, errcode, errmsg)
 end
 
 --登录成功
 function M.login_succ(player_id,login_res)
 	log.info("login_succ:",player_id,login_res)
+	login_msg:login_res(player_id, login_res)
 end
 
 --登出回调

@@ -4,6 +4,7 @@ local skynet = require "skynet"
 local cache_help = require "cache_help"
 local contriner_client = require "contriner_client"
 local C_ENUM = require "C_ENUM"
+local log = require "log"
 
 contriner_client:register("share_config_m")
 
@@ -26,8 +27,8 @@ local g_svr_id = tonumber(skynet.getenv('svr_id'))
 local g_cur_module_id = assert(SVR_MODULE_ID[g_svr_id])
 
 --注册用户
-function CMD.register(player_id)
-    if g_player_cli:create_one_entry({player_id = player_id}) then
+function CMD.register(player_id, account)
+    if g_player_cli:create_one_entry({player_id = player_id, nickname = account}) then
         return true
     end
 
@@ -41,6 +42,7 @@ end
 
 --预告登录
 function CMD.advance_login(player_id, randkey)
+    log.info("advance_login >>> ", player_id, randkey, skynet.self())
     randkey_cache:del_cache(player_id)
     randkey_cache:set_cache(player_id, randkey)
     return g_host
@@ -48,6 +50,7 @@ end
 
 --获取randkey
 function CMD.get_randkey(player_id)
+    log.info("get_randkey >>> ", player_id, skynet.self())
     return randkey_cache:get_cache(player_id)
 end
 
