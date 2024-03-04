@@ -1,8 +1,8 @@
-local redis_cfg = loadfile("../../common/etc/redis_cfg.lua")()
-local mysql_cfg = loadfile("../../common/etc/mysql_cfg.lua")()
-local server_cfg = loadfile("../../common/etc/server_cfg.lua")()
-local cluster_server_cfg = loadfile("../../common/etc/cluster_server_cfg.lua")()
-local http_cfg = loadfile("../../common/etc/http_cfg.lua")()
+local redis_cfg = loadfile("../../commonlualib/common/etc/redis_cfg.lua")()
+local mysql_cfg = loadfile("../../commonlualib/common/etc/mysql_cfg.lua")()
+local server_cfg = loadfile("../../commonlualib/common/etc/server_cfg.lua")()
+local cluster_server_cfg = loadfile("../../commonlualib/common/etc/cluster_server_cfg.lua")()
+local http_cfg = loadfile("../../commonlualib/common/etc/http_cfg.lua")()
 
 return {
     --共享配置
@@ -73,8 +73,8 @@ return {
 		launch_seq = 5500,
 		launch_num = 2,
 		mod_args = {
-			{instance_name = "roles",orm_plug = "roles_entity"},
-			{instance_name = "users",orm_plug = "users_entity"},
+			{instance_name = "roles",orm_plug = "orm_entity.roles_entity"},
+			{instance_name = "users",orm_plug = "orm_entity.users_entity"},
 		}
 	},
 

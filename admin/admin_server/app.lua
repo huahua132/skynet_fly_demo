@@ -1,8 +1,8 @@
 local skynet = require "skynet"
-local engine_web = require "engine_web"
+local engine_web = require "skynet-fly.web.engine_web"
 local router = require "router"
-local token_auth_mid = require "token_auth_mid"
-local permission_mid = require "permission_mid"
+local token_auth_mid = require "middleware.token_auth_mid"
+local permission_mid = require "middleware.permission_mid"
 
 local M = {}
 

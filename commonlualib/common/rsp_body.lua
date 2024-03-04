@@ -1,4 +1,4 @@
-local errorcode = require "errorcode"
+local errorcode = require "common.enum.errorcode"
 
 local function new_body(code,message,data)
     return {

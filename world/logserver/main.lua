@@ -1,6 +1,6 @@
 local skynet = require "skynet"
-local contriner_launcher = require "contriner_launcher"
-local log = require "log"
+local contriner_launcher = require "skynet-fly.contriner.contriner_launcher"
+local log = require "skynet-fly.log"
 
 skynet.start(function()
 	skynet.error("start logserver>>>>>>>>>>>>>>>>>")

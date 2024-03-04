@@ -1,6 +1,6 @@
-local rsp_body = require "rsp_body"
-local cluster_client = require "cluster_client"
-local log = require "log"
+local rsp_body = require "common.rsp_body"
+local cluster_client = require "skynet-fly.client.cluster_client"
+local log = require "skynet-fly.log"
 
 local assert = assert
 local tonumber = tonumber

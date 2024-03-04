@@ -1,7 +1,7 @@
-local ormtable = require "ormtable"
-local ormadapter_mysql = require "ormadapter_mysql"
-local ENUM = require "ENUM"
-local log = require "log"
+local ormtable = require "skynet-fly.db.orm.ormtable"
+local ormadapter_mysql = require "skynet-fly.db.ormadapter.ormadapter_mysql"
+local ENUM = require "enum.ENUM"
+local log = require "skynet-fly.log"
 local json = require "cjson"
 
 local pairs = pairs

@@ -1,8 +1,8 @@
-local log = require "log"
-local CODE = require "CODE"
-local rsp_body = require "rsp_body"
-local table_util = require "table_util"
-local ENUM = require "ENUM"
+local log = require "skynet-fly.log"
+local CODE = require "enum.CODE"
+local rsp_body = require "common.rsp_body"
+local table_util = require "skynet-fly.utils.table_util"
+local ENUM = require "enum.ENUM"
 
 local string = string
 

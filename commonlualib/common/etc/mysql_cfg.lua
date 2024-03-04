@@ -1,4 +1,4 @@
-local table_util = dofile("../../skynet_fly/lualib/utils/table_util.lua")
+local table_util = dofile("../../skynet_fly/lualib/skynet-fly/utils/table_util.lua")
 --mysql的配置
 
 local db1 = {

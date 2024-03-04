@@ -8,11 +8,6 @@ M.games = {
         address = '0.0.0.0',
         port = 9012,
         maxclient = 2048,
-    },
-    stone_scissors_cloth = {
-        address = '0.0.0.0',
-        port = 9112,
-        maxclient = 2048,
     }
 }
 

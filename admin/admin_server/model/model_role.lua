@@ -1,8 +1,8 @@
-local log = require "log"
+local log = require "skynet-fly.log"
 local json = require "cjson"
-local CODE = require "CODE"
-local contriner_client = require "contriner_client"
-local orm_table_client = require "orm_table_client"
+local CODE = require "enum.CODE"
+local contriner_client = require "skynet-fly.client.contriner_client"
+local orm_table_client = require "skynet-fly.client.orm_table_client"
 
 contriner_client:register("signature_m")
 

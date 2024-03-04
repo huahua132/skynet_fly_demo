@@ -1,7 +1,7 @@
-local server_cfg = loadfile("../../common/etc/server_cfg.lua")()
-local redis_cfg = loadfile("../../common/etc/redis_cfg.lua")()
-local cluster_server_cfg = loadfile("../../common/etc/cluster_server_cfg.lua")()
-local mysql_cfg = loadfile("../../common/etc/mysql_cfg.lua")()
+local server_cfg = loadfile("../../commonlualib/common/etc/server_cfg.lua")()
+local redis_cfg = loadfile("../../commonlualib/common/etc/redis_cfg.lua")()
+local cluster_server_cfg = loadfile("../../commonlualib/common/etc/cluster_server_cfg.lua")()
+local mysql_cfg = loadfile("../../commonlualib/common/etc/mysql_cfg.lua")()
 
 return {
         --共享配置
@@ -55,19 +55,19 @@ return {
 		launch_seq = 5000,
 		launch_num = 11,
 		mod_args = {
-			{instance_name = "account_1",orm_plug  = "account_entity"},
-            {instance_name = "account_2",orm_plug  = "account_entity"},
-            {instance_name = "account_3",orm_plug  = "account_entity"},
-            {instance_name = "account_4",orm_plug  = "account_entity"},
-            {instance_name = "account_5",orm_plug  = "account_entity"},
-            {instance_name = "account_6",orm_plug  = "account_entity"},
-            {instance_name = "account_7",orm_plug  = "account_entity"},
-            {instance_name = "account_8",orm_plug  = "account_entity"},
-            {instance_name = "account_9",orm_plug  = "account_entity"},
-            {instance_name = "account_10",orm_plug = "account_entity"},
+			{instance_name = "account_1",orm_plug  = "orm_entity.account_entity"},
+            {instance_name = "account_2",orm_plug  = "orm_entity.account_entity"},
+            {instance_name = "account_3",orm_plug  = "orm_entity.account_entity"},
+            {instance_name = "account_4",orm_plug  = "orm_entity.account_entity"},
+            {instance_name = "account_5",orm_plug  = "orm_entity.account_entity"},
+            {instance_name = "account_6",orm_plug  = "orm_entity.account_entity"},
+            {instance_name = "account_7",orm_plug  = "orm_entity.account_entity"},
+            {instance_name = "account_8",orm_plug  = "orm_entity.account_entity"},
+            {instance_name = "account_9",orm_plug  = "orm_entity.account_entity"},
+            {instance_name = "account_10",orm_plug = "orm_entity.account_entity"},
 
             --自增id分配
-            {instance_name = "allocid",   orm_plug = "allocid_entity"},
+            {instance_name = "allocid",   orm_plug = "orm_entity.allocid_entity"},
 		}
 	},
 

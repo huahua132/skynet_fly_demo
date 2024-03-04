@@ -1,5 +1,5 @@
-local ormtable = require "ormtable"
-local ormadapter_mysql = require "ormadapter_mysql"
+local ormtable = require "skynet-fly.db.orm.ormtable"
+local ormadapter_mysql = require "skynet-fly.db.ormadapter.ormadapter_mysql"
 local skynet = require "skynet"
 
 local svr_id = tonumber(skynet.getenv('svr_id'))

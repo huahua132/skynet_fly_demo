@@ -2,13 +2,13 @@
 --对集群服务进行监控
 -------------------------------------------------------
 local skynet = require "skynet"
-local cluster_client = require "cluster_client"
-local timer_point = require "timer_point"
-local string_util = require "string_util"
-local time_util = require "time_util"
-local contriner_client = require "contriner_client"
+local cluster_client = require "skynet-fly.client.cluster_client"
+local timer_point = require "skynet-fly.time_extend.timer_point"
+local string_util = require "skynet-fly.utils.string_util"
+local time_util = require "skynet-fly.utils.time_util"
+local contriner_client = require "skynet-fly.client.contriner_client"
 local json = require "cjson"
-local log = require "log"
+local log = require "skynet-fly.log"
 local os = os
 
 local tonumber = tonumber
