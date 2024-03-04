@@ -35,8 +35,3 @@ cd games/chinese_chess
 bash ${make_cmd}
 bash script/restart.sh load_mods.lua
 cd ../../
-
-cd games/stone_scissors_cloth
-bash ${make_cmd}
-bash script/restart.sh load_mods.lua
-cd ../../
