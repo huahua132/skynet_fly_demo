@@ -1,6 +1,6 @@
-local ormtable = require "ormtable"
-local ormadapter_mysql = require "ormadapter_mysql"
-local module_info = require "module_info"
+local ormtable = require "skynet-fly.db.orm.ormtable"
+local ormadapter_mysql = require "skynet-fly.db.ormadapter.ormadapter_mysql"
+local module_info = require "skynet-fly.etc.module_info"
 
 local pairs = pairs
 local ipairs = ipairs

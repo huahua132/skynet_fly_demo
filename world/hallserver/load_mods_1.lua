@@ -1,8 +1,8 @@
-local server_cfg = loadfile("../../common/etc/server_cfg.lua")()
-local redis_cfg = loadfile("../../common/etc/redis_cfg.lua")()
-local cluster_server_cfg = loadfile("../../common/etc/cluster_server_cfg.lua")()
-local gate_cfg = loadfile("../../common/etc/gate_cfg.lua")()
-local mysql_cfg = loadfile("../../common/etc/mysql_cfg.lua")()
+local server_cfg = loadfile("../../commonlualib/common/etc/server_cfg.lua")()
+local redis_cfg = loadfile("../../commonlualib/common/etc/redis_cfg.lua")()
+local cluster_server_cfg = loadfile("../../commonlualib/common/etc/cluster_server_cfg.lua")()
+local gate_cfg = loadfile("../../commonlualib/common/etc/gate_cfg.lua")()
+local mysql_cfg = loadfile("../../commonlualib/common/etc/mysql_cfg.lua")()
 
 return {
         --共享配置
@@ -25,7 +25,7 @@ return {
 				gateservice = "ws_gate", --gate 或者 ws_gate
 				--gate连接配置
 				gateconf = gate_cfg.world.hallserver_1,
-				login_plug = "login_plug",  --login加载的插件lua模块文件名
+				login_plug = "login.login_plug",  --login加载的插件lua模块文件名
 			},
 		}
 	},
@@ -78,7 +78,7 @@ return {
 		launch_seq = 6000,
 		launch_num = 6,     --启动6个
 		default_arg = {
-			hall_plug = "hall_plug",         --大厅加载的插件lua模块文件名
+			hall_plug = "hall.hall_plug",         --大厅加载的插件lua模块文件名
 		}
 	},
 
@@ -87,7 +87,7 @@ return {
 		launch_seq = 6100,
 		launch_num = 1, --启动1个
 		default_arg = {
-			alloc_plug = "alloc_plug",       --匹配加载的插件lua模块文件名
+			alloc_plug = "alloc.alloc_plug",       --匹配加载的插件lua模块文件名
 			MAX_TABLES = 10000,  --最多1万个游戏桌子
 		}
 	},
@@ -97,7 +97,7 @@ return {
 		launch_seq = 6200,
 		launch_num = 1,
 		default_arg = {
-			table_plug = "table_plug",   --房间插件
+			table_plug = "table.table_plug",   --房间插件
 			instance_name = "default",
 			table_conf = {}
 		}
@@ -108,7 +108,7 @@ return {
 		launch_seq = 7000,
 		launch_num = 1,
 		mod_args = {
-            {instance_name = "player", orm_plug = "player_entity"},
+            {instance_name = "player", orm_plug = "orm_entity.player_entity"},
 		}
 	},
 

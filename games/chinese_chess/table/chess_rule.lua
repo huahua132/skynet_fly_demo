@@ -1,6 +1,6 @@
-local CHESS_TYPE = require "CHESS_TYPE"
-local TEAM_TYPE = require "TEAM_TYPE"
-local table_util = require "table_util"
+local CHESS_TYPE = require "enum.CHESS_TYPE"
+local TEAM_TYPE = require "enum.TEAM_TYPE"
+local table_util = require "skynet-fly.utils.table_util"
 
 local ipairs = ipairs
 local tinsert = table.insert

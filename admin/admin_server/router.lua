@@ -1,8 +1,8 @@
-local user_router = require "user_router"
-local role_router = require "role_router"
-local monitor_router = require "monitor_router"
-local realtimelist_router = require "realtimelist_router"
-local warnlog_router = require "warnlog_router"
+local user_router = require "router_group.user_router"
+local role_router = require "router_group.role_router"
+local monitor_router = require "router_group.monitor_router"
+local realtimelist_router = require "router_group.realtimelist_router"
+local warnlog_router = require "router_group.warnlog_router"
 
 return function(app)
     user_router(app:group("/user"))                     --用户模块

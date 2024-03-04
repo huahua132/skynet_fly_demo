@@ -1,10 +1,10 @@
-local cluster_client = require "cluster_client"
-local jwt = require "luajwtjitsi"
-local rsp_body = require "rsp_body"
+local cluster_client = require "skynet-fly.client.cluster_client"
+local jwt = require "skynet-fly.3rd.luajwtjitsi"
+local rsp_body = require "common.rsp_body"
 local crypt = require "skynet.crypt"
-local C_ENUM = require "C_ENUM"
-local time_util = require "time_util"
-local log = require "log"
+local ENUM = require "common.enum.ENUM"
+local time_util = require "skynet-fly.utils.time_util"
+local log = require "skynet-fly.log"
 
 local assert = assert
 local type = type
@@ -38,7 +38,7 @@ local function login(c)
         local cur_time = time_util.time()
         local claim = {
             iss = "skynet_fly_admin",                       --签发者
-            exp = cur_time + C_ENUM.LOGIN_TOKEN_TIME_OUT,   --过期时间
+            exp = cur_time + ENUM.LOGIN_TOKEN_TIME_OUT,   --过期时间
             nbf = cur_time,                                 --生效时间
         }
 

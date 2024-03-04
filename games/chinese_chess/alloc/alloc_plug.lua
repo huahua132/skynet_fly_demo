@@ -1,6 +1,6 @@
-local log = require "log"
-local errorcode = require "errorcode"
-local GAME_STATE = require "GAME_STATE"
+local log = require "skynet-fly.log"
+local errorcode = require "common.enum.errorcode"
+local GAME_STATE = require "enum.GAME_STATE"
 
 local pairs = pairs
 local table = table

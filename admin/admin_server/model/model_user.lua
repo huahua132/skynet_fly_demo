@@ -1,13 +1,13 @@
-local token_auth_mid = require "token_auth_mid"
-local model_role = require "model_role"
-local mysqlf = require "mysqlf"
-local log = require "log"
-local CODE = require "CODE"
+local token_auth_mid = require "middleware.token_auth_mid"
+local model_role = require "model.model_role"
+local mysqlf = require "skynet-fly.db.mysqlf"
+local log = require "skynet-fly.log"
+local CODE = require "enum.CODE"
 local json = require "cjson"
-local orm_table_client = require "orm_table_client"
-local crypt_util = require "crypt_util"
+local orm_table_client = require "skynet-fly.client.orm_table_client"
+local crypt_util = require "skynet-fly.utils.crypt_util"
 local crypt = require "skynet.crypt"
-local time_util = require "time_util"
+local time_util = require "skynet-fly.utils.time_util"
 
 local g_users_client = orm_table_client:new("users")
 

@@ -1,8 +1,8 @@
-local log = require "log"
+local log = require "skynet-fly.log"
 local skynet = require "skynet"
-local cluster_client = require "cluster_client"
-local cache_help = require "cache_help"
-local timer = require "timer"
+local cluster_client = require "skynet-fly.client.cluster_client"
+local cache_help = require "skynet-fly.cache.cache_help"
+local timer = require "skynet-fly.timer"
 
 local warn_cache = cache_help:new(timer.hour)   --同一条错误，一个小时只报1次
 

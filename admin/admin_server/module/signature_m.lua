@@ -1,12 +1,11 @@
-local crypt = require "client.crypt"
-local time_util = require "time_util"
-local skynet_util = require "skynet_util"
+local time_util = require "skynet-fly.utils.time_util"
+local skynet_util = require "skynet-fly.utils.skynet_util"
 local skynet = require "skynet"
-local log = require "log"
-local timer = require "timer"
+local log = require "skynet-fly.log"
+local timer = require "skynet-fly.timer"
 local crypt = require "skynet.crypt"
-local cache_help = require "cache_help"
-local ENUM = require "ENUM"
+local cache_help = require "skynet-fly.cache.cache_help"
+local ENUM = require "enum.ENUM"
 
 local pairs = pairs
 local next = next

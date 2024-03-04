@@ -1,4 +1,4 @@
-local ws_pbnet_util = require "ws_pbnet_util"
+local ws_pbnet_util = require "skynet-fly.utils.net.ws_pbnet_util"
 
 local M = {}
 

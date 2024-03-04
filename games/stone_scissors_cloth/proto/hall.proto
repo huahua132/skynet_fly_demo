@@ -1,9 +1,0 @@
-package hall;
-
-message MatchReq {
-	optional int32 player_id = 1;
-}
-
-message MatchRes {
-    optional string table_id = 1;        //桌子id
-}

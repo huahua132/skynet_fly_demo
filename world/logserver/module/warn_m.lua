@@ -1,7 +1,7 @@
 local skynet = require "skynet"
-local contriner_client = require "contriner_client"
-local log = require "log"
-local time_util = require "time_util"
+local contriner_client = require "skynet-fly.client.contriner_client"
+local log = require "skynet-fly.log"
+local time_util = require "skynet-fly.utils.time_util"
 contriner_client:register("logrotate_m")
 
 local CMD = {}

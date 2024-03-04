@@ -1,10 +1,10 @@
-local log = require "log"
-local orm_table_client = require "orm_table_client"
+local log = require "skynet-fly.log"
+local orm_table_client = require "skynet-fly.client.orm_table_client"
 local crypt = require "skynet.crypt"
-local crypt_util = require "crypt_util"
-local cluster_client = require "cluster_client"
-local errorcode = require "errorcode"
-local string_util = require "string_util"
+local crypt_util = require "skynet-fly.utils.crypt_util"
+local cluster_client = require "skynet-fly.client.cluster_client"
+local errorcode = require "common.enum.errorcode"
+local string_util = require "skynet-fly.utils.string_util"
 
 local sbyte = string.byte
 local assert = assert

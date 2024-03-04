@@ -1,15 +1,15 @@
 local skynet = require "skynet"
-local pb_netpack = require "pb_netpack"
-local ws_pbnet_util = require "ws_pbnet_util"
-local string_util = require "string_util"
-local GAME_STATE = require "GAME_STATE"
-local seater = require "seater"
-local log = require "log"
-local chess_rule = require "chess_rule"
-local TEAM_TYPE = require "TEAM_TYPE"
-local module_cfg = require "module_info".get_cfg()
-local errors_msg = require "errors_msg"
-local game_msg = require "game_msg"
+local pb_netpack = require "skynet-fly.netpack.pb_netpack"
+local ws_pbnet_util = require "skynet-fly.utils.net.ws_pbnet_util"
+local string_util = require "skynet-fly.utils.string_util"
+local GAME_STATE = require "enum.GAME_STATE"
+local seater = require "table.seater"
+local log = require "skynet-fly.log"
+local chess_rule = require "table.chess_rule"
+local TEAM_TYPE = require "enum.TEAM_TYPE"
+local module_cfg = require "skynet-fly.etc.module_info".get_cfg()
+local errors_msg = require "common.msg.errors_msg"
+local game_msg = require "msg.game_msg"
 
 local string = string
 local assert = assert

@@ -5,10 +5,7 @@ local M = {}
 M.games = {
     chinese_chess = {
         debug_port = 9011,
-    },
-    stone_scissors_cloth = {
-        debug_port = 9021,
-    },
+    }
 }
 
 --后台配置 10开头

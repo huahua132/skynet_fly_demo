@@ -1,14 +1,14 @@
-local rsp_body = require "rsp_body"
-local contriner_client = require "contriner_client"
-local cluster_client = require "cluster_client"
-local cache_help = require "cache_help"
-local timer = require "timer"
-local time_util = require "time_util"
-local file_util = require "file_util"
-local log = require "log"
+local rsp_body = require "common.rsp_body"
+local contriner_client = require "skynet-fly.client.contriner_client"
+local cluster_client = require "skynet-fly.client.cluster_client"
+local cache_help = require "skynet-fly.cache.cache_help"
+local timer = require "skynet-fly.timer"
+local time_util = require "skynet-fly.utils.time_util"
+local file_util = require "skynet-fly.utils.file_util"
+local log = require "skynet-fly.log"
 local cjson_safe = require 'cjson.safe'
-local table_util = require "table_util"
-local string_util = require "string_util"
+local table_util = require "skynet-fly.utils.table_util"
+local string_util = require "skynet-fly.utils.string_util"
 
 local assert = assert
 local next = next

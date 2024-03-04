@@ -1,10 +1,10 @@
 
-local log = require "log"
-local ws_pbnet_util = require "ws_pbnet_util"
-local pb_netpack = require "pb_netpack"
-local timer = require "timer"
-local errors_msg = require "errors_msg"
-local orm_table_client = require "orm_table_client"
+local log = require "skynet-fly.log"
+local ws_pbnet_util = require "skynet-fly.utils.net.ws_pbnet_util"
+local pb_netpack = require "skynet-fly.netpack.pb_netpack"
+local timer = require "skynet-fly.timer"
+local errors_msg = require "common.msg.errors_msg"
+local orm_table_client = require "skynet-fly.client.orm_table_client"
 local assert = assert
 
 local g_interface_mgr = nil
