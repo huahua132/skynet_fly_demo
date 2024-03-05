@@ -5,6 +5,7 @@ local pb_netpack = require "skynet-fly.netpack.pb_netpack"
 local timer = require "skynet-fly.timer"
 local errors_msg = require "common.msg.errors_msg"
 local orm_table_client = require "skynet-fly.client.orm_table_client"
+local player_agent = require "hall.player_agent"
 local assert = assert
 
 local g_interface_mgr = nil
@@ -19,6 +20,11 @@ M.send = ws_pbnet_util.send
 M.broadcast = ws_pbnet_util.broadcast
 M.disconn_time_out = timer.minute                   --掉线一分钟就清理
 
+local function heart_req(player_id, packname, pack_body)
+	log.info("heart_req >>>> ", player_id, pack_body)
+	player_agent.on_heart(player_id)
+end
+
 --初始化
 function M.init(interface_mgr)
 	--加载协议
@@ -26,12 +32,15 @@ function M.init(interface_mgr)
 	pb_netpack.load('./proto')
 	g_interface_mgr = interface_mgr
 	errors_msg = errors_msg:new(interface_mgr)
+
+	g_interface_mgr:handle(".hallserver_hall.HeartReq", heart_req)
 end
 
 --连接成功
 function M.connect(player_id)
-	log.info("hall_plug connect ",player_id)
 	local player = g_player_client:get_one_entry(player_id)
+	log.info("hall_plug connect ",player)
+	player_agent.on_login(player_id)
 	return {
 		player_id = player_id,
 		nickname = player.nickname,
@@ -45,14 +54,17 @@ end
 
 --重连
 function M.reconnect(player_id)
-	log.info("hall_plug reconnect ",player_id)
+	local player = g_player_client:get_one_entry(player_id)
+	log.info("hall_plug reconnect ",player_id, player)
 	return {
-		player_id = player_id
+		player_id = player_id,
+		nickname = player.nickname,
 	}
 end
 
 --登出
 function M.goout(player_id)
+	player_agent.on_loginout(player_id)
 	log.info("hall_plug goout ",player_id)
 end
 

@@ -1,0 +1,6 @@
+package hallserver_hall;
+
+//心跳包
+message HeartReq {
+	optional int64 time = 1;
+}
