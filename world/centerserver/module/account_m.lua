@@ -33,7 +33,12 @@ local CMD = {}
 -- 玩家id生成
 --   92,   23,3   72,03  6,854,775,807
 -- 预留位 渠道id   服务id    自增id
-local MAX_INCRID = 9999999999
+
+--由于js没有long类型，最大能表示 2^53-1的整数，所以调整一下ID结构,为了尽可能的兼容所有客户端
+-- 9      0071      9925   4740991      (1个能注册1千万-1个账号)
+-- 预留位 渠道id    服务id   自增id
+
+local MAX_INCRID = 9999999
 function CMD.register(account_info)
     local account = account_info.account --账号
     assert(account:len() >= 6, "account not long enough")
@@ -52,7 +57,7 @@ function CMD.register(account_info)
 
     local incrid = g_alloc_clinet:incr(module_id)
     assert(incrid <= MAX_INCRID, "incr overflow")
-    local player_id = tonumber(string.format("1%03d%04d%010d", 1, svr_id, incrid))
+    local player_id = tonumber(string.format("1%04d%04d%07d", 1, svr_id, incrid))
     ret = cli:byid_balance_call("register", player_id, account)
     local result = ret.result[1]
     assert(result, "register err")

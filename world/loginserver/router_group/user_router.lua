@@ -46,7 +46,11 @@ local function login(c)
         -- Create a token.
         local token = assert(jwt.encode(claim, rand_key, "HS256"))
         assert(type(token) == "string")
-        
+        local json = require "cjson"
+        local aa = {
+            player_id = player_id
+        }
+        log.info("login:", json.decode(json.encode(aa)))
         rsp_body.set_rsp(c, {
             token = token,
             host = host,

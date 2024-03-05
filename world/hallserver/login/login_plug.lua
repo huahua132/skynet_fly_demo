@@ -15,8 +15,6 @@ local x_pcall = x_pcall
 
 local g_interface_mgr = nil   --接口
 
-local g_player_map = {}
-
 local M = {}
 
 --登录检测的超时时间
@@ -57,19 +55,13 @@ function M.check(packname,pack_body)
 		log.error("login check err ",pack_body)
 		return false,errorcode.REQ_PARAM_ERR,"not token",packname
 	end
-	local player = g_player_map[player_id]
-	local randkey = nil
-	if player then
-		randkey = player.randkey
-	else
-		local cli = contriner_client:instance("player_m")
-		cli:set_mod_num(player_id)
-		log.info("mod_call get_randkey >>>>> ",player_id)
-		randkey = cli:mod_call("get_randkey", player_id)
-		if not randkey then
-			log.error("login check err not randkey ")
-			return false, errorcode.TOPEN_ERR, "not randkey"
-		end
+	local cli = contriner_client:instance("player_m")
+	cli:set_mod_num(player_id)
+	log.info("mod_call get_randkey >>>>> ",player_id)
+	local randkey = cli:mod_call("get_randkey", player_id)
+	if not randkey then
+		log.error("login check err not randkey ")
+		return false, errorcode.TOPEN_ERR, "not randkey"
 	end
 	-- jwt 认证
 	local payload, msg = jwt.verify(token, "HS256", randkey)
@@ -77,16 +69,11 @@ function M.check(packname,pack_body)
 		log.info("login check verify failed", player_id)
 		return false, errorcode.TOPEN_ERR, "token err"
 	end
-	--成功返回玩家id
-	g_player_map[player_id] = {
-		randkey = randkey
-	}
 	return player_id
 end
 
 --登录失败
 function M.login_failed(player_id,errcode,errmsg)
-	g_player_map[player_id] = nil
 	log.info("login_failed >>>> ", player_id, errcode, errmsg)
 	errors_msg:errors(player_id, errcode, errmsg)
 end
@@ -99,7 +86,6 @@ end
 
 --登出回调
 function M.login_out(player_id)
-	g_player_map[player_id] = nil
 	log.info("login_out ",player_id)
 end
 
