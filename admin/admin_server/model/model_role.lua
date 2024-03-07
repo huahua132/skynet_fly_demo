@@ -1,6 +1,6 @@
 local log = require "skynet-fly.log"
 local json = require "cjson"
-local CODE = require "enum.CODE"
+local CODE = require "common.enum.CODE"
 local contriner_client = require "skynet-fly.client.contriner_client"
 local orm_table_client = require "skynet-fly.client.orm_table_client"
 

@@ -1,6 +1,6 @@
 local model_role = require "model.model_role"
 local rsp_body = require "common.rsp_body"
-local CODE = require "enum.CODE"
+local CODE = require "common.enum.CODE"
 local log = require "skynet-fly.log"
 local ENUM = require "enum.ENUM"
 local permission_mid = require "middleware.permission_mid"

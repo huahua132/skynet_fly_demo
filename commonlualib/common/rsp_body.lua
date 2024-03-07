@@ -1,4 +1,4 @@
-local errorcode = require "common.enum.errorcode"
+local CODE = require "common.enum.CODE"
 
 local function new_body(code,message,data)
     return {
@@ -11,7 +11,7 @@ end
 local M = {}
 
 local function ok_rsp(data)
-    return new_body(errorcode.OK,nil,data)
+    return new_body(CODE.OK,nil,data)
 end
 
 local function error_rsp(code, message)
