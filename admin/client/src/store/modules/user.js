@@ -37,12 +37,15 @@ const mutations = {
 const actions = {
   // user login
   login({ commit, state }, userInfo) {
+    console.log("userlogin>>>>>>>>>>>>>>>>>>>>>>>>>>>")
     let dh = ECDHCrypto.createECDHCrypto()
+    console.log("userlogin1>>>>>>>>>>>>>>>>>>>>>>>>>>>")
     let serverdh = ECDHCrypto.createECDHCrypto()    //mock那边创建在这里创建，正常是服务端创建的
     let challenge = ''
     return new Promise((resolve, reject) => {
       handshake({}).then(response => {
         const { data } = response
+        console.log("userlogin2>>>>>>>>>>>>>>>>>>>>>>>>>>>", response)
         challenge = Buffer.from(data, 'base64')
 
         let server_key = serverdh.asPublicECDHCrypto()

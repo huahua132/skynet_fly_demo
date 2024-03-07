@@ -3,6 +3,7 @@
 local assert = assert
 local tonumber = tonumber
 local string = string
+local math = math
 
 local M = {}
 --构建玩家ID
@@ -25,12 +26,17 @@ end
 
 -- 通过玩家id得到渠道ID
 function M.get_channel_id_by_player_id(player_id)
-    
+    local offset = INCRID_LIMIT * SVRID_LIMIT
+    return math.floor(player_id / offset) % CHANELLID_LIMIT
 end
 
 -- 通过玩家id得到服务id
 function M.get_svr_id_by_player_id(player_id)
-
+    local offset = INCRID_LIMIT
+    return math.floor(player_id / offset) % SVRID_LIMIT
 end
+
+assert(M.get_channel_id_by_player_id(1100120021234567) == 1001)
+assert(M.get_svr_id_by_player_id(1100120021234567) == 2002)
 
 return M

@@ -1,7 +1,7 @@
 local model_user = require "model.model_user"
 local rsp_body = require "common.rsp_body"
 local log = require "skynet-fly.log"
-local CODE = require "enum.CODE"
+local CODE = require "common.enum.CODE"
 local crypt = require "skynet.crypt"
 local crypt_util = require "skynet-fly.utils.crypt_util"
 local permission_mid = require "middleware.permission_mid"

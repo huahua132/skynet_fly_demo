@@ -1,7 +1,7 @@
 local jwt = require "skynet-fly.3rd.luajwtjitsi"
 local radix_router = require "skynet-fly.3rd.radix-router"
 local time_util = require "skynet-fly.utils.time_util"
-local CODE = require "enum.CODE"
+local CODE = require "common.enum.CODE"
 local rsp_body = require "common.rsp_body"
 local contriner_client = require "skynet-fly.client.contriner_client"
 local log = require "skynet-fly.log"

@@ -4,6 +4,7 @@ local skynet = require "skynet"
 local timer = require "skynet-fly.timer"
 local redis = require "skynet-fly.db.redisf"
 local string_util = require "skynet-fly.utils.string_util"
+local player_util = require "common.utils.player"
 
 local tonumber = tonumber
 local ipairs = ipairs
@@ -19,20 +20,25 @@ local function syn_game_info()
     --给所有节点发
     local gameinfo_list = {}
     local ret = g_game_cli:all_mod_call("get_info")
+    if not ret then return end
+
     for _,v in ipairs(ret) do
-        local cluster_name = v.cluster_name
-        local spstr = string_util.split(cluster_name, ':')
-        local svr_name, svr_id = tonumber(spstr[1]), tonumber(spstr[2])
         local result = v.result
         local info = result[1]
-        table.insert(gameinfo_list, {
-            host = info.host,
-            cur_player_num = info.cur_player_num,
-            cur_table_num = info.cur_table_num,
-            max_table_num = info.max_table_num,
-            svr_name = svr_name,
-            svr_id = svr_id,
-        })
+        if info then
+            local cluster_name = v.cluster_name
+            local spstr = string_util.split(cluster_name, ':')
+            local svr_name, svr_id = tonumber(spstr[1]), tonumber(spstr[2])
+        
+            table.insert(gameinfo_list, {
+                host = info.host,
+                cur_player_num = info.cur_player_num,
+                cur_table_num = info.cur_table_num,
+                max_table_num = info.max_table_num,
+                svr_name = svr_name,
+                svr_id = svr_id,
+            })
+        end
     end
 
     g_gameinfolist = gameinfo_list
@@ -71,8 +77,14 @@ local function match_loop()
         local table_id, token_list = g_game_cli:byid_mod_call("createtable", member_list) --创建桌子
         log.info("match_loop >>> ", table_id, token_list)
 
+        --通知大厅服，匹配成功了
         for _,player_id in ipairs(match_list) do
-            
+            local svr_id = player_util.get_svr_id_by_player_id(player_id)
+            log.info("get_svr_id_by_player_id >>> ",player_id, svr_id)
+            local hallcli = cluster_client:instance("hallserver")
+            hallcli:set_svr_id(svr_id)      --指定服
+            hallcli:set_mod_num(player_id)  --指定mod_num 
+            hallcli:byid_mod_call()
         end
     end
 end
@@ -114,9 +126,6 @@ function CMD.start(config)
         g_game_cli = cluster_client:new(config.instance_name, "room_game_alloc_m")
         --注册一个5秒一次的定时器
         g_timer_obj = timer:new(timer.second * 5, 0, syn_game_info)
-
-        CMD.match(1000)
-        CMD.match(1001)
         --匹配循环
         g_match_loop_timer = timer:new(timer.second * 5, 0, match_loop)
         --执行完再注册下一次
