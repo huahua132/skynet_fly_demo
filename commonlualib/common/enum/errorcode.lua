@@ -13,4 +13,5 @@ return {
 	ACCOUNT_NOT_EXISTS = 10, --账号不存在
 	TOKEN_ERR = 11,          --token失效
 	ACCOUNT_EXISTS = 12,     --账号已存在
+	GAME_NOT_EXISTS = 13,    --游戏不存在
 }

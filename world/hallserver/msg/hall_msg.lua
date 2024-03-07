@@ -1,0 +1,28 @@
+local setmetatable = setmetatable
+
+local interface_mgr = nil
+
+local M = {}
+local meta = {__index = M}
+
+function M:new(interface_mgr)
+	local t = {
+		interface_mgr = interface_mgr
+	}
+	setmetatable(t,meta)
+	return t
+end
+
+function M:match_game_res(player_id, res)
+	self.interface_mgr:send_msg(player_id, '.hallserver_hall.MatchGameRes', res)
+end
+
+function M:cancel_match_game_res(player_id, res)
+	self.interface_mgr:send_msg(player_id, '.hallserver_hall.CancelMatchGameRes', res)
+end
+
+function M:match_game_notice(player_id, res)
+	self.interface_mgr:send_msg(player_id, '.hallserver_hall.MatchGameNotice', res)
+end
+
+return M

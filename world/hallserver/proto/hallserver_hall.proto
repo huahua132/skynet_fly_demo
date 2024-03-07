@@ -76,7 +76,7 @@ message AcceptMatchReq {
 
 //回应接受匹配
 message AcceptMatchRes {
-    optional int32 session_id    = 1;  //匹配成功的会话ID
+    optional int32 session_id = 1;  //匹配成功的会话ID
 }
 
 //请求拒绝匹配结果
