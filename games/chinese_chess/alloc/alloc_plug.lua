@@ -1,6 +1,12 @@
 local log = require "skynet-fly.log"
 local errorcode = require "common.enum.errorcode"
 local GAME_STATE = require "enum.GAME_STATE"
+local skynet = require "skynet"
+local contriner_client = require "skynet-fly.client.contriner_client"
+local cfg = require "skynet-fly.etc.module_info".get_cfg()
+local ENUM = require "enum.ENUM"
+
+contriner_client:register("share_config_m", "token_m")
 
 local pairs = pairs
 local table = table
@@ -8,140 +14,74 @@ local ipairs = ipairs
 local assert = assert
 local next = next
 
-local g_table_map = {}
-local g_cant_enter_map = {}
+local g_alloc_interface = nil
+
+local g_info = {
+	max_table_num = cfg.MAX_TABLES,
+	cur_table_num = 0,
+	cur_player_num = 0,
+	host = "",
+}
 
 local M = {}
 
 local CMD = {}
 
-function CMD.update_state(table_id,player_id,state)
-	log.info("update_state:",table_id, player_id)
+--销毁桌子
+function CMD.dismisstable(table_id)
+	g_alloc_interface.dismisstable(table_id)
+end
 
-	local t_info = g_table_map[table_id]
-	if not t_info then
-		log.warn("update state not exists table_id = ",table_id)
-		return
+--获取信息
+function CMD.get_info()
+	return g_info
+end
+
+--创建桌子
+function CMD.createtable(player_list)
+	local table_id = g_alloc_interface.create_table("default")
+	if not table_id then
+		return nil
 	end
 
-	t_info.state = state
+	--创建token
+	local token_list = contriner_client:instance("token_m"):mod_call("create_token", player_list, ENUM.TOKEN_TIME_OUT)
+	return table_id, token_list
 end
 
 M.register_cmd = CMD
 
-function M.init(alloc_mgr) --初始化
-
-end
-
-local function check_can_join(t_info,player_id)
-	local max_player_num = t_info.config.table_conf.player_num
-	if t_info.state ~= GAME_STATE.waiting then
-		return false
-	end
-
-	if #t_info.player_list + 1 > max_player_num then
-		return false
-	end
-
-	return true
+function M.init(alloc_interface) --初始化
+	g_alloc_interface = alloc_interface
+	skynet.fork(function()
+		local confclient = contriner_client:new("share_config_m")
+        local room_game_login = confclient:mod_call('query','room_game_login')
+        g_info.host = room_game_login.gateconf.host
+	end)
 end
 
 function M.match(player_id) --匹配
-	local table_num_map = {}
-
-	local max_player_num = 0
-	for table_id,t_info in pairs(g_table_map) do
-		local player_num = #t_info.player_list
-		if not table_num_map[player_num] then
-			table_num_map[player_num] = {}
-		end
-		if not g_cant_enter_map[table_id] then
-			table.insert(table_num_map[player_num],t_info)
-		end
-
-		if t_info.config.table_conf.player_num > max_player_num then
-			max_player_num = t_info.config.table_conf.player_num
-		end
-	end
-
-	--log.info("matching_table",g_table_map,table_num_map)
-
-	for i = max_player_num - 1,0,-1 do
-		local t_list = table_num_map[i]
-		if t_list then
-			for _,t_info in ipairs(t_list) do
-				if check_can_join(t_info,player_id) then
-					return t_info.table_id
-				end
-			end
-		end
-	end
-
-	return nil
+	assert(1 == 2)
 end
 
 function M.createtable(table_name, table_id, config, create_player_id) --创建桌子
 	log.info("createtable:",table_id)
-	assert(not g_table_map[table_id],"repeat table_id")
-	g_table_map[table_id] = {
-		table_id = table_id,
-		table_name = table_name,
-		config = config,
-		state = GAME_STATE.waiting,
-		player_list = {}
-	}
+	g_info.cur_table_num = g_info.cur_table_num + 1
 end
 
 function M.entertable(table_id,player_id)  --进入桌子
 	log.info("entertable:",table_id,player_id)
-	assert(g_table_map[table_id],"table not exists")
-
-	local t_info = g_table_map[table_id]
-	local player_list = t_info.player_list
-
-	for i = 1,#player_list do
-		local pid = player_list[i]
-		if pid == player_id then
-			log.error("entertable player exists ",table_id,player_id)
-			return
-		end
-	end
-
-	table.insert(t_info.player_list,player_id)
-	if #t_info.player_list == t_info.config.table_conf.player_num then
-		g_cant_enter_map[table_id] = true
-	end
+	g_info.cur_player_num = g_info.cur_player_num + 1
 end
 
 function M.leavetable(table_id,player_id)  --离开桌子
 	log.info("leavetable:",table_id,player_id)
-	assert(g_table_map[table_id],"table not exists")
-
-	local t_info = g_table_map[table_id]
-	local player_list = t_info.player_list
-
-	for i = #player_list,1,-1 do
-		local pid = player_list[i]
-		if pid == player_id then
-			table.remove(player_list,i)
-			return
-		end
-	end
-
-	log.error("leavetable player not exists ",table_id,player_id) 
+	g_info.cur_player_num = g_info.cur_player_num - 1
 end
 
 function M.dismisstable(table_id) --解散桌子
 	log.info("dismisstable:",table_id)
-	assert(g_table_map[table_id],"table not exists")
-
-	local t_info = g_table_map[table_id]
-	local player_list = t_info.player_list
-
-	assert(not next(player_list),"dismisstable exists player " .. #player_list)
-
-	g_cant_enter_map[table_id] = nil
-	g_table_map[table_id] = nil
+	g_info.cur_table_num = g_info.cur_table_num - 1
 end
 
 function M.tablefull()

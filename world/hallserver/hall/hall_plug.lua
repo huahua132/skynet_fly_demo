@@ -6,7 +6,14 @@ local timer = require "skynet-fly.timer"
 local errors_msg = require "common.msg.errors_msg"
 local orm_table_client = require "skynet-fly.client.orm_table_client"
 local player_agent = require "hall.player_agent"
+
 local assert = assert
+local ipairs = ipairs
+local pairs = pairs
+
+local g_modules_list = {
+	require "hall.match.match"
+}
 
 local g_interface_mgr = nil
 
@@ -34,6 +41,19 @@ function M.init(interface_mgr)
 	errors_msg = errors_msg:new(interface_mgr)
 
 	g_interface_mgr:handle(".hallserver_hall.HeartReq", heart_req)
+
+	--注册handle
+	for _, m in ipairs(g_modules_list) do
+		local handle = m.handle
+		for packname,func in pairs(handle) do
+			g_interface_mgr:handle(packname, func)
+		end
+	end
+
+	--初始化
+	for _, m in ipairs(g_modules_list) do
+		m.init()
+	end
 end
 
 --连接成功
@@ -68,8 +88,15 @@ function M.goout(player_id)
 	log.info("hall_plug goout ",player_id)
 end
 
-M.register_cmd = {
-    
-}
+M.register_cmd = {}
+
+--设置CMD命令
+for _, m in ipairs(g_modules_list) do
+	local register_cmd = m.register_cmd
+	for cmdname,func in pairs(register_cmd) do
+		assert(not M.register_cmd[cmdname], "exists cmdname: " .. cmdname)
+		M.register_cmd[cmdname] = func
+	end
+end
 
 return M

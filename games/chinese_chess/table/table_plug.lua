@@ -10,6 +10,7 @@ local TEAM_TYPE = require "enum.TEAM_TYPE"
 local module_cfg = require "skynet-fly.etc.module_info".get_cfg()
 local errors_msg = require "common.msg.errors_msg"
 local game_msg = require "msg.game_msg"
+local timer = require "skynet-fly.timer"
 
 local string = string
 local assert = assert
@@ -48,7 +49,13 @@ function M.table_creator(table_id)
 	local m_game_seat_id_list = {}               	 --游戏参与座位号列表
 	local m_next_doing = {seat_id = 0,player_id = 0} --接下来谁操作
 
-	
+	local function dismisstable()
+		m_interface_mgr:send_alloc("dismisstable")
+	end
+	local m_join_time_out
+	if table_id ~= 1 then  --测试创建
+		m_join_time_out = timer:new(timer.minute, 1, dismisstable)
+	end
 	--棋子数据
 	local m_chess_list = {}                      --棋子数据
 	local m_chess_map = {}
@@ -172,6 +179,8 @@ end
 
 		send_game_state()
 		m_interface_mgr:kick_out_all()
+		log.info("game_over >>> ", m_table_id)
+		m_interface_mgr:send_alloc("dismisstable")
 		return true
 	end
 -----------------------------------------------------------------------
@@ -201,7 +210,8 @@ end
             if m_enter_num >= 2 then
                 skynet.fork(game_start)
             end
-        
+
+			m_join_time_out:cancel()
             return alloc_seat_id
         end,
 		--玩家离开桌子

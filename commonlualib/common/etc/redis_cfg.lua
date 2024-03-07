@@ -11,4 +11,8 @@ local M = {}
 
 M.rpc = db1
 
+M.world = {
+    matchserver = db1
+}
+
 return M

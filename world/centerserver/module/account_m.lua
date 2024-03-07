@@ -89,7 +89,7 @@ function CMD.auth(account, password)
     return true, account_info.player_id, account_info.hall_server_id
 end
 
---查询账号玩家id
+-- 查询账号玩家id
 function CMD.get(account)
     local orm_clinet = get_orm_by_account(account)
     local account_info = orm_clinet:get_one_entry(account)

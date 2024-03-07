@@ -85,7 +85,7 @@ return {
 
 	--集群客户端
 	cluster_client_m = {
-		launch_seq = 6,
+		launch_seq = 7,
 		launch_num = 1,
 		default_arg = {
 			node_map = {
@@ -94,4 +94,10 @@ return {
 			watch = 'redis',  --监听redis的方式做服务发现
 		}
 	},
+
+	--token
+	token_m = {
+		launch_seq = 8,
+		launch_num = 1,
+	}
 }
