@@ -19,7 +19,7 @@ function M.init()
         c.res:set_rsp("OK", 200)
         log.error("options:")
     end)
-
+    
     app:set_no_route(function(c)
 		local method = c.req.method
 		log.error("no route handle begin 1:",method, c.req.url)

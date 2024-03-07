@@ -12,7 +12,10 @@ return {
 		default_arg = {     --默认配置
 			redis = {
 				--rpc连接配置
-				rpc = redis_cfg.rpc
+				rpc = redis_cfg.rpc,
+
+				--全服共用的redis
+				global = redis_cfg.world.matchserver,
 			},
 
 			--cluster_server用的配置
@@ -68,6 +71,7 @@ return {
 		default_arg = {
 			node_map = {
 				['logserver'] = true,       --日志服
+				['matchserver'] = true,     --匹配服
 			},
 			watch = 'redis',  --监听redis的方式做服务发现
 		}

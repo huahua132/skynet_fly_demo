@@ -4,8 +4,10 @@ local ws_pbnet_util = require "skynet-fly.utils.net.ws_pbnet_util"
 local pb_netpack = require "skynet-fly.netpack.pb_netpack"
 local timer = require "skynet-fly.timer"
 local errors_msg = require "common.msg.errors_msg"
+local hall_msg = require "msg.hall_msg"
 local orm_table_client = require "skynet-fly.client.orm_table_client"
 local player_agent = require "hall.player_agent"
+local hall_global = require "hall.hall_global"
 
 local assert = assert
 local ipairs = ipairs
@@ -30,6 +32,7 @@ M.disconn_time_out = timer.minute                   --掉线一分钟就清理
 local function heart_req(player_id, packname, pack_body)
 	log.info("heart_req >>>> ", player_id, pack_body)
 	player_agent.on_heart(player_id)
+	return true
 end
 
 --初始化
@@ -39,7 +42,10 @@ function M.init(interface_mgr)
 	pb_netpack.load('./proto')
 	g_interface_mgr = interface_mgr
 	errors_msg = errors_msg:new(interface_mgr)
+	hall_msg = hall_msg:new(interface_mgr)
 
+	hall_global.set_hall_interface(interface_mgr)
+	hall_global.set_hall_msg(hall_msg)
 	g_interface_mgr:handle(".hallserver_hall.HeartReq", heart_req)
 
 	--注册handle
@@ -52,7 +58,7 @@ function M.init(interface_mgr)
 
 	--初始化
 	for _, m in ipairs(g_modules_list) do
-		m.init()
+		m.init(interface_mgr)
 	end
 end
 
@@ -96,6 +102,14 @@ for _, m in ipairs(g_modules_list) do
 	for cmdname,func in pairs(register_cmd) do
 		assert(not M.register_cmd[cmdname], "exists cmdname: " .. cmdname)
 		M.register_cmd[cmdname] = func
+	end
+end
+
+-- 客户端消息处理结束
+function M.handle_end(player_id, packname, pack_body, ret, errcode, errmsg)
+	log.info("handle_end >>> ", packname, ret, errcode, errmsg)
+	if not ret then
+		errors_msg:errors(player_id, errcode, errmsg, packname)
 	end
 end
 
