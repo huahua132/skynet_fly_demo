@@ -14,6 +14,11 @@ bash ${make_cmd}
 bash script/restart.sh load_mods.lua
 cd ../../
 
+cd world/matchserver
+bash ${make_cmd}
+bash script/restart.sh load_mods.lua
+cd ../../
+
 cd world/loginserver
 bash ${make_cmd}
 bash script/restart.sh load_mods_1.lua

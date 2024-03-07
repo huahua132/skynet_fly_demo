@@ -30,6 +30,11 @@ M.world = {
         register = register,        --连接信息注册到redis
     },
 
+    matchserver = {
+        host = "127.0.0.1:11033",
+        register = register,        --连接信息注册到redis
+    },
+
     loginserver_1 = {
         host = "127.0.0.1:11113",
         register = register,        --连接信息注册到redis

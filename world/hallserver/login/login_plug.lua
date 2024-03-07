@@ -61,13 +61,13 @@ function M.check(packname,pack_body)
 	local randkey = cli:mod_call("get_randkey", player_id)
 	if not randkey then
 		log.error("login check err not randkey ")
-		return false, errorcode.TOPEN_ERR, "not randkey"
+		return false, errorcode.TOKEN_ERR, "not randkey"
 	end
 	-- jwt 认证
 	local payload, msg = jwt.verify(token, "HS256", randkey)
-	if not payload then
-		log.info("login check verify failed", player_id)
-		return false, errorcode.TOPEN_ERR, "token err"
+	if not payload or payload.player_id ~= player_id then
+		log.info("login check verify failed", player_id, payload)
+		return false, errorcode.TOKEN_ERR, "token err"
 	end
 	return player_id
 end

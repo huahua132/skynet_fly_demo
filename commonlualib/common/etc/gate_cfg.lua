@@ -8,6 +8,7 @@ M.games = {
         address = '0.0.0.0',
         port = 9012,
         maxclient = 2048,
+        host = '127.0.0.1:9012',
     }
 }
 

@@ -5,6 +5,9 @@ local errors_msg = require "common.msg.errors_msg"
 local login_msg = require "msg.login_msg"
 local errorcode = require "common.enum.errorcode"
 local timer = require "skynet-fly.timer"
+local contriner_client = require "skynet-fly.client.contriner_client"
+
+contriner_client:register("token_m")
 
 local assert = assert
 local x_pcall = x_pcall
@@ -41,15 +44,21 @@ function M.check(packname,pack_body)
 	--检测是不是登录请求
 	if packname ~= '.chinese_chess_login.LoginReq' then
 		log.error("login_check msg err ",packname)
-		return false,errorcode.NOT_LOGIN,"not login",packname
+		return false,errorcode.NOT_LOGIN,"not login"
 	end
 
 	local player_id = pack_body.player_id
-	if not player_id then
-		log.error("req err ",pack_body)
-		return false,errorcode.REQ_PARAM_ERR,"not player_id",packname
+	local token = pack_body.token
+	if not player_id or not token then
+		log.error("login check err ",pack_body)
+		return false,errorcode.REQ_PARAM_ERR,"not player_id"
 	end
 
+	--校验token
+	if not contriner_client:instance("token_m"):mod_call("auth_token", player_id, token) then
+		log.error("token err ", pack_body)
+		return false, errorcode.TOKEN_ERR, "TOKEN err"
+	end
 	--成功返回玩家id
 	return player_id
 end
