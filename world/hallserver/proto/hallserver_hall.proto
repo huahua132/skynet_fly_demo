@@ -16,16 +16,6 @@ message HeartReq {
     7. s2c AcceptMatchRes
     8. s2c JoinGameNotice
 
-    匹配成功 取消 流程
-    1. c2s MatchGameReq
-    2. s2s hallserver 2 matchserver 请求匹配
-    3. s2c MatchGameRes
-    4. s2s matchserver 2 hallserver 匹配成功
-    5. s2c MatchGameNotice 
-    6. c2s CancelMatchReq
-    7. s2c CancelMatchRes
-    8. s2s hallserver 2 matchserver 请求匹配(没有取消的继续请求匹配)
-
     匹配成功 超时 流程
     1. c2s MatchGameReq
     2. s2s hallserver 2 matchserver 请求匹配
@@ -65,28 +55,20 @@ message CancelMatchGameRes {
 //通知匹配成功
 message MatchGameNotice {
     optional int32   game_id     = 1;  //游戏ID
-    optional int32   session_id  = 2;  //匹配成功的会话ID
+    optional string  session_id  = 2;  //匹配成功的会话ID
     optional int32   remain_time = 3;  //接受倒计时
 }
 
 //请求接受匹配
 message AcceptMatchReq {
-    optional int32 session_id = 1;  //匹配成功的会话ID
+    optional int32  game_id      = 1;  //游戏ID
+    optional string session_id   = 2;  //匹配成功的会话ID
 }
 
 //回应接受匹配
 message AcceptMatchRes {
-    optional int32 session_id = 1;  //匹配成功的会话ID
-}
-
-//请求拒绝匹配结果
-message CancelMatchReq {
-    optional int32 session_id = 1;  //匹配成功的会话ID
-}
-
-//回应拒绝匹配结果
-message CancelMatchRes {
-    optional int32 session_id = 1;  //匹配成功的会话ID
+    optional int32  game_id      = 1;  //游戏ID
+    optional string session_id   = 2;  //匹配成功的会话ID
 }
 
 //通知进入游戏

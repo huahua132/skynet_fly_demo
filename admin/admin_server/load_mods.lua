@@ -18,10 +18,7 @@ return {
 			--cluster_server用的配置
 			cluster_server = cluster_server_cfg.admin.admin_server,
 
-			server_cfg = {
-				debug_port = 10001,
-				loglevel = "info",
-			}
+			server_cfg = server_cfg.admin.admin_server,
 		}
 	},
 

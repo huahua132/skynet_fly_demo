@@ -25,4 +25,12 @@ function M:match_game_notice(player_id, res)
 	self.interface_mgr:send_msg(player_id, '.hallserver_hall.MatchGameNotice', res)
 end
 
+function M:accept_match_res(player_id, res)
+	self.interface_mgr:send_msg(player_id, '.hallserver_hall.AcceptMatchRes', res)
+end
+
+function M:join_game_notice(player_id, res)
+    self.interface_mgr:send_msg(player_id, '.hallserver_hall.JoinGameNotice', res)
+end
+
 return M

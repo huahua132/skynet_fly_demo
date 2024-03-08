@@ -10,9 +10,6 @@ local db1 = {
 local M = {}
 
 M.rpc = db1
-
-M.world = {
-    matchserver = db1
-}
+M.global = db1
 
 return M

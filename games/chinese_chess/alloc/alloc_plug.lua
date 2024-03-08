@@ -5,6 +5,7 @@ local skynet = require "skynet"
 local contriner_client = require "skynet-fly.client.contriner_client"
 local cfg = require "skynet-fly.etc.module_info".get_cfg()
 local ENUM = require "enum.ENUM"
+local game_redis = require "common.redis.game"
 
 contriner_client:register("share_config_m", "token_m")
 
@@ -22,6 +23,8 @@ local g_info = {
 	cur_player_num = 0,
 	host = "",
 }
+
+local g_table_info = {}
 
 local M = {}
 
@@ -43,10 +46,20 @@ function CMD.createtable(player_list)
 	if not table_id then
 		return nil
 	end
-
+	g_table_info[table_id] = player_list
 	--创建token
 	local token_list = contriner_client:instance("token_m"):mod_call("create_token", player_list, ENUM.TOKEN_TIME_OUT)
 	return table_id, token_list
+end
+
+--设置玩家房间信息
+function CMD.set_game_room_info(game_info_map)
+	log.info("set_game_room_info >>> ",game_info_map)
+	for player_id, game_room_info in pairs(game_info_map) do
+		game_redis.set_game_room_info(player_id, game_room_info)
+	end
+
+	return true
 end
 
 M.register_cmd = CMD
@@ -82,6 +95,11 @@ end
 function M.dismisstable(table_id) --解散桌子
 	log.info("dismisstable:",table_id)
 	g_info.cur_table_num = g_info.cur_table_num - 1
+
+	local player_list = assert(g_table_info[table_id])
+	for _,player_id in ipairs(player_list) do
+		game_redis.del_game_room_info(player_id)
+	end
 end
 
 function M.tablefull()

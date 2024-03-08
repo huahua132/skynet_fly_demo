@@ -15,13 +15,24 @@ local ipairs = ipairs
 local table = table
 local string = string
 local next = next
+local pairs = pairs
 
+--匹配集合
 local function match_key()
-    return "match"
+    local cfg = module_info.get_cfg()
+    return cfg.instance_name .. ":match"
 end
 
+--匹配成功的结果信息
 local function match_result_key(session_id)
-    return "match:result:" .. session_id
+    local cfg = module_info.get_cfg()
+    return cfg.instance_name .. ":match:result:" .. session_id
+end
+
+--匹配成功锁 (匹配成功后 对局没有确定是否加入时，不能再进行匹配)
+local function match_succ_lock_key(player_id)
+    local cfg = module_info.get_cfg()
+    return cfg.instance_name .. ":match_lock:" .. player_id
 end
 
 local g_game_cli = nil
@@ -80,8 +91,7 @@ local function match_loop()
     end
 
     local redis_cli = redis.instance("global")
-
-    local member_list = redis_cli:zrevrange("match", 0, 999)
+    local member_list = redis_cli:zrevrange(match_key(), 0, 999)
     for i = 1,#member_list, 2 do
         local match_list = {tonumber(member_list[i]), tonumber(member_list[i + 1])}
         if #match_list ~= 2 then
@@ -123,9 +133,12 @@ local function match_loop()
                 for j,player_id in ipairs(match_list) do
                     table.insert(args, {"hset", key, "token:" .. player_id, token_list[j]})   --token
                     table.insert(args, {"hset", key, "accept:" .. player_id, 0})              --是否同意进入  
+                    table.insert(args, {"set", match_succ_lock_key(player_id), 1, "EX", ENUM.MATCH_ACCEPT_TIME_OUT})  --匹配锁
                 end
+                table.insert(args, {"hset", key, "total_cnt", #match_list})                   --总人数
+                table.insert(args, {"hset", key, "accept_cnt", 0})                            --接受人数
                 table.insert(args, {"hset", key, "host", game_node_info.host})                --host
-                table.insert(args, {"expire", key, ENUM.MATCH_ACCEPT_TIME_OUT + 2})           --过期时间
+                table.insert(args, {"expire", key, ENUM.MATCH_ACCEPT_TIME_OUT})               --过期时间
                 local ret = redis_cli:pipeline(args,{})
                 if ret[#ret].out == 1 then
                     --通知大厅服，匹配成功了
@@ -157,6 +170,12 @@ function CMD.match(player_id)
         local player_id = KEYS[1]
         local score = ARGV[1]
         local key = KEYS[2]
+        local match_lock = KEYS[3]
+
+        if redis.call('exists', match_lock) == 1 then
+            return 0
+        end
+        
         local rank = redis.call('zrank', key, player_id)
         if rank then
             return 0
@@ -166,7 +185,7 @@ function CMD.match(player_id)
         return 1
     ]]
 
-    local ret = redis.instance("global"):script_run(script_str, 2, player_id, match_key(), 0)
+    local ret = redis.instance("global"):script_run(script_str, 3, player_id, match_key(), match_succ_lock_key(player_id), 0)
     log.info("match2>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>", ret)
     if ret ~= 1 then
         return nil
@@ -183,6 +202,89 @@ function CMD.cancel_match(player_id)
     end
 
     return false
+end
+
+--接受对局
+function CMD.accept_session(player_id, session_id)
+    log.info("accept_session >>>>>>>>>>>>>>>>>>>>>>>>>>>>>", player_id, session_id)
+
+    local result_key = match_result_key(session_id)
+    local script_str = [[
+        local result_key = KEYS[1]
+        local player_id = KEYS[2]
+        if redis.call('exists', result_key) ~= 1 then
+            return 1
+        end
+
+        local accept_status = tonumber(redis.call('hget', result_key, 'accept:' .. player_id))
+        if not accept_status or accept_status == 1 then
+            return 2
+        end
+
+        redis.call('hset', result_key, 'accept:' .. player_id, 1)
+        local accept_cnt = tonumber(redis.call('hincrby', result_key, 'accept_cnt', 1))
+        local total_cnt = tonumber(redis.call('hget', result_key, 'total_cnt'))
+        if accept_cnt == total_cnt then
+            return redis.call('hgetall', result_key)
+        end
+
+        return 3
+    ]]
+
+    local ret = redis.instance("global"):script_run(script_str, 2, result_key, player_id)
+    log.info("accept_session2 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>", player_id, session_id, ret)
+    if not ret or ret == 1 or ret == 2 then
+        return false
+    elseif ret == 3 then
+        return true
+    else
+        skynet.fork(function()
+            local result = {}
+            for i = 1, #ret, 2 do
+                result[ret[i]] = ret[i + 1]
+            end
+
+            local host = result.host
+            local spstr = string_util.split(session_id, '-')
+            local svr_name, svr_id, table_id = spstr[1], tonumber(spstr[2]), spstr[3]
+
+            local game_info_map = {}
+
+            for k,token in pairs(result) do
+                local b,e = string.find(k, 'token:', nil, false)
+                if b then
+                    local l_player_id = tonumber(k:sub(e + 1))
+                    game_info_map[l_player_id] = {
+                        host = host,
+                        table_id = table_id,
+                        svr_name = svr_name,
+                        svr_id = svr_id,
+                        token = token,
+                    }
+                end
+            end
+
+            --通知游戏服记录游戏房间信息
+            g_game_cli:set_svr_id(svr_id)
+            local ret = g_game_cli:byid_mod_call("set_game_room_info", game_info_map) --记录游戏房间信息
+            log.info("set_game_room_info ret >>>", ret)
+            if not ret then
+                log.warn("set_game_room_info err ", svr_name, svr_id, table_id)
+                return
+            end
+
+            for l_player_id,info in pairs(game_info_map) do
+                --通知加入对局
+                local svr_id = player_util.get_svr_id_by_player_id(l_player_id)
+                log.info("get_svr_id_by_player_id >>> ",l_player_id, svr_id)
+                local hallcli = cluster_client:instance("hallserver", "room_game_hall_m")
+                hallcli:set_svr_id(svr_id)                --指定服
+                hallcli:set_mod_num(l_player_id)          --指定mod_num 
+                hallcli:byid_mod_send("join_game", l_player_id, info.token, host, table_id)
+            end
+        end)
+        return true
+    end
 end
 
 function CMD.start(config)
