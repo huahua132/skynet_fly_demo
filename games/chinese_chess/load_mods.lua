@@ -20,6 +20,8 @@ return {
 			redis = {
 				--rpc连接配置
 				rpc = redis_cfg.rpc,
+				--全服共用的redis
+				global = redis_cfg.global,
 			},
 
 			--cluster_server用的配置

@@ -13,7 +13,7 @@ return {
 				rpc = redis_cfg.rpc,
 
                 --全服共用的redis
-                global = redis_cfg.world.matchserver,
+                global = redis_cfg.global,
 			},
 
 			--cluster_server用的配置

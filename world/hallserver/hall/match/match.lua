@@ -8,20 +8,39 @@ function M.init(interface_mgr)
 
 end
 
+function M.on_login(player_id)
+    match_logic.on_login(player_id)
+end
+
+function M.on_reconnect(player_id)
+    match_logic.on_reconnect(player_id)
+end
+
 M.handle = {
+    --匹配
     ['.hallserver_hall.MatchGameReq'] = function(player_id, packname, pack_body)
        return match_logic.do_match_game(player_id, pack_body)
     end,
+    --取消匹配
     ['.hallserver_hall.CancelMatchGameReq'] = function(player_id, packname, pack_body)
         return match_logic.do_cancel_match_game(player_id, pack_body)
+    end,
+    --接受对局
+    ['.hallserver_hall.AcceptMatchReq'] = function(player_id, packname, pack_body)
+        return match_logic.do_accept_match(player_id, pack_body)
     end,
 }
 
 local CMD = {}
 
 --匹配成功
-function CMD.match_succ(player_id, session_id, game_id)
-   return match_logic.do_match_succ(player_id, session_id, game_id)
+function CMD.match_succ(...)
+   return match_logic.cmd_match_succ(...)
+end
+
+--加入对局
+function CMD.join_game(...)
+    return match_logic.cmd_join_game(...)
 end
 
 M.register_cmd = CMD
