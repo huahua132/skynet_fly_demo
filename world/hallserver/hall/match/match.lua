@@ -5,7 +5,7 @@ local match_logic = require "hall.match.match_logic"
 local M = {}
 
 function M.init(interface_mgr)
-
+    match_logic.init(interface_mgr)
 end
 
 function M.on_login(player_id)
@@ -18,15 +18,15 @@ end
 
 M.handle = {
     --匹配
-    ['.hallserver_hall.MatchGameReq'] = function(player_id, packname, pack_body)
+    ['.hallserver_match.MatchGameReq'] = function(player_id, packname, pack_body)
        return match_logic.do_match_game(player_id, pack_body)
     end,
     --取消匹配
-    ['.hallserver_hall.CancelMatchGameReq'] = function(player_id, packname, pack_body)
+    ['.hallserver_match.CancelMatchGameReq'] = function(player_id, packname, pack_body)
         return match_logic.do_cancel_match_game(player_id, pack_body)
     end,
     --接受对局
-    ['.hallserver_hall.AcceptMatchReq'] = function(player_id, packname, pack_body)
+    ['.hallserver_match.AcceptMatchReq'] = function(player_id, packname, pack_body)
         return match_logic.do_accept_match(player_id, pack_body)
     end,
 }

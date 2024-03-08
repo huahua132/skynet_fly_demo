@@ -7,5 +7,4 @@ message LoginReq {
 
 message LoginRes {
 	optional int64 player_id = 1;
-	optional string nickname = 2;
 }

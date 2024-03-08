@@ -1,6 +1,7 @@
 local log = require "skynet-fly.log"
 local time_util = require "skynet-fly.utils.time_util"
 local hall_global = require "hall.hall_global"
+local player_msg = require "msg.player_msg"
 
 local assert = assert
 local pairs = pairs
@@ -8,6 +9,9 @@ local pairs = pairs
 local g_player_map = {}
 
 local M = {}
+function M.init(interface_mgr)
+    player_msg = player_msg:new(interface_mgr)
+end
 ---------------------------其他逻辑------------------------------------
 --检测心跳
 function M.check_heart()
