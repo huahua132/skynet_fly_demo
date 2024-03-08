@@ -12,6 +12,7 @@ function M.init(interface_mgr)
             player_logic.check_heart()
         end
     end)
+    player_logic.init(interface_mgr)
 end
 
 function M.on_login(player_id)
@@ -24,7 +25,7 @@ end
 
 M.handle = {
     --心跳
-    ['.hallserver_hall.HeartReq'] = function(player_id, packname, pack_body)
+    ['.hallserver_player.HeartReq'] = function(player_id, packname, pack_body)
        return player_logic.do_heart(player_id, pack_body)
     end,
 }

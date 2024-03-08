@@ -1,9 +1,4 @@
-package hallserver_hall;
-
-//心跳包
-message HeartReq {
-	optional int64 time = 1;
-}
+package hallserver_match;
 
 /*
     匹配成功 接受 流程
