@@ -7,18 +7,7 @@
 5. 完成中国象棋游戏。
 6. 后续添加球球大作战，自走棋等等游戏。
 
-# 游戏示例视频
-<html>
-<head>
-  <base href="https://huahua132.github.io/">
-</head>
-<body>
-  <video width="960" height="720" controls>
-    <source src="video/chess.mp4" type="video/mp4">
-    Your browser does not support the video tag.
-  </video>
-</body>
-</html>
+# [游戏示例视频](https://huahua132.github.io/video/chess.mp4)
 
 # 本地部署
 拉取代码
