@@ -7,3 +7,7 @@ message JoinReq {
 message JoinRes {
 	optional string table_id = 1;
 }
+//心跳包
+message HeartReq {
+	optional int64 time = 1;
+}
