@@ -1,11 +1,13 @@
 local log = require "skynet-fly.log"
 local time_util = require "skynet-fly.utils.time_util"
 local player_msg = require "msg.player_msg"
+local orm_table_client = require "skynet-fly.client.orm_table_client"
 
 local assert = assert
 local pairs = pairs
 
 local g_hall_interface = nil
+local g_player_entity = orm_table_client:instance("player")
 
 local g_player_map = {}
 
@@ -25,12 +27,27 @@ function M.check_heart()
     end
 end
 
+--推送基础信息
+local function player_info_notice(player_id)
+    local player_info = g_player_entity:get_one_entry(player_id)
+    if not player_info then
+        log.error("player_entity not exists " .. player_id)
+        return
+    end
+
+    log.info("player_info_notice ", player_info)
+    player_msg:player_info_notice(player_id, {
+        nickname = player_info.nickname
+    })
+end
+
 ---------------------------客户端事件----------------------------------
 --登录
 function M.on_login(player_id)
     log.info("on_login >>> ", player_id)
     assert(not g_player_map[player_id], "is exists " .. player_id)
     g_player_map[player_id] = {}
+    player_info_notice(player_id)
 end
 
 --登出
@@ -38,6 +55,12 @@ function M.on_loginout(player_id)
     log.info("on_loginout >>> ", player_id)
     assert(g_player_map[player_id], "is not exists " .. player_id)
     g_player_map[player_id] = nil
+end
+
+--重连
+function M.on_reconnect(player_id)
+    log.info("on_reconnect >>> ", player_id)
+    player_info_notice(player_id)
 end
 
 ---------------------------客户端消息处理-------------------------------

@@ -4,3 +4,8 @@ package hallserver_player;
 message HeartReq {
 	optional int64 time = 1;
 }
+
+//玩家信息通知
+message PlayerInfoNotice {
+    optional string nickname = 1;
+}

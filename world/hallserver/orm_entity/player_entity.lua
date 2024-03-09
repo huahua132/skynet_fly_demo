@@ -24,7 +24,7 @@ function M.init()
     :uint16("viplevel")         --vip等级
     :string256("head_url")      --头像url
     :set_keys("player_id")
-    :set_cache(60 * 5,100)    --缓存5分钟，1秒同步一次更改
+    :set_cache(60 * 60,100)    --缓存1个小时，1秒同步一次更改
     :builder(adapter)
     return g_ormobj
 end
