@@ -18,15 +18,13 @@ M.send = ws_pbnet_util.send
 M.broadcast = ws_pbnet_util.broadcast
 M.disconn_time_out = timer.minute                   --掉线一分钟就清理
 
-local function matchReq(player_id,packname,pack_body)
-	log.info("matchReq:",player_id,packname,pack_body)
-	local ok,errorcode,errormsg = g_interface_mgr:match_join_table(player_id,pack_body.table_name)
-	if not ok then
-		log.error("dispatch err ",errorcode,errormsg)
-		errors_msg:errors(player_id,errorcode,errormsg,packname)
-	else
+local function JoinReq(player_id,packname,pack_body)
+	log.info("JoinReq:",player_id,packname,pack_body)
+	local ok,errorcode,errormsg = g_interface_mgr:join_table(player_id, "default", pack_body.table_id)
+	if ok then
 		hall_msg:match_res(player_id,{table_id = errorcode})
 	end
+	return ok,errorcode,errormsg
 end
 
 --初始化
@@ -37,14 +35,14 @@ function M.init(interface_mgr)
 	g_interface_mgr = interface_mgr
 	hall_msg = hall_msg:new(interface_mgr)
 	errors_msg = errors_msg:new(interface_mgr)
-	g_interface_mgr:handle('.chinese_chess_hall.matchReq',matchReq)
+	g_interface_mgr:handle('.chinese_chess_hall.JoinReq', JoinReq)
 end
 
 --连接成功
 function M.connect(player_id)
 	log.info("hall_plug connect ",player_id)
 	return {
-		player_id = player_id
+		isreconnect = 0
 	}
 end
 
@@ -57,13 +55,21 @@ end
 function M.reconnect(player_id)
 	log.info("hall_plug reconnect ",player_id)
 	return {
-		player_id = player_id
+		isreconnect = 1
 	}
 end
 
 --登出
 function M.goout(player_id)
 	log.info("hall_plug goout ",player_id)
+end
+
+-- 客户端消息处理结束
+function M.handle_end(player_id, packname, pack_body, ret, errcode, errmsg)
+	if not ret then
+		log.info("handle_end err >>> ", packname, ret, errcode, errmsg)
+		errors_msg:errors(player_id, errcode, errmsg, packname)
+	end
 end
 
 return M
