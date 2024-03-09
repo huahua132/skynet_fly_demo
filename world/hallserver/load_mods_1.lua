@@ -113,6 +113,7 @@ return {
 		launch_num = 1,
 		mod_args = {
             {instance_name = "player", orm_plug = "orm_entity.player_entity"},
+			{instance_name = "item", orm_plug = "orm_entity.item_entity"},
 		}
 	},
 

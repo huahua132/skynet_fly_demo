@@ -13,4 +13,8 @@ function M:new(interface_mgr)
 	return t
 end
 
+function M:player_info_notice(player_id, res)
+    self.interface_mgr:send_msg(player_id, '.hallserver_player.PlayerInfoNotice', res)
+end
+
 return M
