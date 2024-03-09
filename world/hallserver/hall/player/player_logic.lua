@@ -1,25 +1,26 @@
 local log = require "skynet-fly.log"
 local time_util = require "skynet-fly.utils.time_util"
-local hall_global = require "hall.hall_global"
 local player_msg = require "msg.player_msg"
 
 local assert = assert
 local pairs = pairs
 
+local g_hall_interface = nil
+
 local g_player_map = {}
 
 local M = {}
 function M.init(interface_mgr)
+    g_hall_interface = interface_mgr
     player_msg = player_msg:new(interface_mgr)
 end
 ---------------------------其他逻辑------------------------------------
 --检测心跳
 function M.check_heart()
     local cur_time = time_util.time()
-    local hall_interface = hall_global.get_hall_interface()
     for player_id,player in pairs(g_player_map) do
         if cur_time - player.heart_time > 60 then  --心跳超时
-            hall_interface.goout(player_id)        --踢出
+            g_hall_interface.goout(player_id)        --踢出
         end
     end
 end
