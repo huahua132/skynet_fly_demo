@@ -4,19 +4,23 @@ local cache_help = require "skynet-fly.cache.cache_help"
 local time_util = require "skynet-fly.utils.time_util"
 local log = require "skynet-fly.log"
 
-local g_cache = cache_help:new(86400 * 100)
+local g_cache = cache_help:new(60 * 60 * 100)
 
 local ipairs = ipairs
 local assert = assert
 local type = type
 local table = table
+local tonumber = tonumber
+local tostring = tostring
 
 local CMD = {}
 
 --创建token
 function CMD.create_token(player_list, timeout)
     local retlist = {}
-    for _,player_id in ipairs(player_list) do
+    for _,d in ipairs(player_list) do
+        local player_id = tonumber(d)
+        assert(player_id, "player_id not isnumber " .. tostring(d))
         --生成登录token
         local cur_time = time_util.time()
         local claim = {
@@ -36,17 +40,19 @@ function CMD.create_token(player_list, timeout)
         g_cache:del_cache(player_id)
         g_cache:set_cache(player_id, rand_key)
     end
-
+   
     return retlist
 end
 
 --验证token
-function CMD.auth_token(player_id, token)
+function CMD.auth_token(_player_id, token)
+    local player_id = tonumber(_player_id)
+    assert(player_id, "player_id not isnumber " .. tostring(_player_id))
     -- jwt 认证
     local randkey = g_cache:get_cache(player_id)
     local payload, msg = jwt.verify(token, "HS256", randkey)
     if not payload or payload.player_id ~= player_id then
-        log.info("auth_token failed", player_id, payload)
+        log.info("auth_token failed", msg, player_id, payload)
         return nil
     end
 

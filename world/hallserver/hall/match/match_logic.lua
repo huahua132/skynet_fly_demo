@@ -19,8 +19,7 @@ local function check_join_room_game(player_id)
     if not game_room_info or not next(game_room_info) then
         return
     end
-
-    M.cmd_join_game(game_room_info.token, game_room_info.host, game_room_info.table_id)
+    M.cmd_join_game(player_id, game_room_info.token, game_room_info.host, game_room_info.table_id)
 end
 
 ---------------------------客户端事件----------------------------------

@@ -315,7 +315,14 @@ end
 				end
 				return true
 			end
-		}
+		},
+
+		handle_end = function(player_id, packname, pack_body, ret, errcode, errmsg)
+			log.info("handle_end >>> ", player_id, packname, ret, errcode, errmsg)
+			if not ret then
+				m_errors_msg:errors(player_id, errcode, errmsg, packname)
+			end
+		end,
     }
 end
 

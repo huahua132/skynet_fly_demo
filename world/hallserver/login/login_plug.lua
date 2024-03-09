@@ -66,7 +66,7 @@ function M.check(packname,pack_body)
 	-- jwt 认证
 	local payload, msg = jwt.verify(token, "HS256", randkey)
 	if not payload or payload.player_id ~= player_id then
-		log.info("login check verify failed", player_id, payload)
+		log.info("login check verify failed", msg, player_id, payload)
 		return false, errorcode.TOKEN_ERR, "token err"
 	end
 	return player_id

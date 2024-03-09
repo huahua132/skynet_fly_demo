@@ -65,7 +65,7 @@ end
 
 --登录失败
 function M.login_failed(player_id,errcode,errmsg)
-	errmsg:errors(errcode,errmsg)
+	errors_msg:errors(player_id,errcode,errmsg)
 end
 
 --登录成功

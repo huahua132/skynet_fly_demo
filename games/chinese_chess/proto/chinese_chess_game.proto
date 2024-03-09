@@ -1,12 +1,12 @@
 package chinese_chess_game;
 
 message gameStateReq {
-	optional int32 player_id = 1;
+	optional int64 player_id = 1;
 }
 
 message playerInfo {
 	optional int32 seat_id = 1;
-	optional int32 player_id = 2;
+	optional int64 player_id = 2;
 	optional int32 team_type = 3;       //队伍id  
 }
 
@@ -26,7 +26,7 @@ message chessCanMove {
 
 message nextDoing {
 	optional int32 seat_id = 1;
-	optional int32 player_id = 2;
+	optional int64 player_id = 2;
 	optional int32 team_type = 3;
 	repeated chessCanMove can_move_list = 4;
 }
@@ -40,7 +40,7 @@ message gameStateRes {
 	optional nextDoing next_doing = 4;      //接下来谁操作
 
 	//赢家
-	optional int32 win_player_id = 5;       //赢家
+	optional int64 win_player_id = 5;       //赢家
 }
 
 //移动棋子请求
