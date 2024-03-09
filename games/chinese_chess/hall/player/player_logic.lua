@@ -41,7 +41,7 @@ end
 ---------------------------客户端消息处理-------------------------------
 --接收到心跳
 function M.do_heart(player_id, pack_body)
-    log.info("do_heart >>> ", player_id)
+    --log.info("do_heart >>> ", player_id)
     local player = g_player_map[player_id]
     if not player then
         return

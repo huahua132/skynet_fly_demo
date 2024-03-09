@@ -48,6 +48,7 @@ function M.table_creator(table_id)
     local m_enter_num = 0                        	 --坐下数量
 	local m_game_seat_id_list = {}               	 --游戏参与座位号列表
 	local m_next_doing = {seat_id = 0,player_id = 0} --接下来谁操作
+	local m_win_player_id = 0					     --赢家
 
 	local function dismisstable()
 		m_interface_mgr:send_alloc("dismisstable")
@@ -106,6 +107,7 @@ local function send_game_state(seat_player)
 		player_list = {},
 		chess_list = m_chess_list,
 		next_doing = m_next_doing,
+		win_player_id = m_win_player_id,
 	}
 
 	for seat_id,seat_player in ipairs(m_seat_list) do
@@ -175,7 +177,7 @@ end
 		end
 
 		local seat_player = m_seat_list[win_seat_id]
-		local win_player_id = seat_player:get_player().player_id
+		m_win_player_id = seat_player:get_player().player_id
 
 		send_game_state()
 		m_interface_mgr:kick_out_all()
