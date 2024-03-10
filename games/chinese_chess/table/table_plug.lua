@@ -169,7 +169,7 @@ end
 
 	--结束游戏
 	local function game_over(win_seat_id)
-		log.info("游戏结束:",win_seat_id)
+		log.info("游戏结束:",win_seat_id, m_table_id)
 		m_game_state = GAME_STATE.over
 		--踢出所有玩家
 		for _,seat_player in ipairs(m_seat_list) do
@@ -181,7 +181,6 @@ end
 
 		send_game_state()
 		m_interface_mgr:kick_out_all()
-		log.info("game_over >>> ", m_table_id)
 		m_interface_mgr:send_alloc("dismisstable")
 		return true
 	end
