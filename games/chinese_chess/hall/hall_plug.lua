@@ -115,4 +115,10 @@ function M.handle_end(player_id, packname, pack_body, ret, errcode, errmsg)
 	end
 end
 
+-- 离开房间回调
+function M.leave_table(player_id, table_name, table_id)
+	--离开房间说明对局结束了，就直接踢掉吧
+	skynet.fork(g_interface_mgr.goout, g_interface_mgr, player_id)
+end
+
 return M
