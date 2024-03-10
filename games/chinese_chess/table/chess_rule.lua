@@ -521,7 +521,7 @@ local function get_one_check_can_move_pos(chess_map, boss_map, one_chess)
         --左下
         add_x_move_pos(chess_map,row + 2,col - 2,team_type,can_move_pos_list)
         --左上
-        add_x_move_pos(chess_map,row + 2,col + 2,team_type,can_move_pos_list)
+        add_x_move_pos(chess_map,row - 2,col - 2,team_type,can_move_pos_list)
     elseif is_z(one_chess) then
         if (team_type == TEAM_TYPE.BLACK and row > 5) or (team_type == TEAM_TYPE.RED and row < 6) then
             --右
