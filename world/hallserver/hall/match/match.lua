@@ -39,7 +39,7 @@ function CMD.match_succ(...)
 end
 
 --加入对局
-function CMD.join_game(...)
+function CMD.match_join_game(...)
     return match_logic.cmd_join_game(...)
 end
 

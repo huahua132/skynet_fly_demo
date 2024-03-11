@@ -2,6 +2,11 @@ local skynet = require "skynet"
 local SEAT_STATE = require "enum.SEAT_STATE"
 local ws_pbnet_util = require "skynet-fly.utils.net.ws_pbnet_util"
 local log = require "skynet-fly.log"
+local player = require "common.rpc.hallserver.player"
+local item = require "common.rpc.hallserver.item"
+local ITEM = require "common.enum.ITEM"
+local timer = require "skynet-fly.timer"
+
 local setmetatable = setmetatable
 local assert = assert
 
@@ -21,10 +26,15 @@ function M:new()
 end
 
 --坐下
-function M:enter(player_id)
-	self.player = {
-		player_id = player_id
-	}
+function M:enter(player_id, seat_id)
+	self.player = player.get_player_info(player_id)
+	self.score = item.get_item(player_id, ITEM.score)
+	self.seat_id = seat_id
+
+	if not self.player or not self.score then
+		return false
+	end
+
 	self.state = SEAT_STATE.waitting
 end
 
@@ -67,6 +77,71 @@ end
 --返回队伍类型
 function M:get_team_type()
 	return self.team_type
+end
+
+--获取分数
+function M:get_score()
+	return self.score
+end
+
+--增加积分
+function M:add_score(num)
+	if num <= 0 then return end
+	local player_id = self.player.player_id
+	self.score = item.add_item(player_id, ITEM.score, num)
+end
+
+--减少积分
+function M:reduce_score(num)
+	if num <= 0 then return end
+	if self.score <= 0 then return end
+
+	if num > self.score then
+		num = self.score
+	end
+
+	local player_id = self.player.player_id
+	self.score = item.add_item(player_id, ITEM.score, num)
+end
+
+--设置操作,总时长,单次时长
+function M:set_doing_time(total_time, one_time)
+	self.remain_total_time = total_time
+	self.once_time = one_time
+end
+
+--开始操作
+function M:start_doing(time_out_callback)
+	if self.remain_total_time > self.once_time then
+		self.time_obj = timer:new(self.once_time, 1, time_out_callback, self)
+	else
+		self.time_obj = timer:new(self.remain_total_time, 1, time_out_callback, self)
+	end
+end
+
+--获取操作剩余时间
+function M:get_doing_time()
+	local remain_total_time = self.remain_total_time
+	local remain_once_time = self.once_time
+	if self.time_obj then
+		remain_once_time = self.time_obj:remain_expire()
+		remain_total_time = remain_total_time - self.once_time + remain_once_time
+	end
+
+	return remain_total_time, remain_once_time
+end
+
+--操作结束
+function M:doing_end()
+	local remain_once_time = self.time_obj:remain_expire()
+	self.remain_total_time = self.remain_total_time - self.once_time + remain_once_time
+	self.time_obj:cancel()
+	self.time_obj = nil
+end
+
+--获取座位号
+function M:get_seat_id()
+	return self.seat_id
 end
 
 return M

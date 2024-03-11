@@ -5,9 +5,11 @@ message gameStateReq {
 }
 
 message playerInfo {
-	optional int32 seat_id = 1;
+	optional int32 seat_id   = 1;
 	optional int64 player_id = 2;
-	optional int32 team_type = 3;       //队伍id  
+	optional int32 team_type = 3;       //队伍id
+	optional string nickname = 4;       //昵称
+	optional int32 score     = 5;       //积分
 }
 
 message oneChess {
@@ -29,6 +31,8 @@ message nextDoing {
 	optional int64 player_id = 2;
 	optional int32 team_type = 3;
 	repeated chessCanMove can_move_list = 4;
+	optional int32 remain_total_time = 5;
+	optional int32 remain_once_time = 6;
 }
 
 message gameStateRes {

@@ -1,0 +1,11 @@
+package hallserver_item;
+
+//玩家道具信息
+message Item {
+    optional int64 id = 1;
+    optional int64 count = 2;
+}
+
+message ItemListNotice {
+    repeated Item item_list = 1;
+}

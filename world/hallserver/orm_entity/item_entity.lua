@@ -30,7 +30,7 @@ function M.init()
 end
 
 --增加道具
-function M.add_item(player_id, id, num)
+function handle.add_item(player_id, id, num)
     assert(player_id > 0, "err player_id " .. tostring(player_id))
     assert(id > 0, "err id " .. tostring(id))
     assert(num > 0, "err num ".. tostring(num))
@@ -50,7 +50,7 @@ function M.add_item(player_id, id, num)
 end
 
 --扣除道具
-function M.reduce_item(player_id, id, num)
+function handle.reduce_item(player_id, id, num)
     assert(player_id > 0, "err player_id " .. tostring(player_id))
     assert(id > 0, "err id " .. tostring(id))
     assert(num > 0, "err num ".. tostring(num))
@@ -74,7 +74,7 @@ function M.reduce_item(player_id, id, num)
 end
 
 --获取道具
-function M.get_item(player_id, id)
+function handle.get_item(player_id, id)
     assert(player_id > 0, "err player_id " .. tostring(player_id))
     assert(id > 0, "err id " .. tostring(id))
     local entry = g_ormobj:get_one_entry(player_id, id)

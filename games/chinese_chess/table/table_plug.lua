@@ -49,6 +49,7 @@ function M.table_creator(table_id)
 	local m_game_seat_id_list = {}               	 --游戏参与座位号列表
 	local m_next_doing = {seat_id = 0,player_id = 0} --接下来谁操作
 	local m_win_player_id = 0					     --赢家
+	
 
 	local function dismisstable()
 		m_interface_mgr:send_alloc("dismisstable")
@@ -63,6 +64,31 @@ function M.table_creator(table_id)
 	local m_boss_chess_map = {}                  --帅和将
 	local m_can_move_map = {}
 
+	--操作超时
+	local m_game_over = nil
+	local function doing_time_out(seat_player)
+		log.info("doing_time_out >>> ", seat_player)
+		seat_player:doing_end()
+
+		local seat_id = seat_player:get_seat_id()
+		local win_seat_id = nil
+		for _, id in pairs(m_game_seat_id_list) do
+			if id ~= seat_id then
+				win_seat_id = id
+				break
+			end
+		end
+		m_game_over(win_seat_id)
+	end
+
+	local function up_doing_time()
+		local seat_id = m_next_doing.seat_id
+		local seat_player = m_seat_list[seat_id]
+		if seat_player then
+			m_next_doing.remain_total_time, m_next_doing.remain_once_time = seat_player:get_doing_time()
+		end
+	end
+
 	local function set_next_doing(seat_id)
 		local seat_player = m_seat_list[seat_id]
 		local player = seat_player:get_player()
@@ -71,8 +97,10 @@ function M.table_creator(table_id)
 		m_next_doing.team_type = seat_player:get_team_type()
 		m_next_doing.can_move_list = {}
 
+		up_doing_time()
+
 		m_can_move_map = chess_rule.get_all_can_move_map(m_chess_list,m_chess_map,m_boss_chess_map,m_next_doing.team_type)
-		log.info("m_can_move_map:",m_next_doing.team_type,m_can_move_map)
+		--log.info("m_can_move_map:",m_next_doing.team_type,m_can_move_map)
 		for chess_id,can_move_list in pairs(m_can_move_map) do
 			local row_list = {}
 			local col_list = {}
@@ -90,18 +118,23 @@ function M.table_creator(table_id)
 		if not next(m_can_move_map) then
 			return false
 		end
+
+		seat_player:start_doing(doing_time_out)
 		return true
 	end
 
 	--座位初始化
     for i = 1,g_table_conf.player_num do
         m_seat_list[i] = seater:new()
+		m_seat_list[i]:set_doing_time(60 * 20 * 100, 60 * 100)   --操作总时长20分钟, 单次1分钟
     end
 -----------------------------------------------------------------------
 --msg
 -----------------------------------------------------------------------
 --发送游戏当前状态信息
 local function send_game_state(seat_player)
+	up_doing_time()
+	
 	local msg_body = {
 		state = m_game_state,
 		player_list = {},
@@ -116,12 +149,13 @@ local function send_game_state(seat_player)
 			table.insert(msg_body.player_list,{
 				player_id = player.player_id,
 				seat_id = seat_id,
-				team_type = seat_player:get_team_type()
+				team_type = seat_player:get_team_type(),
+				nickname = player.nickname,
+				score = seat_player:get_score(),
 			})
 		end
 	end
 
-	log.info("send_msg:",msg_body)
 	local player_id = nil
 	if seat_player then
 		player_id = seat_player.player_id
@@ -132,7 +166,8 @@ end
 
 --发送接下来谁操作
 local function send_next_doing()
-	log.error("send_next_doing:",m_next_doing)
+	--log.error("send_next_doing:",m_next_doing)
+	up_doing_time()
 	m_game_msg:next_doing(m_next_doing)
 end
 
@@ -184,6 +219,7 @@ end
 		m_interface_mgr:send_alloc("dismisstable")
 		return true
 	end
+	m_game_over = game_over
 -----------------------------------------------------------------------
 --state
 -----------------------------------------------------------------------
@@ -195,7 +231,7 @@ end
             for seat_id,seater in ipairs(m_seat_list) do
                 if seater:is_empty() then
 					log.info("玩家坐下:",player_id)
-                    seater:enter(player_id)
+                    seater:enter(player_id, seat_id)
                     m_player_seat_map[player_id] = seat_id
                     m_enter_num = m_enter_num + 1
                     alloc_seat_id = seat_id
@@ -305,7 +341,8 @@ end
 
 				chess_rule.move_chess(m_chess_list,m_chess_map,m_boss_chess_map,move_chess,{row = move_row,col = move_col})
 
-				log.error("moveRes:",pack_body)
+				seat_player:doing_end()
+				--log.error("moveRes:",pack_body)
 				m_game_msg:move_res(pack_body)
 
 				local next_seat_id = (seat_id % 2) + 1
@@ -319,7 +356,7 @@ end
 		},
 
 		handle_end = function(player_id, packname, pack_body, ret, errcode, errmsg)
-			log.info("handle_end >>> ", player_id, packname, ret, errcode, errmsg)
+			--log.info("handle_end >>> ", player_id, packname, ret, errcode, errmsg)
 			if not ret then
 				m_errors_msg:errors(player_id, errcode, errmsg, packname)
 			end
