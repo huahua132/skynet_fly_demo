@@ -72,6 +72,7 @@ return {
 			node_map = {
 				['logserver'] = true,       --日志服
 				['matchserver'] = true,     --匹配服
+				['hallserver'] = true,      --大厅服
 			},
 			watch = 'redis',  --监听redis的方式做服务发现
 		}
@@ -110,7 +111,7 @@ return {
     -- orm
 	orm_table_m = {
 		launch_seq = 7000,
-		launch_num = 1,
+		launch_num = 2,
 		mod_args = {
             {instance_name = "player", orm_plug = "orm_entity.player_entity"},
 			{instance_name = "item", orm_plug = "orm_entity.item_entity"},

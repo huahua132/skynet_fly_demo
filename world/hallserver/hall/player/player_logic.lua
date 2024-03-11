@@ -77,4 +77,9 @@ function M.do_heart(player_id, pack_body)
     return true
 end
 
+---------------------------CMD--------------------------------------------
+function M.cmd_get_info(player_id)
+    return g_player_entity:get_one_entry(player_id)
+end
+
 return M

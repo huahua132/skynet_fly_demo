@@ -13,8 +13,8 @@ function M:new(interface_mgr)
 	return t
 end
 
-function M:join_res(player_id,join_res)
-	self.interface_mgr:send_msg(player_id,'.chinese_chess_hall.JoinRes',join_res)
+function M:item_list_notice(player_id, res)
+    self.interface_mgr:send_msg(player_id, '.hallserver_item.ItemListNotice', res)
 end
 
 return M

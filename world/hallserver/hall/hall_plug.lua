@@ -13,6 +13,7 @@ local pairs = pairs
 local g_modules_list = {
 	require "hall.player.player",
 	require "hall.match.match",
+	require "hall.item.item"
 }
 
 local g_interface_mgr = nil

@@ -36,6 +36,11 @@ M.handle = {
 
 local CMD = {}
 
+--获取玩家信息
+function CMD.player_get_info(player_id)
+    return player_logic.cmd_get_info(player_id)
+end
+
 M.register_cmd = CMD
 
 return M

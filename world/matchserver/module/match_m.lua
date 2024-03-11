@@ -280,7 +280,7 @@ function CMD.accept_session(player_id, session_id)
                 local hallcli = cluster_client:instance("hallserver", "room_game_hall_m")
                 hallcli:set_svr_id(svr_id)                --指定服
                 hallcli:set_mod_num(l_player_id)          --指定mod_num 
-                hallcli:byid_mod_send("join_game", l_player_id, info.token, host, table_id)
+                hallcli:byid_mod_send("match_join_game", l_player_id, info.token, host, table_id)
             end
         end)
         return true

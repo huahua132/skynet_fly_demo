@@ -20,7 +20,7 @@ function M.do_join(player_id, pack_body)
 	log.info("JoinReq:",player_id,pack_body)
 	local ok,errorcode,errormsg = g_interface_mgr:join_table(player_id, "default", pack_body.table_id)
 	if ok then
-		hall_msg:match_res(player_id,{table_id = errorcode})
+		hall_msg:join_res(player_id,{table_id = errorcode})
 	end
 	return ok,errorcode,errormsg
 end
