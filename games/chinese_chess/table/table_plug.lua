@@ -134,7 +134,7 @@ function M.table_creator(table_id)
 --发送游戏当前状态信息
 local function send_game_state(seat_player)
 	up_doing_time()
-	
+
 	local msg_body = {
 		state = m_game_state,
 		player_list = {},
@@ -213,6 +213,20 @@ end
 
 		local seat_player = m_seat_list[win_seat_id]
 		m_win_player_id = seat_player:get_player().player_id
+
+		local lose_seat_player = nil
+		for _,seat_id in ipairs(m_game_seat_id_list) do
+			if seat_id ~= win_seat_id then
+				lose_seat_player = m_seat_list[seat_id]
+				break
+			end
+		end
+
+		--结算积分
+		--赢了加10分
+		seat_player:add_score(10)
+		--输了减10分
+		lose_seat_player:reduce_score(10)
 
 		send_game_state()
 		m_interface_mgr:kick_out_all()
