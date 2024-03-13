@@ -60,5 +60,12 @@ M.world = {
         debug_port = 11221,
     },
 }
+--世界配置 12开头
+M.robots = {
+    chinese_chess = {
+        thread = 8,
+        debug_port = 12011,
+    }
+}
 
 return M

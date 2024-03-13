@@ -1,9 +1,9 @@
 local log = require "skynet-fly.log"
 local GAME_ID_ENUM = require "common.enum.GAME_ID_ENUM"
-local cluster_client = require "skynet-fly.client.cluster_client"
 local errorcode = require "common.enum.errorcode"
 local game_redis = require "common.redis.game"
 local match_msg = require "msg.match_msg"
+local rpc_matchserver_match = require "common.rpc.matchserver.match"
 
 local next = next
 
@@ -51,7 +51,7 @@ function M.do_match_game(player_id, pack_body)
     end
 
     log.info("do_match_game2 >>> ",player_id, pack_body)
-    if not cluster_client:instance("matchserver", "match_m", game_server):one_balance_call("match", player_id) then
+    if not rpc_matchserver_match.match(game_server, player_id) then
         return nil
     end
     log.info("do_match_game3 >>> ",player_id, pack_body)
@@ -71,7 +71,7 @@ function M.do_cancel_match_game(player_id, pack_body)
         return nil, errorcode.GAME_NOT_EXISTS, "GAME_NOT_EXISTS"
     end
 
-    if not cluster_client:instance("matchserver", "match_m", game_server):one_balance_call("cancel_match", player_id) then
+    if not rpc_matchserver_match.cancel_match(game_server, player_id) then
         return nil
     end
 
@@ -92,7 +92,7 @@ function M.do_accept_match(player_id, pack_body)
     end
 
     local session_id = pack_body.session_id
-    if not cluster_client:instance("matchserver", "match_m", game_server):one_balance_call("accept_session", player_id, session_id) then
+    if not rpc_matchserver_match.accept_session(game_server, player_id, session_id) then
         return nil
     end
 

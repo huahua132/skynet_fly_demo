@@ -1,10 +1,12 @@
-local cluster_client = require "skynet-fly.client.cluster_client"
 local jwt = require "skynet-fly.3rd.luajwtjitsi"
 local rsp_body = require "common.rsp_body"
 local crypt = require "skynet.crypt"
 local ENUM = require "common.enum.ENUM"
 local time_util = require "skynet-fly.utils.time_util"
 local log = require "skynet-fly.log"
+local rpc_hall_player = require "common.rpc.hallserver.player"
+local rpc_center_account = require "common.rpc.centerserver.account"
+local CHANNEL = require "common.enum.CHANNEL"
 
 local assert = assert
 local type = type
@@ -18,22 +20,15 @@ local function login(c)
     assert(account, "not account")
     assert(password, "not passwword")
 
-    local cli = cluster_client:instance("centerserver", "account_m")
-    local ret = cli:one_balance_call("auth", account, password)
-    if not ret then return end
-    local result = ret.result
-    local isok, errcode, errmsg = result[1], result[2], result[3]
+    local isok, errcode, errmsg = rpc_center_account.auth(account, password)
     if not isok then
         rsp_body.set_rsp(c, nil, errcode, errmsg)
     else
         local player_id, hall_server_id = errcode, errmsg
         local rand_key = crypt.randomkey()
         log.info("login >>>>>> ", player_id, hall_server_id, rand_key)
-        local hallcli = cluster_client:instance("hallserver", "player_m")
-        hallcli:set_svr_id(hall_server_id)
-        hallcli:set_mod_num(player_id)
-        local ret = hallcli:byid_mod_call("advance_login", player_id, rand_key)
-        local host = ret.result[1]
+        local host = rpc_hall_player.advance_login(player_id, rand_key)
+        assert(host, "server err")
         --生成登录token
         local cur_time = time_util.time()
         local claim = {
@@ -60,17 +55,17 @@ local function signup(c)
     local body = req.body
     local account = body.account
     local password = body.password
+    local channel = body.channel
 
     assert(account, "not account")
     assert(password, "not passwword")
-    local cli = cluster_client:instance("centerserver", "account_m")
-    local ret = cli:one_balance_call("register", {
+    assert(channel, "not channel")
+    assert(CHANNEL[channel], "not exists channel", channel)
+
+    local isok, errcode, errmsg = rpc_center_account.register({
         account = account,
         password = password,
-    })
-    if not ret then return end
-    local result = ret.result
-    local isok, errcode, errmsg = result[1], result[2], result[3]
+    }, channel)
     if isok then
         rsp_body.set_rsp(c, "success")
     else

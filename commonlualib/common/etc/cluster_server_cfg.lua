@@ -53,4 +53,12 @@ M.world = {
         register = register,        --连接信息注册到redis
     }
 }
+
+--机器人  12开头
+M.robots = {
+    chinese_chess_robot = {
+        host = "127.0.0.1:12013",
+        register = register,        
+    }
+}
 return M
