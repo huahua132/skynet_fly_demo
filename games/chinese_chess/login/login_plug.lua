@@ -27,7 +27,7 @@ M.broadcast = ws_pbnet_util.broadcast
 
 function M.init(interface_mgr)
 	--加载pb文件
-	pb_netpack.load('../../common/proto')
+	pb_netpack.load('../../commonlualib/common/proto')
 	pb_netpack.load('./proto')
 	g_interface_mgr = interface_mgr
 	login_msg = login_msg:new(interface_mgr)
