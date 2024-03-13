@@ -2,7 +2,7 @@ local log = require "skynet-fly.log"
 local orm_table_client = require "skynet-fly.client.orm_table_client"
 local crypt = require "skynet.crypt"
 local crypt_util = require "skynet-fly.utils.crypt_util"
-local errorcode = require "common.enum.errorcode"
+local CODE = require "common.enum.CODE"
 local string_util = require "skynet-fly.utils.string_util"
 local time_util = require "skynet-fly.utils.time_util"
 local rpc_hallserver_player_m = require "common.rpc.hallserver.player"
@@ -46,7 +46,7 @@ function CMD.register(account_info, channel)
     assert(account:len() >= 6, "account not long enough")
     local orm_clinet = get_orm_by_account(account)
     if orm_clinet:get_one_entry(account) then
-        return nil, errorcode.ACCOUNT_EXISTS, "ACCOUNT_EXISTS"
+        return nil, CODE.EXISTS_USER, "EXISTS_USER"
     end
 
     local module_id, svr_id = rpc_hallserver_player_m.get_module_id()
@@ -77,12 +77,12 @@ function CMD.auth(account, password)
     local orm_clinet = get_orm_by_account(account)
     local account_info = orm_clinet:get_one_entry(account)
     if not account_info then
-        return nil, errorcode.ACCOUNT_NOT_EXISTS, "ACCOUNT_NOT_EXISTS"
+        return nil, CODE.NOT_USER, "NOT_USER"
     end
 
     password = crypt_util.HMAC.SHA256(password, crypt.base64decode(account_info.key))
     if account_info.password ~= password then
-        return nil, errorcode.LOGIN_PASS_ERR, "LOGIN_PASS_ERR"
+        return nil, CODE.ERR_PASSWORD, "ERR_PASSWORD"
     end
     --log.info("auth >>>>> :", account_info)
     account_info.last_login_time = time_util.time()

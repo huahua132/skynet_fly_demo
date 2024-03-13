@@ -9,6 +9,7 @@ local code = {
     NOT_PERMISSION = 50022,       --没有权限
     NOT_HANDSHAKE = 50023,        --还没有握手
     ERR_PARAM = 50033,            --参数错误
+    EXISTS_USER = 50034,          --用户已存在
 }
 
 return code

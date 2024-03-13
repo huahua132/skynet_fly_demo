@@ -56,4 +56,19 @@ return {
 			watch = 'redis',  --监听redis的方式做服务发现
 		}
 	},
+
+	--机器人启动管理
+	robot_launch_m = {
+		launch_seq = 5,
+		launch_num = 1,
+		default_arg = {
+			robot_num = 1,    --启动机器人数量
+		}
+	},
+
+	--机器人逻辑
+	robot_m = {
+		launch_seq = 6,
+		launch_num = 6,
+	}
 }
