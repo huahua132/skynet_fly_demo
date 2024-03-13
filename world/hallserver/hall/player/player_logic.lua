@@ -35,6 +35,9 @@ local function player_info_notice(player_id)
         return
     end
 
+    player_info.last_login_time = time_util.time()
+    g_player_entity:change_save_one_entry(player_info)
+
     log.info("player_info_notice ", player_info)
     player_msg:player_info_notice(player_id, {
         nickname = player_info.nickname

@@ -2,9 +2,10 @@ local log = require "skynet-fly.log"
 local orm_table_client = require "skynet-fly.client.orm_table_client"
 local crypt = require "skynet.crypt"
 local crypt_util = require "skynet-fly.utils.crypt_util"
-local cluster_client = require "skynet-fly.client.cluster_client"
 local errorcode = require "common.enum.errorcode"
 local string_util = require "skynet-fly.utils.string_util"
+local time_util = require "skynet-fly.utils.time_util"
+local rpc_hallserver_player_m = require "common.rpc.hallserver.player"
 
 local sbyte = string.byte
 local assert = assert
@@ -39,7 +40,8 @@ local CMD = {}
 -- 预留位 渠道id    服务id   自增id
 
 local MAX_INCRID = 9999999
-function CMD.register(account_info)
+function CMD.register(account_info, channel)
+    assert(channel <= 9999, "incr overflow  channel = ",channel)
     local account = account_info.account --账号
     assert(account:len() >= 6, "account not long enough")
     local orm_clinet = get_orm_by_account(account)
@@ -47,25 +49,22 @@ function CMD.register(account_info)
         return nil, errorcode.ACCOUNT_EXISTS, "ACCOUNT_EXISTS"
     end
 
-    local cli = cluster_client:instance("hallserver", "player_m")
-    local ret = cli:one_balance_call("get_module_id")
-    local cluster_name = ret.cluster_name
-    local result = ret.result
-    local module_id = result[1]
-    local svr_id = tonumber(string_util.split(cluster_name, ':')[2])
-    cli:set_svr_id(svr_id)
+    local module_id, svr_id = rpc_hallserver_player_m.get_module_id()
+    assert(module_id, "register err ")
 
     local incrid = g_alloc_clinet:incr(module_id)
     assert(incrid <= MAX_INCRID, "incr overflow")
-    local player_id = tonumber(string.format("1%04d%04d%07d", 1, svr_id, incrid))
-    ret = cli:byid_balance_call("register", player_id, account)
-    local result = ret.result[1]
-    assert(result, "register err")
+    local player_id = tonumber(string.format("1%04d%04d%07d", channel, svr_id, incrid))
+    local ret = rpc_hallserver_player_m.register(player_id, account)
+    assert(ret, "register err")
+
     account_info.key = crypt.randomkey()
     account_info.password = crypt_util.HMAC.SHA256(account_info.password, account_info.key)
     account_info.key = crypt.base64encode(account_info.key)
     account_info.player_id = player_id
     account_info.hall_server_id = svr_id
+    account_info.channel = channel
+    account_info.create_time = time_util.time()
     if orm_clinet:create_one_entry(account_info) then
         return true
     else
@@ -85,7 +84,9 @@ function CMD.auth(account, password)
     if account_info.password ~= password then
         return nil, errorcode.LOGIN_PASS_ERR, "LOGIN_PASS_ERR"
     end
-    log.info("auth >>>>> :", account_info)
+    --log.info("auth >>>>> :", account_info)
+    account_info.last_login_time = time_util.time()
+    orm_clinet:change_save_one_entry(account_info)
     return true, account_info.player_id, account_info.hall_server_id
 end
 

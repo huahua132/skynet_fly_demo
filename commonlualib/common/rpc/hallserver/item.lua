@@ -1,11 +1,11 @@
-local base = require "common.rpc.base"
+local base = require "common.rpc.hallserver.base"
 
 local table = table
 
 local M = {}
 
 function M.get_item(player_id, id)
-    local cli = base.hallserver_hall(player_id)
+    local cli = base.hallserver_room_game_hall_m(player_id)
     local ret = cli:byid_mod_call("item_get_item", player_id, id)
     if not ret then
         return nil
@@ -14,7 +14,7 @@ function M.get_item(player_id, id)
 end
 
 function M.add_item(player_id, id, count)
-    local cli = base.hallserver_hall(player_id)
+    local cli = base.hallserver_room_game_hall_m(player_id)
     local ret = cli:byid_mod_call("item_add_item", player_id, id, count)
     if not ret then
         return nil
@@ -23,7 +23,7 @@ function M.add_item(player_id, id, count)
 end
 
 function M.reduce_item(player_id, id, count)
-    local cli = base.hallserver_hall(player_id)
+    local cli = base.hallserver_room_game_hall_m(player_id)
     local ret = cli:byid_mod_call("item_reduce_item", player_id, id, count)
     if not ret then
         return nil

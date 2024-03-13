@@ -23,6 +23,8 @@ function M.init()
     :uint16("level")            --等级
     :uint16("viplevel")         --vip等级
     :string256("head_url")      --头像url
+    :int64("create_time")       --创建时间
+    :int64("last_login_time")   --最后登录时间
     :set_keys("player_id")
     :set_cache(60 * 60,100)    --缓存1个小时，1秒同步一次更改
     :builder(adapter)
