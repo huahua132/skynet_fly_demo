@@ -33,9 +33,9 @@ M.world = {
         master = {
 			protocol = 'http',
 			port = 11014,         --端口
-			max_client = 2048, --最大连接数
-			second_conn_limit = 2000, --相同ip 1秒内建立连接数限制
-			keep_live_limit = 2000,  --相同ip 保持活跃数量限制
+			max_client = 20000, 		--最大连接数
+			second_conn_limit = 2000, 	--相同ip 1秒内建立连接数限制
+			keep_live_limit = 20000,  	--相同ip 保持活跃数量限制
         }
     },
     loginserver_2 = {
@@ -48,9 +48,9 @@ M.world = {
         master = {
 			protocol = 'http',
 			port = 11024,         --端口
-			max_client = 2048, --最大连接数
+			max_client = 20000, --最大连接数
 			second_conn_limit = 2000, --相同ip 1秒内建立连接数限制
-			keep_live_limit = 2000,  --相同ip 保持活跃数量限制
+			keep_live_limit = 20000,  --相同ip 保持活跃数量限制
         }
     }
 }

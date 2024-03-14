@@ -4,6 +4,9 @@ skynet_fly_path="../../skynet_fly/"
 bin_shell_path="${skynet_fly_path}/script/shell"
 make_cmd="${bin_shell_path}/make_server.sh ${skynet_fly_path}"
 
+ulimit -n 65535
+ulimit -c unlimited
+
 #启动世界相关服
 cd world/logserver
 bash ${make_cmd}
