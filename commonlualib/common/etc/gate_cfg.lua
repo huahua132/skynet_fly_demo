@@ -7,7 +7,7 @@ M.games = {
     chinese_chess = {
         address = '0.0.0.0',
         port = 9012,
-        maxclient = 2048,
+        maxclient = 10000,
         host = '127.0.0.1:9012',
     }
 }
@@ -17,13 +17,13 @@ M.world = {
     hallserver_1 = {
         address = '0.0.0.0',
         port = 11012,
-        maxclient = 6000,
+        maxclient = 20000,
         host = '127.0.0.1:11012',
     },
     hallserver_2 = {
         address = '0.0.0.0',
         port = 11022,
-        maxclient = 6000,
+        maxclient = 20000,
         host = '127.0.0.1:11022',
     },
 }
