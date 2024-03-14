@@ -4,6 +4,7 @@ skynet_fly_path="../../skynet_fly/"
 bin_shell_path="${skynet_fly_path}/script/shell"
 make_cmd="${bin_shell_path}/make_server.sh ${skynet_fly_path}"
 
+#启动世界相关服
 cd world/logserver
 bash ${make_cmd}
 bash script/restart.sh load_mods.lua
@@ -31,12 +32,20 @@ bash script/restart.sh load_mods_1.lua
 bash script/restart.sh load_mods_2.lua
 cd ../../
 
+#启动后台
 cd admin/admin_server
 bash ${make_cmd}
 bash script/restart.sh load_mods.lua
 cd ../../
 
+#启动游戏
 cd games/chinese_chess
+bash ${make_cmd}
+bash script/restart.sh load_mods.lua
+cd ../../
+
+#启动机器人
+cd robots/chinese_chess_robot
 bash ${make_cmd}
 bash script/restart.sh load_mods.lua
 cd ../../
