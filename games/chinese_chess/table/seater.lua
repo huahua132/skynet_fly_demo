@@ -101,7 +101,8 @@ function M:reduce_score(num)
 	end
 
 	local player_id = self.player.player_id
-	self.score = item.add_item(player_id, ITEM.score, num)
+	local _
+	_,self.score = item.reduce_item(player_id, ITEM.score, num)
 end
 
 --设置操作,总时长,单次时长

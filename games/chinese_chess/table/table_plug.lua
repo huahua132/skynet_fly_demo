@@ -52,6 +52,7 @@ function M.table_creator(table_id)
 	
 
 	local function dismisstable()
+		m_interface_mgr:kick_out_all()
 		m_interface_mgr:send_alloc("dismisstable")
 	end
 	local m_join_time_out
@@ -178,6 +179,7 @@ end
 	local function game_start()
 		m_game_state = GAME_STATE.playing
 		m_game_seat_id_list = {}
+		m_join_time_out:cancel()
 
 		local rand_num = math.random(1,2)
 		local next_doing_seat_id = nil
@@ -262,7 +264,6 @@ end
                 skynet.fork(game_start)
             end
 
-			m_join_time_out:cancel()
             return alloc_seat_id
         end,
 		--玩家离开桌子
@@ -298,6 +299,7 @@ end
 		handle = {
 			--玩家请求游戏状态数据
 			['.chinese_chess_game.gameStateReq'] = function(player_id,packname,pack_body)
+				log.info("handle >>>> ", packname)
 				local seat_id = m_player_seat_map[player_id]
 				if not seat_id then
 					log.error("player not seat_down ",player_id)

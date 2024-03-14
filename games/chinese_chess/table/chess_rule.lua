@@ -508,11 +508,11 @@ local function get_one_check_can_move_pos(chess_map, boss_map, one_chess)
         end
     elseif is_s(one_chess) then
         --右
-        add_c_move_pos(chess_map,row + 1,col + 1,team_type,can_move_pos_list) 
-        add_c_move_pos(chess_map,row - 1,col + 1,team_type,can_move_pos_list)
+        add_j_move_pos(chess_map,row + 1,col + 1,team_type,can_move_pos_list) 
+        add_j_move_pos(chess_map,row - 1,col + 1,team_type,can_move_pos_list)
         --左
-        add_c_move_pos(chess_map,row + 1,col - 1,team_type,can_move_pos_list)
-        add_c_move_pos(chess_map,row - 1,col - 1,team_type,can_move_pos_list)
+        add_j_move_pos(chess_map,row + 1,col - 1,team_type,can_move_pos_list)
+        add_j_move_pos(chess_map,row - 1,col - 1,team_type,can_move_pos_list)
     elseif is_x(one_chess) then
         --右下
         add_x_move_pos(chess_map,row + 2, col + 2, team_type, can_move_pos_list)
