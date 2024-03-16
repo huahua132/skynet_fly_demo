@@ -81,9 +81,13 @@ return {
 		launch_num = 1,
 		default_arg = {
 			node_map = {
-				['centerserver'] = true,    --连接中心服节点
 				['logserver'] = true,       --连接日志服务节点
 				['chinese_chess'] = true,   --连接象棋游戏节点
+				['chinese_chess_robot'] = true, --象棋机器人
+				['hallserver'] = true,          --大厅服
+				['centerserver'] = true,        --中心服
+				['loginserver'] = true,         --登录服
+				['matchserver'] = true,         --匹配服
 			},
 			watch = 'redis',  --监听redis的方式做服务发现
 		}
@@ -97,6 +101,11 @@ return {
             node_list = {
                 'chinese_chess',             --象棋游戏
 				'logserver',                 --日志服务
+				'chinese_chess_robot',
+				'hallserver',
+				'centerserver',
+				'loginserver',
+				'matchserver',
             }
         }
     },
