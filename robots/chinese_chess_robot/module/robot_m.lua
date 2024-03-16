@@ -223,7 +223,7 @@ local function create_one_robot_logic(idx)
     m_STATE_HANDLE[STATE_ENUM.ONLINE_HALL] = function()
         if not m_hall_fd then
             --去重启登录
-            m_state = STATE_ENUM.ONLINE_HALL
+            m_state = STATE_ENUM.UNLOGIN_HALL
         end
         --匹配游戏
         if not m_hall_matching then
@@ -236,7 +236,7 @@ local function create_one_robot_logic(idx)
         if not m_game_fd then
             --去重启登录
             m_game_scene:clear()
-            m_state = STATE_ENUM.ONLINE_HALL
+            m_state = STATE_ENUM.UNLOGIN_HALL
         end
     end
 
