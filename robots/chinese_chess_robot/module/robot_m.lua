@@ -236,7 +236,7 @@ local function create_one_robot_logic(idx)
         if not m_game_fd then
             --去重启登录
             m_game_scene:clear()
-            m_state = STATE_ENUM.UNLOGIN_HALL
+            m_state = STATE_ENUM.ONLINE_HALL
         end
     end
 
