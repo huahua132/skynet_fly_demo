@@ -26,7 +26,7 @@ local function login(c)
     else
         local player_id, hall_server_id = errcode, errmsg
         local rand_key = crypt.randomkey()
-        log.info("login >>>>>> ", player_id, hall_server_id, rand_key)
+        --log.info("login >>>>>> ", player_id, hall_server_id, rand_key)
         local host = rpc_hall_player.advance_login(player_id, rand_key)
         assert(host, "server err")
         --生成登录token

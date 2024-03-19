@@ -62,7 +62,7 @@ return {
 		launch_seq = 5,
 		launch_num = 1,
 		default_arg = {
-			robot_num = 100,    --启动机器人数量
+			robot_num = 500,    --启动机器人数量
 		}
 	},
 

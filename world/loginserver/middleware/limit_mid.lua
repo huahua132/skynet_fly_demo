@@ -11,9 +11,9 @@ return function(c)
     end
 
     cur_req = cur_req + 1
-    log.info("cur_req begin >>>>>>>>>>> ",cur_req)
+    --log.info("cur_req begin >>>>>>>>>>> ",cur_req)
     c:next()
 
     cur_req = cur_req - 1
-    log.info("cur_req end >>>>>>>>>>> ",cur_req)
+    --log.info("cur_req end >>>>>>>>>>> ",cur_req)
 end

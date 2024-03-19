@@ -43,7 +43,7 @@ end
 
 --预告登录
 function CMD.advance_login(player_id, randkey)
-    log.info("advance_login >>> ", player_id, randkey, skynet.self())
+    --log.info("advance_login >>> ", player_id, randkey, skynet.self())
     randkey_cache:del_cache(player_id)
     randkey_cache:set_cache(player_id, randkey)
     return g_host
@@ -51,7 +51,7 @@ end
 
 --获取randkey
 function CMD.get_randkey(player_id)
-    log.info("get_randkey >>> ", player_id, skynet.self())
+    --log.info("get_randkey >>> ", player_id, skynet.self())
     return randkey_cache:get_cache(player_id)
 end
 

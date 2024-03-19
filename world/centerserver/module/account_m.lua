@@ -11,10 +11,13 @@ local sbyte = string.byte
 local assert = assert
 local tonumber = tonumber
 local string = string
+local xx_pcall = xx_pcall
 
 local g_orm_clients = {}
-local g_alloc_clinet = orm_table_client:new("allocid")
+local g_alloc_client = orm_table_client:new("allocid")
 local ACOUNT_TABLE_MAX = 10         --分表数量
+
+local g_register_lock = {}
 
 do
     for i = 1, ACOUNT_TABLE_MAX do
@@ -38,9 +41,8 @@ local CMD = {}
 --由于js没有long类型，最大能表示 2^53-1的整数，所以调整一下ID结构,为了尽可能的兼容所有客户端
 -- 9      0071      9925   4740991      (1个能注册1千万-1个账号)
 -- 预留位 渠道id    服务id   自增id
-
 local MAX_INCRID = 9999999
-function CMD.register(account_info, channel)
+local function register(account_info, channel)
     assert(channel <= 9999, "incr overflow  channel = ",channel)
     local account = account_info.account --账号
     assert(account:len() >= 6, "account not long enough")
@@ -52,7 +54,7 @@ function CMD.register(account_info, channel)
     local module_id, svr_id = rpc_hallserver_player_m.get_module_id()
     assert(module_id, "register err ")
 
-    local incrid = g_alloc_clinet:incr(module_id)
+    local incrid = g_alloc_client:incr(module_id)
     assert(incrid <= MAX_INCRID, "incr overflow")
     local player_id = tonumber(string.format("1%04d%04d%07d", channel, svr_id, incrid))
     local ret = rpc_hallserver_player_m.register(player_id, account)
@@ -70,6 +72,16 @@ function CMD.register(account_info, channel)
     else
         return nil
     end
+end
+
+function CMD.register(account_info, channel)
+    local account = account_info.account
+    assert(account, "not account")
+    if g_register_lock[account] then return nil,CODE.SERVER_BUZY,"SERVER_BUZY" end
+    g_register_lock[account] = true
+    local ret,errno,errmsg = xx_pcall(register, account_info, channel)
+    g_register_lock[account] = nil
+    return ret, errno, errmsg
 end
 
 --验证登录
