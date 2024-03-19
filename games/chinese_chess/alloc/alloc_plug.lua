@@ -54,7 +54,7 @@ end
 
 --设置玩家房间信息
 function CMD.set_game_room_info(game_info_map)
-	log.info("set_game_room_info >>> ",game_info_map)
+	--log.info("set_game_room_info >>> ",game_info_map)
 	for player_id, game_room_info in pairs(game_info_map) do
 		game_redis.set_game_room_info(player_id, game_room_info)
 	end
@@ -78,22 +78,22 @@ function M.match(player_id) --匹配
 end
 
 function M.createtable(table_name, table_id, config, create_player_id) --创建桌子
-	log.info("createtable:",table_id)
+	--log.info("createtable:",table_id)
 	g_info.cur_table_num = g_info.cur_table_num + 1
 end
 
 function M.entertable(table_id,player_id)  --进入桌子
-	log.info("entertable:",table_id,player_id)
+	--log.info("entertable:",table_id,player_id)
 	g_info.cur_player_num = g_info.cur_player_num + 1
 end
 
 function M.leavetable(table_id,player_id)  --离开桌子
-	log.info("leavetable:",table_id,player_id)
+	--log.info("leavetable:",table_id,player_id)
 	g_info.cur_player_num = g_info.cur_player_num - 1
 end
 
 function M.dismisstable(table_id) --解散桌子
-	log.info("dismisstable:",table_id)
+	--log.info("dismisstable:",table_id)
 	g_info.cur_table_num = g_info.cur_table_num - 1
 
 	local player_list = assert(g_table_info[table_id])

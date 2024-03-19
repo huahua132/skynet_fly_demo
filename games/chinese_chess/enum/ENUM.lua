@@ -1,3 +1,3 @@
 return {
-    TOKEN_TIME_OUT = 3600,
+    TOKEN_TIME_OUT = 60 * 60,
 }

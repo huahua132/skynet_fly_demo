@@ -38,7 +38,7 @@ local function player_info_notice(player_id)
     player_info.last_login_time = time_util.time()
     g_player_entity:change_save_one_entry(player_info)
 
-    log.info("player_info_notice ", player_info)
+    --log.info("player_info_notice ", player_info)
     player_msg:player_info_notice(player_id, {
         nickname = player_info.nickname
     })
@@ -47,7 +47,7 @@ end
 ---------------------------客户端事件----------------------------------
 --登录
 function M.on_login(player_id)
-    log.info("on_login >>> ", player_id)
+    --log.info("on_login >>> ", player_id)
     assert(not g_player_map[player_id], "is exists " .. player_id)
     g_player_map[player_id] = {}
     player_info_notice(player_id)
@@ -55,21 +55,21 @@ end
 
 --登出
 function M.on_loginout(player_id)
-    log.info("on_loginout >>> ", player_id)
+    --log.info("on_loginout >>> ", player_id)
     assert(g_player_map[player_id], "is not exists " .. player_id)
     g_player_map[player_id] = nil
 end
 
 --重连
 function M.on_reconnect(player_id)
-    log.info("on_reconnect >>> ", player_id)
+    --log.info("on_reconnect >>> ", player_id)
     player_info_notice(player_id)
 end
 
 ---------------------------客户端消息处理-------------------------------
 --接收到心跳
 function M.do_heart(player_id, pack_body)
-    log.info("do_heart >>> ", player_id)
+    --log.info("do_heart >>> ", player_id)
     local player = g_player_map[player_id]
     if not player then
         return

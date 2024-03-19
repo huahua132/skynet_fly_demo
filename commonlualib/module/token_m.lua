@@ -40,7 +40,7 @@ function CMD.create_token(player_list, timeout)
         g_cache:del_cache(player_id)
         g_cache:set_cache(player_id, rand_key)
     end
-   
+    
     return retlist
 end
 
@@ -50,6 +50,11 @@ function CMD.auth_token(_player_id, token)
     assert(player_id, "player_id not isnumber " .. tostring(_player_id))
     -- jwt 认证
     local randkey = g_cache:get_cache(player_id)
+    if not randkey then
+        log.warn("auth_token not randkey ", player_id)
+        return nil
+    end
+
     local payload, msg = jwt.verify(token, "HS256", randkey)
     if not payload or payload.player_id ~= player_id then
         log.info("auth_token failed", msg, player_id, payload)

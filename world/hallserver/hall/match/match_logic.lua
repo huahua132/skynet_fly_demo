@@ -36,7 +36,7 @@ end
 
 --请求匹配
 function M.do_match_game(player_id, pack_body)
-    log.info("do_match_game >>> ",player_id, pack_body)
+    --log.info("do_match_game >>> ",player_id, pack_body)
     local game_id = pack_body.game_id
     local game_server = GAME_ID_ENUM[game_id]
     if not game_server then
@@ -50,11 +50,11 @@ function M.do_match_game(player_id, pack_body)
         return 
     end
 
-    log.info("do_match_game2 >>> ",player_id, pack_body)
+    --log.info("do_match_game2 >>> ",player_id, pack_body)
     if not rpc_matchserver_match.match(game_server, player_id) then
         return nil
     end
-    log.info("do_match_game3 >>> ",player_id, pack_body)
+    --log.info("do_match_game3 >>> ",player_id, pack_body)
     --回复匹配
     match_msg:match_game_res(player_id, {game_id = game_id})
 
@@ -63,7 +63,7 @@ end
 
 --取消匹配
 function M.do_cancel_match_game(player_id, pack_body)
-    log.info("do_cancel_match_game >>> ",player_id, pack_body)
+    --log.info("do_cancel_match_game >>> ",player_id, pack_body)
     local game_id = pack_body.game_id
     local game_server = GAME_ID_ENUM[game_id]
     if not game_server then
@@ -83,7 +83,7 @@ end
 
 --接受对局
 function M.do_accept_match(player_id, pack_body)
-    log.info("do_accept_match >>> ", player_id, pack_body)
+    --log.info("do_accept_match >>> ", player_id, pack_body)
     local game_id = pack_body.game_id
     local game_server = GAME_ID_ENUM[game_id]
     if not game_server then
@@ -105,14 +105,14 @@ end
 ---------------------------服务器传来的消息处理---------------------------
 --匹配成功
 function M.cmd_match_succ(player_id, session_id, game_id, remain_time)
-    log.info("cmd_match_succ >>> ",player_id, session_id, game_id, remain_time)
+    --log.info("cmd_match_succ >>> ",player_id, session_id, game_id, remain_time)
     --通知匹配成功
     match_msg:match_game_notice(player_id, {game_id = game_id, session_id = session_id, remain_time = remain_time})
 end
 
 --加入对局
 function M.cmd_join_game(player_id, token, host, table_id)
-    log.info("cmd_join_game >>>>> ", player_id, token, host, table_id)
+    --log.info("cmd_join_game >>>>> ", player_id, token, host, table_id)
     --通知加入对局
     match_msg:join_game_notice(player_id, {
         gamehost = host, 

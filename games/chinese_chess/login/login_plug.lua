@@ -70,18 +70,18 @@ end
 
 --登录成功
 function M.login_succ(player_id,login_res)
-	log.info("login_succ:",player_id,login_res)
+	--log.info("login_succ:",player_id,login_res)
 	login_msg:login_res(player_id,login_res)
 end
 
 --登出回调
 function M.login_out(player_id)
-	log.info("login_out ",player_id)
+	--log.info("login_out ",player_id)
 end
 
 --掉线回调
 function M.disconnect(player_id)
-	log.info('disconnect:',player_id)
+	--log.info('disconnect:',player_id)
 end
 
 --正在登录中

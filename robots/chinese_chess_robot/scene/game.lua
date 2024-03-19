@@ -116,7 +116,7 @@ function M:on_handle(packname, packbody)
 
     local handle = HANDLE_FUNC[packname]
     if not handle then
-        log.error("drop game packname = ", packname)
+        --log.error("drop game packname = ", packname)
     else
         handle(packbody)
     end
