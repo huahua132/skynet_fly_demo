@@ -40,7 +40,7 @@ function CMD.create_token(player_list, timeout)
         g_cache:del_cache(player_id)
         g_cache:set_cache(player_id, rand_key)
     end
-    
+
     return retlist
 end
 

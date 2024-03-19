@@ -17,7 +17,7 @@ end
 function M.check_heart()
     local cur_time = time_util.time()
     for player_id,player in pairs(g_player_map) do
-        if cur_time - player.heart_time > 60 then  --心跳超时
+        if not cur_time - player.heart_time > 60 then  --心跳超时
             g_hall_interface.goout(player_id)        --踢出
         end
     end
@@ -28,7 +28,9 @@ end
 function M.on_login(player_id)
     --log.info("on_login >>> ", player_id)
     assert(not g_player_map[player_id], "is exists " .. player_id)
-    g_player_map[player_id] = {}
+    g_player_map[player_id] = {
+        heart_time = 0
+    }
 end
 
 --登出
