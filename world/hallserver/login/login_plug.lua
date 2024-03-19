@@ -50,14 +50,14 @@ function M.check(packname,pack_body)
 
 	local token = pack_body.token
 	local player_id = pack_body.player_id
-	log.info("login check >>>> ",pack_body)
+	--log.info("login check >>>> ",pack_body)
 	if not token or not player_id then
 		log.error("login check err ",pack_body)
 		return false,errorcode.REQ_PARAM_ERR,"not token",packname
 	end
 	local cli = contriner_client:instance("player_m")
 	cli:set_mod_num(player_id)
-	log.info("mod_call get_randkey >>>>> ",player_id)
+	--log.info("mod_call get_randkey >>>>> ",player_id)
 	local randkey = cli:mod_call("get_randkey", player_id)
 	if not randkey then
 		log.error("login check err not randkey ")
@@ -74,24 +74,24 @@ end
 
 --登录失败
 function M.login_failed(player_id,errcode,errmsg)
-	log.info("login_failed >>>> ", player_id, errcode, errmsg)
+	--log.info("login_failed >>>> ", player_id, errcode, errmsg)
 	errors_msg:errors(player_id, errcode, errmsg)
 end
 
 --登录成功
 function M.login_succ(player_id,login_res)
-	log.info("login_succ:",player_id,login_res)
+	--log.info("login_succ:",player_id,login_res)
 	login_msg:login_res(player_id, login_res)
 end
 
 --登出回调
 function M.login_out(player_id)
-	log.info("login_out ",player_id)
+	--log.info("login_out ",player_id)
 end
 
 --掉线回调
 function M.disconnect(player_id)
-	log.info('disconnect:',player_id)
+	--log.info('disconnect:',player_id)
 end
 
 --正在登录中

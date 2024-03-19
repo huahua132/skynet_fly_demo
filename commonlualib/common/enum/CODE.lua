@@ -10,6 +10,7 @@ local code = {
     NOT_HANDSHAKE = 50023,        --还没有握手
     ERR_PARAM = 50033,            --参数错误
     EXISTS_USER = 50034,          --用户已存在
+    SERVER_BUZY = 50035,          --服务器繁忙
 }
 
 return code

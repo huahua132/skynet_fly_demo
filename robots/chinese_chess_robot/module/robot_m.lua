@@ -86,6 +86,7 @@ local function create_one_robot_logic(idx)
     local m_HALL_SERVER_HANDLE = {}
     --登录大厅成功
     m_HALL_SERVER_HANDLE['.hallserver_login.LoginRes'] = function(body)
+        m_hall_matching = false
         --登录大厅成功
         m_state = STATE_ENUM.ONLINE_HALL
         --发送心跳包
@@ -122,6 +123,7 @@ local function create_one_robot_logic(idx)
         m_game_fd = websocket.connect("ws://" .. host)
         if m_game_fd then
             socket.onclose(m_game_fd, function()
+                --log.info("m_game_fd close:", m_game_fd)
                 m_game_fd = nil
             end)
 
@@ -171,8 +173,11 @@ local function create_one_robot_logic(idx)
             local host = data.host
             m_hall_fd = websocket.connect("ws://" .. host)
             if m_hall_fd then
-                socket.onclose(m_hall_fd, function()
-                    m_hall_fd = nil
+                local hall_id = m_hall_fd
+                socket.onclose(hall_id, function()
+                    if hall_id == m_hall_fd then
+                        m_hall_fd = nil
+                    end
                 end)
 
                 --监听大厅服消息
@@ -233,6 +238,7 @@ local function create_one_robot_logic(idx)
 
     --游戏中
     m_STATE_HANDLE[STATE_ENUM.GAMEING] = function()
+        --log.info("m_game_fd:", m_game_fd)
         if not m_game_fd then
             --去重启登录
             m_game_scene:clear()
