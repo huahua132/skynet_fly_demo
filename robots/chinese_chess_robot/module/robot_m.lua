@@ -70,7 +70,7 @@ local function create_one_robot_logic(idx)
         if m_game_fd then
             ws_pbnet_util.send(nil, m_game_fd, packname, packbody)
         else
-            log.warn("给游戏服发送消息 连接不存在 ", idx, m_player_id)
+            --.warn("给游戏服发送消息 连接不存在 ", idx, m_player_id)
         end
     end
 
@@ -79,7 +79,7 @@ local function create_one_robot_logic(idx)
         if m_hall_fd then
             ws_pbnet_util.send(nil, m_hall_fd, packname, packbody)
         else
-            log.warn("给大厅服发送消息 连接不存在 ", idx, m_player_id)
+            --log.warn("给大厅服发送消息 连接不存在 ", idx, m_player_id)
         end
     end
 
@@ -139,10 +139,10 @@ local function create_one_robot_logic(idx)
 
     local function hallserver_handle(_,packname,packbody)
         --大厅服消息处理
-        log.info("hallserver_handle >>> ", packname, packbody)
+        --log.info("hallserver_handle >>> ", packname, packbody)
         local handle = m_HALL_SERVER_HANDLE[packname]
         if not handle then
-            log.error("drop hallserver_handle packname = ", packname)
+            --log.error("drop hallserver_handle packname = ", packname)
         else
             handle(packbody)
         end
@@ -157,7 +157,7 @@ local function create_one_robot_logic(idx)
             password = m_password,
         }
         local isok,code,bodystr = pcall(httpc.request, "POST", get_login_server_host(), '/user/login', nil, g_header, json.encode(req))
-        log.info("请求登录:", idx, isok, code, bodystr)
+        --log.info("请求登录:", idx, isok, code, bodystr)
         if not isok then
             log.error("请求登录 网络错误:", idx, isok, code)
             return
@@ -205,14 +205,14 @@ local function create_one_robot_logic(idx)
         }
 
         local isok,code,bodystr = pcall(httpc.request, "POST", get_login_server_host(), '/user/signup', nil, g_header, json.encode(req))
-        log.info("请求注册:", idx, isok, code, bodystr)
+        --log.info("请求注册:", idx, isok, code, bodystr)
         if not isok then
             log.error("请求注册 网络错误:", idx, isok, code)
             return
         end
 
         local body = json.decode(bodystr)
-        if body.code == CODE.OK then
+        if body.code == CODE.OK or body.code == CODE.EXISTS_USER then
             m_state = STATE_ENUM.UNLOGIN_HALL
         else
             log.warn("请求注册 注册失败:",idx, code, bodystr)
@@ -252,7 +252,7 @@ end
 local CMD = {}
 
 function CMD.launch(idx)
-    log.info("launch >>> ", idx)
+    --log.info("launch >>> ", idx)
     create_one_robot_logic(idx)
 end
 

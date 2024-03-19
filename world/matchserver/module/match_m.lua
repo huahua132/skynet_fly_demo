@@ -100,8 +100,8 @@ local function match_loop()
 
         --匹配成功，请求游戏服创建房间
         g_game_cli:set_svr_id(game_node_info.svr_id)
-        local ret = g_game_cli:byid_mod_call("createtable", member_list) --创建桌子
-        log.info("match_loop >>> ", ret)
+        local ret = g_game_cli:byid_mod_call("createtable", match_list) --创建桌子
+        --log.info("match_loop >>> ", ret)
         if ret and #ret.result > 0 then
             local table_id = ret.result[1]
             local token_list = ret.result[2]
@@ -124,7 +124,7 @@ local function match_loop()
             ]]
 
             local ret = redis_cli:script_run(script_str, 1, match_key(), table.unpack(match_list))
-            log.info("ret >>>> ", ret)
+            --log.info("ret >>>> ", ret)
             if ret == 1 then
                 local session_id = string.format("%s-%s-%s-%s", game_node_info.svr_name, game_node_info.svr_id, table_id, time_util.time())
                 --记录匹配信息
@@ -144,7 +144,7 @@ local function match_loop()
                     --通知大厅服，匹配成功了
                     for j,player_id in ipairs(match_list) do
                         local svr_id = player_util.get_svr_id_by_player_id(player_id)
-                        log.info("get_svr_id_by_player_id >>> ",player_id, svr_id)
+                        --log.info("get_svr_id_by_player_id >>> ",player_id, svr_id)
                         local hallcli = cluster_client:instance("hallserver", "room_game_hall_m")
                         hallcli:set_svr_id(svr_id)              --指定服
                         hallcli:set_mod_num(player_id)          --指定mod_num 
@@ -165,7 +165,7 @@ local CMD = {}
 
 --匹配
 function CMD.match(player_id)
-    log.info("match1 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>", player_id)
+    --log.info("match1 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>", player_id)
     local script_str = [[
         local player_id = KEYS[1]
         local score = ARGV[1]
@@ -186,7 +186,7 @@ function CMD.match(player_id)
     ]]
 
     local ret = redis.instance("global"):script_run(script_str, 3, player_id, match_key(), match_succ_lock_key(player_id), 0)
-    log.info("match2>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>", ret)
+    --log.info("match2>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>", ret)
     if ret ~= 1 then
         return nil
     end
@@ -196,7 +196,7 @@ end
 
 --取消匹配
 function CMD.cancel_match(player_id)
-    log.info("cancel_match >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>", player_id)
+    --log.info("cancel_match >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>", player_id)
     if redis.instance("global"):zrem(match_key(), player_id) == 1 then
         return true
     end
@@ -206,7 +206,7 @@ end
 
 --接受对局
 function CMD.accept_session(player_id, session_id)
-    log.info("accept_session >>>>>>>>>>>>>>>>>>>>>>>>>>>>>", player_id, session_id)
+    --log.info("accept_session >>>>>>>>>>>>>>>>>>>>>>>>>>>>>", player_id, session_id)
 
     local result_key = match_result_key(session_id)
     local script_str = [[
@@ -232,7 +232,7 @@ function CMD.accept_session(player_id, session_id)
     ]]
 
     local ret = redis.instance("global"):script_run(script_str, 2, result_key, player_id)
-    log.info("accept_session2 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>", player_id, session_id, ret)
+    --log.info("accept_session2 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>", player_id, session_id, ret)
     if not ret or ret == 1 or ret == 2 then
         return false
     elseif ret == 3 then
@@ -267,7 +267,7 @@ function CMD.accept_session(player_id, session_id)
             --通知游戏服记录游戏房间信息
             g_game_cli:set_svr_id(svr_id)
             local ret = g_game_cli:byid_mod_call("set_game_room_info", game_info_map) --记录游戏房间信息
-            log.info("set_game_room_info ret >>>", ret)
+            --log.info("set_game_room_info ret >>>", ret)
             if not ret then
                 log.warn("set_game_room_info err ", svr_name, svr_id, table_id)
                 return
@@ -276,7 +276,7 @@ function CMD.accept_session(player_id, session_id)
             for l_player_id,info in pairs(game_info_map) do
                 --通知加入对局
                 local svr_id = player_util.get_svr_id_by_player_id(l_player_id)
-                log.info("get_svr_id_by_player_id >>> ",l_player_id, svr_id)
+                --log.info("get_svr_id_by_player_id >>> ",l_player_id, svr_id)
                 local hallcli = cluster_client:instance("hallserver", "room_game_hall_m")
                 hallcli:set_svr_id(svr_id)                --指定服
                 hallcli:set_mod_num(l_player_id)          --指定mod_num 
@@ -288,7 +288,7 @@ function CMD.accept_session(player_id, session_id)
 end
 
 function CMD.start(config)
-    log.info("start match_m", config, module_info.get_cfg())
+    --log.info("start match_m", config, module_info.get_cfg())
     
     skynet.fork(function()
         g_game_cli = cluster_client:new(config.instance_name, "room_game_alloc_m")

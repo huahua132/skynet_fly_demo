@@ -23,7 +23,7 @@ do
 end
 
 local function get_orm_by_account(account)
-    local mod_num = sbyte(account:len()) --用账号最后一位做映射
+    local mod_num = sbyte(account, account:len()) --用账号最后一位做映射
     local index = mod_num % ACOUNT_TABLE_MAX + 1
     local orm_clinet = g_orm_clients[index]
     return orm_clinet

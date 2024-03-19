@@ -246,7 +246,7 @@ end
             local alloc_seat_id = nil
             for seat_id,seater in ipairs(m_seat_list) do
                 if seater:is_empty() then
-					log.info("玩家坐下:",player_id)
+					--log.info("玩家坐下:",player_id)
                     seater:enter(player_id, seat_id)
                     m_player_seat_map[player_id] = seat_id
                     m_enter_num = m_enter_num + 1
@@ -283,7 +283,7 @@ end
 				m_player_seat_map[player_id] = nil
 			end
 
-			log.info("离开房间成功 ",player_id)
+			--log.info("离开房间成功 ",player_id)
 
 			return seat_id
 		end,
@@ -299,7 +299,7 @@ end
 		handle = {
 			--玩家请求游戏状态数据
 			['.chinese_chess_game.gameStateReq'] = function(player_id,packname,pack_body)
-				log.info("handle >>>> ", packname)
+				--log.info("handle >>>> ", packname)
 				local seat_id = m_player_seat_map[player_id]
 				if not seat_id then
 					log.error("player not seat_down ",player_id)

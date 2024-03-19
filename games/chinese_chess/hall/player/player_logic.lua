@@ -26,14 +26,14 @@ end
 ---------------------------客户端事件----------------------------------
 --登录
 function M.on_login(player_id)
-    log.info("on_login >>> ", player_id)
+    --log.info("on_login >>> ", player_id)
     assert(not g_player_map[player_id], "is exists " .. player_id)
     g_player_map[player_id] = {}
 end
 
 --登出
 function M.on_loginout(player_id)
-    log.info("on_loginout >>> ", player_id)
+    --log.info("on_loginout >>> ", player_id)
     assert(g_player_map[player_id], "is not exists " .. player_id)
     g_player_map[player_id] = nil
 end
