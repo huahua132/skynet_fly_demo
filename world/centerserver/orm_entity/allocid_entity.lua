@@ -19,7 +19,7 @@ function M.init()
     :int64("module_id")       --模块id
     :int64("incr")            --自增值
     :set_keys("module_id")
-    :set_cache(0, 100)    --永久缓存，1秒同步一次更改
+    :set_cache(0, 500)    --永久缓存，5秒同步一次更改
     :builder(adapter)
     return g_ormobj
 end

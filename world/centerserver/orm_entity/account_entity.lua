@@ -25,7 +25,7 @@ function M.init()
     :int64("last_login_time")       --最后登录时间
     :int16("channel")               --注册渠道
     :set_keys("account")
-    :set_cache(60 * 5,100)    --缓存5分钟，1秒同步一次更改
+    :set_cache(60 * 60 * 100, 500, 10000)    --缓存1个小时，5秒同步一次更改,最大缓存一万条数据
     :builder(adapter)
     return g_ormobj
 end
