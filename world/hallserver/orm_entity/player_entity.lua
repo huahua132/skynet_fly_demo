@@ -26,7 +26,7 @@ function M.init()
     :int64("create_time")       --创建时间
     :int64("last_login_time")   --最后登录时间
     :set_keys("player_id")
-    :set_cache(60 * 60,100)    --缓存1个小时，1秒同步一次更改
+    :set_cache(60 * 60 * 100, 500, 10000)    --缓存1个小时，5秒同步一次更改，最大缓存1万条数据
     :builder(adapter)
     return g_ormobj
 end
