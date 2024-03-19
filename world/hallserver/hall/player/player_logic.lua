@@ -49,7 +49,9 @@ end
 function M.on_login(player_id)
     --log.info("on_login >>> ", player_id)
     assert(not g_player_map[player_id], "is exists " .. player_id)
-    g_player_map[player_id] = {}
+    g_player_map[player_id] = {
+        heart_time = 0
+    }
     player_info_notice(player_id)
 end
 
