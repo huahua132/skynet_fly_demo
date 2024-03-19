@@ -1,10 +1,10 @@
 local jwt = require "skynet-fly.3rd.luajwtjitsi"
 local crypt = require "skynet.crypt"
-local cache_help = require "skynet-fly.cache.cache_help"
+local tti = require "skynet-fly.cache.tti"
 local time_util = require "skynet-fly.utils.time_util"
 local log = require "skynet-fly.log"
 
-local g_cache = cache_help:new(60 * 60 * 100)
+local g_cache = tti:new(60 * 60 * 100)
 
 local ipairs = ipairs
 local assert = assert

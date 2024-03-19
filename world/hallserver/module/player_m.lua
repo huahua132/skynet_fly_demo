@@ -1,7 +1,7 @@
 local orm_table_client = require "skynet-fly.client.orm_table_client"
 local ALLOCID_MODULE = require "common.enum.ALLOCID_MODULE"
 local skynet = require "skynet"
-local cache_help = require "skynet-fly.cache.cache_help"
+local tti = require "skynet-fly.cache.tti"
 local contriner_client = require "skynet-fly.client.contriner_client"
 local ENUM = require "common.enum.ENUM"
 local log = require "skynet-fly.log"
@@ -12,7 +12,7 @@ contriner_client:register("share_config_m")
 local tonumber = tonumber
 local assert = assert
 
-local randkey_cache = cache_help:new(ENUM.LOGIN_TOKEN_TIME_OUT * 100)
+local randkey_cache = tti:new(ENUM.LOGIN_TOKEN_TIME_OUT * 100)
 local g_host = nil
 
 local SVR_MODULE_ID = {

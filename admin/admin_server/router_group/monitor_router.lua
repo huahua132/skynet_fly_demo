@@ -1,7 +1,7 @@
 local rsp_body = require "common.rsp_body"
 local contriner_client = require "skynet-fly.client.contriner_client"
 local cluster_client = require "skynet-fly.client.cluster_client"
-local cache_help = require "skynet-fly.cache.cache_help"
+local tti = require "skynet-fly.cache.tti"
 local timer = require "skynet-fly.timer"
 local time_util = require "skynet-fly.utils.time_util"
 local file_util = require "skynet-fly.utils.file_util"
@@ -26,7 +26,7 @@ local g_monitor_log_dir = nil
 local g_register_map = {}
 local g_cluster_list = {}
 local g_cluster_servers_map = {}
-local g_file_cache = cache_help:new(timer.minute)  --本地缓存
+local g_file_cache = tti:new(timer.minute)  --本地缓存
 
 local function get_log_file_info(cluster_name, server_name, pre_day)
     local file_path = g_monitor_log_dir..cluster_name .. '/'

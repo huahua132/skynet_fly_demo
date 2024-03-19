@@ -4,14 +4,14 @@ local skynet = require "skynet"
 local log = require "skynet-fly.log"
 local timer = require "skynet-fly.timer"
 local crypt = require "skynet.crypt"
-local cache_help = require "skynet-fly.cache.cache_help"
+local tti = require "skynet-fly.cache.tti"
 local ENUM = require "enum.ENUM"
 
 local pairs = pairs
 local next = next
 local assert = assert
 
-local g_cache = cache_help:new(ENUM.TOKEN_TIMEOUT * timer.second)
+local g_cache = tti:new(ENUM.TOKEN_TIMEOUT * timer.second)
 
 local CMD = {}
 
