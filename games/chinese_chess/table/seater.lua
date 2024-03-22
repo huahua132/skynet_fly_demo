@@ -134,6 +134,7 @@ end
 
 --操作结束
 function M:doing_end()
+	if not self.time_obj then return end
 	local remain_once_time = self.time_obj:remain_expire()
 	self.remain_total_time = self.remain_total_time - self.once_time + remain_once_time
 	if self.remain_total_time < 0 then

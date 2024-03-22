@@ -311,6 +311,10 @@ end
 				return true
 			end,
 			['.chinese_chess_game.moveReq'] = function (player_id,packname,pack_body)
+				if m_game_state ~= GAME_STATE.playing then
+					log.error("not is playing state ", m_game_state)
+					return
+				end
 				local seat_id = m_player_seat_map[player_id]
 				if not seat_id then
 					log.error("player not seat_down ",player_id)
