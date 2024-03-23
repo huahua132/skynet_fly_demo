@@ -39,7 +39,7 @@ function CMD.read(pre_day)
     else
         local pre_time = time_util.day_time(-pre_day + 1,0,0,0)     --前几天
         local date = os.date("%Y%m%d",pre_time)
-        filename = string.format('%s%s_%s.log',g_cfg.file_path,date,g_cfg.filename)
+        filename = string.format('%s%s_%s',g_cfg.file_path,date,g_cfg.filename)
     end
 
     local file = io.open(filename, 'r')
