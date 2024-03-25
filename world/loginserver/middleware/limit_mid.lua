@@ -1,12 +1,13 @@
 local log = require "skynet-fly.log"
 local rsp_body = require "common.rsp_body"
+local CODE = require "common.enum.CODE"
 
 local max_req = 10
 local cur_req = 0
 return function(c)
     if cur_req >= max_req then
         c:abort()
-        rsp_body.set_rsp(c, nil)
+        rsp_body.set_rsp(c, nil, CODE.SERVER_BUZY, "limit_mid")
         return
     end
 
