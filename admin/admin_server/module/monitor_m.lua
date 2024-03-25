@@ -63,6 +63,7 @@ local function monitor(svr_name)
     local svr_debug_console = cluster_client:instance(svr_name,"debug_console_m")
     local svr_info_map = {}
     local ret = svr_debug_console:all_mod_call('call','mem')
+    if not ret then return end
 
     local server_name_map = {}
 
@@ -91,13 +92,14 @@ local function monitor(svr_name)
     end
 
     local ret = svr_debug_console:all_mod_call('call','stat')
-
-    for _,v in ipairs(ret) do
-        for server_id,server_info in pairs(v.result[1]) do
-            svr_info_map[v.cluster_name][server_name_map[server_id]].task = server_info.task
-            svr_info_map[v.cluster_name][server_name_map[server_id]].mqlen = server_info.mqlen
-            svr_info_map[v.cluster_name][server_name_map[server_id]].cpu = server_info.cpu
-            svr_info_map[v.cluster_name][server_name_map[server_id]].message = server_info.message
+    if ret then
+        for _,v in ipairs(ret) do
+            for server_id,server_info in pairs(v.result[1]) do
+                svr_info_map[v.cluster_name][server_name_map[server_id]].task = server_info.task
+                svr_info_map[v.cluster_name][server_name_map[server_id]].mqlen = server_info.mqlen
+                svr_info_map[v.cluster_name][server_name_map[server_id]].cpu = server_info.cpu
+                svr_info_map[v.cluster_name][server_name_map[server_id]].message = server_info.message
+            end
         end
     end
 
