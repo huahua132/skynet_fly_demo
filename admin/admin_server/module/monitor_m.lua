@@ -120,8 +120,6 @@ local function monitor(svr_name)
         end
     end
 
-    log.info(svr_info_map)
-
     for cluster_name,server_info in pairs(svr_info_map) do
         for server_name,info in pairs(server_info) do
             local file_path = g_monitor_log_dir .. cluster_name .. '/'
