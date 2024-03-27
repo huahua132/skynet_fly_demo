@@ -66,7 +66,6 @@ local function monitor(svr_name)
     if not ret then return end
 
     local server_name_map = {}
-
     for _,v in ipairs(ret) do
         svr_info_map[v.cluster_name] = {}
         for server_id,server_info in pairs(v.result[1]) do
@@ -95,13 +94,33 @@ local function monitor(svr_name)
     if ret then
         for _,v in ipairs(ret) do
             for server_id,server_info in pairs(v.result[1]) do
-                svr_info_map[v.cluster_name][server_name_map[server_id]].task = server_info.task
-                svr_info_map[v.cluster_name][server_name_map[server_id]].mqlen = server_info.mqlen
-                svr_info_map[v.cluster_name][server_name_map[server_id]].cpu = server_info.cpu
-                svr_info_map[v.cluster_name][server_name_map[server_id]].message = server_info.message
+                local name_server = server_name_map[server_id]
+                if name_server and svr_info_map[v.cluster_name] and svr_info_map[v.cluster_name][name_server] then
+                    local svr_info = svr_info_map[v.cluster_name][name_server]
+                    svr_info.task = server_info.task
+                    svr_info.mqlen = server_info.mqlen
+                    svr_info.cpu = server_info.cpu
+                    svr_info.message = server_info.message
+                end
             end
         end
     end
+
+    --c 内存信息
+    local ret = svr_debug_console:all_mod_call('call','cmem')
+    if ret then
+        for _,v in ipairs(ret) do
+            for server_id,cmem in pairs(v.result[1]) do
+                local name_server = server_name_map[server_id]
+                if name_server and svr_info_map[v.cluster_name] and svr_info_map[v.cluster_name][name_server] then
+                    local svr_info = svr_info_map[v.cluster_name][name_server]
+                    svr_info.cmem = cmem
+                end
+            end
+        end
+    end
+
+    log.info(svr_info_map)
 
     for cluster_name,server_info in pairs(svr_info_map) do
         for server_name,info in pairs(server_info) do
