@@ -2,6 +2,7 @@ local log = require "skynet-fly.log"
 local time_util = require "skynet-fly.utils.time_util"
 local player_msg = require "msg.player_msg"
 local orm_table_client = require "skynet-fly.client.orm_table_client"
+local skynet = require "skynet"
 
 local assert = assert
 local pairs = pairs
@@ -22,7 +23,7 @@ function M.check_heart()
     local cur_time = time_util.time()
     for player_id,player in pairs(g_player_map) do
         if cur_time - player.heart_time > 60 then  --心跳超时
-            g_hall_interface.goout(player_id)        --踢出
+            skynet.fork(g_hall_interface.goout, player_id) --踢出
         end
     end
 end
