@@ -515,13 +515,21 @@ local function get_one_check_can_move_pos(chess_map, boss_map, one_chess)
         add_j_move_pos(chess_map,row - 1,col - 1,team_type,can_move_pos_list)
     elseif is_x(one_chess) then
         --右下
-        add_x_move_pos(chess_map,row + 2, col + 2, team_type, can_move_pos_list)
+        if not chess_map[row + 1] or not chess_map[row + 1][col + 1] then
+            add_x_move_pos(chess_map,row + 2, col + 2, team_type, can_move_pos_list)
+        end
         --右上
-        add_x_move_pos(chess_map,row - 2, col + 2, team_type, can_move_pos_list)
+        if not chess_map[row - 1] or not chess_map[row - 1][col + 1] then
+            add_x_move_pos(chess_map,row - 2, col + 2, team_type, can_move_pos_list)
+        end
         --左下
-        add_x_move_pos(chess_map,row + 2,col - 2,team_type,can_move_pos_list)
+        if not chess_map[row + 1] or not chess_map[row + 1][col - 1] then
+            add_x_move_pos(chess_map,row + 2,col - 2,team_type,can_move_pos_list)
+        end
         --左上
-        add_x_move_pos(chess_map,row - 2,col - 2,team_type,can_move_pos_list)
+        if not chess_map[row - 1] or not chess_map[row - 1][col - 1] then
+            add_x_move_pos(chess_map,row - 2,col - 2,team_type,can_move_pos_list)
+        end
     elseif is_z(one_chess) then
         if (team_type == TEAM_TYPE.BLACK and row > 5) or (team_type == TEAM_TYPE.RED and row < 6) then
             --右
