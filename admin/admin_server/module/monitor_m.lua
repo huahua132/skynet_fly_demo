@@ -6,6 +6,7 @@ local cluster_client = require "skynet-fly.client.cluster_client"
 local timer_point = require "skynet-fly.time_extend.timer_point"
 local string_util = require "skynet-fly.utils.string_util"
 local time_util = require "skynet-fly.utils.time_util"
+local math_util = require "skynet-fly.utils.math_util"
 local contriner_client = require "skynet-fly.client.contriner_client"
 local json = require "cjson"
 local log = require "skynet-fly.log"
@@ -114,7 +115,7 @@ local function monitor(svr_name)
                 local name_server = server_name_map[server_id]
                 if name_server and svr_info_map[v.cluster_name] and svr_info_map[v.cluster_name][name_server] then
                     local svr_info = svr_info_map[v.cluster_name][name_server]
-                    svr_info.cmem = cmem
+                    svr_info.cmem = math_util.number_div_str(cmem / 1024, 2)  --kb 保持2位小数
                 end
             end
         end
