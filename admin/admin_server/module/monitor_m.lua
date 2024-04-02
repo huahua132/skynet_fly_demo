@@ -88,6 +88,19 @@ local function monitor(svr_name)
             svr_info_map[v.cluster_name][name .. '_' .. server_id] = {
                 mem = mem,
             }
+            if not svr_info_map[v.cluster_name]['total'] then
+                svr_info_map[v.cluster_name]['total'] = {
+                    mem = 0,
+                    task = 0,
+                    mqlen = 0,
+                    cpu = 0,
+                    message = 0,
+                    cmem = 0,
+                }
+            end
+
+            local total_info = svr_info_map[v.cluster_name]['total']
+            total_info.mem = total_info.mem + mem
         end
     end
 
@@ -102,6 +115,12 @@ local function monitor(svr_name)
                     svr_info.mqlen = server_info.mqlen
                     svr_info.cpu = server_info.cpu
                     svr_info.message = server_info.message
+
+                    local total_info = svr_info_map[v.cluster_name]['total']
+                    total_info.task = total_info.task + server_info.task
+                    total_info.mqlen = total_info.mqlen + server_info.mqlen
+                    total_info.cpu = total_info.cpu + server_info.cpu
+                    total_info.message = total_info.message + server_info.message
                 end
             end
         end
@@ -116,6 +135,9 @@ local function monitor(svr_name)
                 if name_server and svr_info_map[v.cluster_name] and svr_info_map[v.cluster_name][name_server] then
                     local svr_info = svr_info_map[v.cluster_name][name_server]
                     svr_info.cmem = math_util.number_div_str(cmem / 1024, 2)  --kb 保持2位小数
+
+                    local total_info = svr_info_map[v.cluster_name]['total']
+                    total_info.cmem = total_info.cmem + svr_info.cmem
                 end
             end
         end
