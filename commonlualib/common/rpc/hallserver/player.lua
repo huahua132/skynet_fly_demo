@@ -18,17 +18,6 @@ function M.get_player_info(player_id)
     return table.unpack(ret.result)
 end
 
--- 预告登录
-function M.advance_login(player_id, rand_key)
-    local cli = base.hallserver_player_m(player_id)
-    local ret = cli:byid_mod_call("advance_login", player_id, rand_key)
-    if not ret then
-        return nil
-    end
-
-    return table.unpack(ret.result)
-end
-
 -- 获取自增ID所属的模块ID
 function M.get_module_id()
     local cli = cluster_client:instance("hallserver", "player_m")
@@ -42,13 +31,36 @@ function M.get_module_id()
     return module_id, svr_id
 end
 
+-- 获取host
+function M.get_host(player_id)
+    local cli = base.hallserver_player_m(player_id)
+    local ret = cli:byid_mod_call("get_host")
+    if not ret then return end
+
+    return ret.result[1]
+end
+
 -- 注册
 function M.register(player_id, account)
     local cli = base.hallserver_player_m(player_id)
-    local ret = cli:byid_balance_call("register", player_id, account)
+    local ret = cli:byid_mod_call("register", player_id, account)
     if not ret then return end
 
     return table.unpack(ret.result)
+end
+
+-- 创建token
+function M.create_token(player_id, timeout)
+    local cli = base.hallserver_token_m(player_id)
+    local ret = cli:byid_mod_call("create_token", {player_id}, timeout)
+    if not ret then return end
+    
+    local token_list = ret.result[1]
+    if not token_list then
+        return
+    end
+    
+    return token_list[1]
 end
 
 return M

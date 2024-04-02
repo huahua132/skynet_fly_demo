@@ -21,4 +21,13 @@ function M.hallserver_player_m(player_id)
     return cli
 end
 
+--大厅服的token_m
+function M.hallserver_token_m(player_id)
+    local svr_id = player_util.get_svr_id_by_player_id(player_id)
+    local cli = cluster_client:instance("hallserver", "token_m")
+    cli:set_svr_id(svr_id)
+    cli:set_mod_num(player_id)
+    return cli
+end
+
 return M

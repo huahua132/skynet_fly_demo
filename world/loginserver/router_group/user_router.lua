@@ -25,22 +25,10 @@ local function login(c)
         rsp_body.set_rsp(c, nil, errcode, errmsg)
     else
         local player_id, hall_server_id = errcode, errmsg
-        local rand_key = crypt.randomkey()
-        --log.info("login >>>>>> ", player_id, hall_server_id, rand_key)
-        local host = rpc_hall_player.advance_login(player_id, rand_key)
-        assert(host, "server err")
-        --生成登录token
-        local cur_time = time_util.time()
-        local claim = {
-            iss = "loginserver",                            --签发者
-            exp = cur_time + ENUM.LOGIN_TOKEN_TIME_OUT,     --过期时间
-            nbf = cur_time,                                 --生效时间
-        }
-
-        claim.player_id = player_id
-        -- Create a token.
-        local token = assert(jwt.encode(claim, rand_key, "HS256"))
-        assert(type(token) == "string")
+        local host = rpc_hall_player.get_host(player_id)
+        assert(host, "can`t get host")
+        local token = rpc_hall_player.create_token(player_id, ENUM.LOGIN_TOKEN_TIME_OUT)
+        assert(type(token) == "string", "create token err ")
         rsp_body.set_rsp(c, {
             token = token,
             host = host,

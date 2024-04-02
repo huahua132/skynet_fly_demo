@@ -28,7 +28,7 @@ return {
 				gateservice = "ws_gate", --gate 或者 ws_gate
 				--gate连接配置
 				gateconf = gate_cfg.world.hallserver_1,
-				login_plug = "login.login_plug",  --login加载的插件lua模块文件名
+				login_plug = "common.plug.login_plug",  --login加载的插件lua模块文件名
 			},
 		}
 	},
@@ -76,6 +76,12 @@ return {
 			},
 			watch = 'redis',  --监听redis的方式做服务发现
 		}
+	},
+
+	--token
+	token_m = {
+		launch_seq = 5500,
+		launch_num = 1,
 	},
 
     --大厅服
