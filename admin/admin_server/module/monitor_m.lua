@@ -134,7 +134,7 @@ local function monitor(svr_name)
                 local name_server = server_name_map[server_id]
                 if name_server and svr_info_map[v.cluster_name] and svr_info_map[v.cluster_name][name_server] then
                     local svr_info = svr_info_map[v.cluster_name][name_server]
-                    svr_info.cmem = math_util.number_div_str(cmem / 1024, 2)  --kb 保持2位小数
+                    svr_info.cmem = math_util.number_div_str(cmem / 1024 * 100, 2)  --kb 保持2位小数
 
                     local total_info = svr_info_map[v.cluster_name]['total']
                     total_info.cmem = total_info.cmem + svr_info.cmem

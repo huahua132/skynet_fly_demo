@@ -8,6 +8,7 @@ local log = require "skynet-fly.log"
 local cjson_safe = require 'cjson.safe'
 local table_util = require "skynet-fly.utils.table_util"
 local string_util = require "skynet-fly.utils.string_util"
+local math_util = require "skynet-fly.utils.math_util"
 
 local assert = assert
 local next = next
@@ -57,37 +58,51 @@ return function(group)
         local instance = cluster_client:instance(svr_name,"debug_console_m"):set_svr_id(svr_id)
 
         local ret = instance:byid_mod_call('call','mem')
-        for server_id,server_info in pairs(ret.result[1]) do
-            local split = string_util.split(server_info,' ')
-            local mem = tonumber(split[1])
-            local name = split[4]:sub(1,#split[4] - 1)
-            if name == "hot_containe" and split[5] then
-                name = split[5]
-            end
+        if ret then
+            for server_id,server_info in pairs(ret.result[1]) do
+                local split = string_util.split(server_info,' ')
+                local mem = tonumber(split[1])
+                local name = split[4]:sub(1,#split[4] - 1)
+                if name == "hot_containe" and split[5] then
+                    name = split[5]
+                end
 
-            local launch_date = ""
-            if split[7] then
-                launch_date = split[7]
-            end
-            local version = 0
-            if split[8] then
-                version = tonumber(split[8])
-            end
+                local launch_date = ""
+                if split[7] then
+                    launch_date = split[7]
+                end
+                local version = 0
+                if split[8] then
+                    version = tonumber(split[8])
+                end
 
-            info_list[server_id] = {
-                mem = mem,
-                name = name,
-                launch_date = launch_date,
-                version = version,
-            }
+                info_list[server_id] = {
+                    mem = mem,
+                    name = name,
+                    launch_date = launch_date,
+                    version = version,
+                }
+            end
         end
 
         local ret = instance:byid_mod_call('call','stat')
-        for server_id,server_info in pairs(ret.result[1]) do
-            info_list[server_id].task = server_info.task
-            info_list[server_id].mqlen = server_info.mqlen
-            info_list[server_id].cpu = server_info.cpu
-            info_list[server_id].message = server_info.message
+        if ret then
+            for server_id,server_info in pairs(ret.result[1]) do
+                info_list[server_id].task = server_info.task
+                info_list[server_id].mqlen = server_info.mqlen
+                info_list[server_id].cpu = server_info.cpu
+                info_list[server_id].message = server_info.message
+            end
+        end
+
+        --c 内存信息
+        local ret = instance:byid_mod_call('call','cmem')
+        if ret then
+            for server_id,cmem in pairs(ret.result[1]) do
+                if info_list[server_id] then
+                    info_list[server_id].cmem = tonumber(math_util.number_div_str(cmem / 1024 * 100, 2))  --kb 保持2位小数
+                end
+            end
         end
         
         rsp_body.set_rsp(c,info_list)
