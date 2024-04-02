@@ -43,7 +43,7 @@ local CMD = {}
 -- 预留位 渠道id    服务id   自增id
 local MAX_INCRID = 9999999
 local function register(account_info, channel)
-    assert(channel <= 9999, "incr overflow  channel = ",channel)
+    assert(channel <= 9999, "overflow  channel = ",channel)
     local account = account_info.account --账号
     assert(account:len() >= 6, "account not long enough")
     local orm_clinet = get_orm_by_account(account)
