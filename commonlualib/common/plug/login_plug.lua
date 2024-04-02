@@ -2,18 +2,18 @@ local log = require "skynet-fly.log"
 local ws_pbnet_util = require "skynet-fly.utils.net.ws_pbnet_util"
 local pb_netpack = require "skynet-fly.netpack.pb_netpack"
 local errors_msg = require "common.msg.errors_msg"
+local login_msg = require "msg.login_msg"
 local errorcode = require "common.enum.errorcode"
 local timer = require "skynet-fly.timer"
-local jwt = require "skynet-fly.3rd.luajwtjitsi"
 local contriner_client = require "skynet-fly.client.contriner_client"
-local login_msg = require "msg.login_msg"
 
-contriner_client:register("player_m")
+contriner_client:register("token_m")
 
 local assert = assert
 local x_pcall = x_pcall
 
 local g_interface_mgr = nil   --接口
+local g_login_req_pack_name = assert(login_msg.login_req_pack_name, "not exists login_req_pack_name")
 
 local M = {}
 
@@ -23,7 +23,7 @@ M.time_out = timer.second * 5
 M.unpack = ws_pbnet_util.unpack
 --发包函数
 M.send = ws_pbnet_util.send
-
+--广播函数
 M.broadcast = ws_pbnet_util.broadcast
 
 function M.init(interface_mgr)
@@ -31,8 +31,8 @@ function M.init(interface_mgr)
 	pb_netpack.load('../../commonlualib/common/proto')
 	pb_netpack.load('./proto')
 	g_interface_mgr = interface_mgr
-	errors_msg = errors_msg:new(interface_mgr)
 	login_msg = login_msg:new(interface_mgr)
+	errors_msg = errors_msg:new(interface_mgr)
 end
 
 --登录检测函数 packname,pack_body是解包函数返回的
@@ -43,45 +43,36 @@ function M.check(packname,pack_body)
 		return false,errorcode.PROTOCOL_ERR,"PROTOCOL_ERR"
 	end
 	--检测是不是登录请求
-	if packname ~= '.hallserver_login.LoginReq' then
+	if packname ~= g_login_req_pack_name then
 		log.error("login_check msg err ",packname)
-		return false,errorcode.NOT_LOGIN,"not login",packname
+		return false,errorcode.NOT_LOGIN,"not login"
 	end
 
-	local token = pack_body.token
 	local player_id = pack_body.player_id
-	--log.info("login check >>>> ",pack_body)
-	if not token or not player_id then
+	local token = pack_body.token
+	if not player_id or not token then
 		log.error("login check err ",pack_body)
-		return false,errorcode.REQ_PARAM_ERR,"not token",packname
+		return false,errorcode.REQ_PARAM_ERR,"not player_id"
 	end
-	local cli = contriner_client:instance("player_m")
-	cli:set_mod_num(player_id)
-	--log.info("mod_call get_randkey >>>>> ",player_id)
-	local randkey = cli:mod_call("get_randkey", player_id)
-	if not randkey then
-		log.error("login check err not randkey ")
-		return false, errorcode.TOKEN_ERR, "not randkey"
+
+	--校验token
+	if not contriner_client:instance("token_m"):mod_call("auth_token", player_id, token) then
+		log.error("token err ", pack_body)
+		return false, errorcode.TOKEN_ERR, "TOKEN err"
 	end
-	-- jwt 认证
-	local payload, msg = jwt.verify(token, "HS256", randkey)
-	if not payload or payload.player_id ~= player_id then
-		log.info("login check verify failed", msg, player_id, payload)
-		return false, errorcode.TOKEN_ERR, "token err"
-	end
+	--成功返回玩家id
 	return player_id
 end
 
 --登录失败
-function M.login_failed(player_id,errcode,errmsg)
-	--log.info("login_failed >>>> ", player_id, errcode, errmsg)
-	errors_msg:errors(player_id, errcode, errmsg)
+function M.login_failed(player_id, errcode, errmsg)
+	errors_msg:errors(player_id, errcode, errmsg, g_login_req_pack_name)
 end
 
 --登录成功
 function M.login_succ(player_id,login_res)
 	--log.info("login_succ:",player_id,login_res)
-	login_msg:login_res(player_id, login_res)
+	login_msg:login_res(player_id,login_res)
 end
 
 --登出回调
@@ -96,7 +87,7 @@ end
 
 --正在登录中
 function M.logining(player_id)
-	errors_msg:errors(player_id,errorcode.LOGINING,"logining please waiting...")
+	log.info("logining >>>>> ", player_id)
 end
 
 --重复登录
