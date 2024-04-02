@@ -3,8 +3,9 @@ local errorcode = require "common.enum.errorcode"
 local GAME_STATE = require "enum.GAME_STATE"
 local skynet = require "skynet"
 local contriner_client = require "skynet-fly.client.contriner_client"
-local cfg = require "skynet-fly.etc.module_info".get_cfg()
 local ENUM = require "enum.ENUM"
+local cfg = require "skynet-fly.etc.module_info".get_cfg()
+local base_info = require "skynet-fly.etc.module_info".get_base_info()
 local game_redis = require "common.redis.game"
 
 contriner_client:register("share_config_m", "token_m")
@@ -70,6 +71,11 @@ function M.init(alloc_interface) --初始化
 		local confclient = contriner_client:new("share_config_m")
         local room_game_login = confclient:mod_call('query','room_game_login')
         g_info.host = room_game_login.gateconf.host
+
+		if base_info.version == 1 then
+			--删除残留的房间信息
+			game_redis.del_all()
+		end
 	end)
 end
 
