@@ -14,7 +14,7 @@ return {
 				gateservice = "ws_gate", --gate 或者 ws_gate
 				--gate连接配置
 				gateconf = gate_cfg.games.chinese_chess,
-				login_plug = "login.login_plug",  --login加载的插件lua模块文件名
+				login_plug = "common.plug.login_plug",  --login加载的插件lua模块文件名
 			},
 
 			redis = {
@@ -36,7 +36,7 @@ return {
 		launch_seq = 2, --第二个启动
 		launch_num = 6, --启动6个
 		default_arg = {
-			hall_plug = "hall.hall_plug",         --大厅加载的插件lua模块文件名
+			hall_plug = "common.plug.hall_plug",         --大厅加载的插件lua模块文件名
 		}
 	},
 
