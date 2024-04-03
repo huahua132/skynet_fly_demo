@@ -27,11 +27,11 @@ local g_cur_module_id = assert(SVR_MODULE_ID[g_svr_id])
 
 --注册用户
 function CMD.register(player_id, account)
-    if g_player_cli:create_one_entry({player_id = player_id, nickname = account, create_time = time_util.time()}) then
-        return true
+    if not g_player_cli:create_one_entry({player_id = player_id, nickname = account, create_time = time_util.time()}) then
+        return false
     end
 
-    return false
+    return true
 end
 
 --获取模块ID
