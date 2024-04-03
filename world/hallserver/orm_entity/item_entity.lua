@@ -24,7 +24,7 @@ function M.init()
     :int64("id")          --道具ID
     :int64("count")       --道具数量
     :set_keys("player_id","id")
-    :set_cache(60 * 60 * 100, 500, 10000)    --缓存1个小时，5秒同步一次更改, 最大缓存1万条数据
+    :set_cache(60 * 60 * 100, 500, 100000)    --缓存1个小时，5秒同步一次更改, 最大缓存10万条数据
     :builder(adapter)
     return g_ormobj
 end
