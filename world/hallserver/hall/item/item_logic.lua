@@ -65,9 +65,9 @@ end
 
 --减少道具
 function M.cmd_reduce_item(player_id, id, num)
-    local count = g_item_entity:reduce_item(player_id, id, num)
-    if not count then
-        return nil
+    local ret,count = g_item_entity:reduce_item(player_id, id, num)
+    if not ret then
+        return ret,count
     end
 
     --同步到客户端
@@ -77,7 +77,7 @@ function M.cmd_reduce_item(player_id, id, num)
         })
     end
 
-    return count
+    return ret,count
 end
 
 return M

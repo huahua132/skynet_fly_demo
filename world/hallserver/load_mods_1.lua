@@ -89,7 +89,7 @@ return {
 		launch_seq = 6000,
 		launch_num = 6,     --启动6个
 		default_arg = {
-			hall_plug = "hall.hall_plug",         --大厅加载的插件lua模块文件名
+			hall_plug = "common.plug.hall_plug",         --大厅加载的插件lua模块文件名
 		}
 	},
 

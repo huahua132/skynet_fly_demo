@@ -5,16 +5,11 @@ local pb_netpack = require "skynet-fly.netpack.pb_netpack"
 local timer = require "skynet-fly.timer"
 local errors_msg = require "common.msg.errors_msg"
 local skynet = require "skynet"
+local g_modules_list = require "hall.hall"
 
 local assert = assert
 local ipairs = ipairs
 local pairs = pairs
-
-local g_modules_list = {
-	require "hall.player.player",
-	require "hall.match.match",
-	require "hall.item.item"
-}
 
 local g_interface_mgr = nil
 
@@ -60,7 +55,7 @@ end
 function M.connect(player_id)
 	skynet.fork(on_login, player_id)
 	return {
-		player_id = player_id,
+		isreconnect = 0,
 	}
 end
 
@@ -84,7 +79,7 @@ end
 function M.reconnect(player_id)
 	skynet.fork(on_reconnect, player_id)
 	return {
-		player_id = player_id,
+		isreconnect = 1,
 	}
 end
 
@@ -114,6 +109,12 @@ function M.handle_end(player_id, packname, pack_body, ret, errcode, errmsg)
 		log.info("handle_end err >>> ", packname, ret, errcode, errmsg)
 		errors_msg:errors(player_id, errcode, errmsg, packname)
 	end
+end
+
+-- 离开房间回调
+function M.leave_table(player_id, table_name, table_id)
+	--离开房间说明对局结束了，就直接踢掉吧
+	skynet.fork(g_interface_mgr.goout, g_interface_mgr, player_id)
 end
 
 return M

@@ -6,5 +6,5 @@ message LoginReq {
 }
 
 message LoginRes {
-	optional int64 player_id = 1;
+	optional int32 isreconnect = 1;
 }

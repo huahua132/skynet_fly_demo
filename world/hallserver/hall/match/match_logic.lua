@@ -15,7 +15,6 @@ end
 -----------------------------其他逻辑---------------------------------
 local function check_join_room_game(player_id)
     local game_room_info = game_redis.get_game_room_info(player_id)
-    log.info("check_join_room_game >>>>>> ", player_id, game_room_info)
     if not game_room_info or not next(game_room_info) then
         return
     end
