@@ -6,6 +6,7 @@ local CODE = require "common.enum.CODE"
 local string_util = require "skynet-fly.utils.string_util"
 local time_util = require "skynet-fly.utils.time_util"
 local rpc_hallserver_player_m = require "common.rpc.hallserver.player"
+local player_util = require "common.utils.player"
 
 local sbyte = string.byte
 local assert = assert
@@ -56,7 +57,7 @@ local function register(account_info, channel)
 
     local incrid = g_alloc_client:incr(module_id)
     assert(incrid <= MAX_INCRID, "incr overflow")
-    local player_id = tonumber(string.format("1%04d%04d%07d", channel, svr_id, incrid))
+    local player_id = player_util.builder_player_id(channel, svr_id, incrid)
     local ret = rpc_hallserver_player_m.register(player_id, account)
     assert(ret, "register err")
 
