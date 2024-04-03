@@ -1,7 +1,7 @@
 -- http服务配置
 
 local M = {}
---http_port 规范为服务类型拼接游戏id拼接 1 例如 09 .. 01 .. 4
+--http_port 规范为服务类型拼接自增id拼接 1 例如 09 .. 01 .. 4
 --后台配置 10开头
 M.admin = {
     admin_server = {

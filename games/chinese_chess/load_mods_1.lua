@@ -13,7 +13,7 @@ return {
 			room_game_login = {
 				gateservice = "ws_gate", --gate 或者 ws_gate
 				--gate连接配置
-				gateconf = gate_cfg.games.chinese_chess,
+				gateconf = gate_cfg.games.chinese_chess_1,
 				login_plug = "common.plug.login_plug",  --login加载的插件lua模块文件名
 			},
 
@@ -25,9 +25,9 @@ return {
 			},
 
 			--cluster_server用的配置
-			cluster_server = cluster_server_cfg.games.chinese_chess,
+			cluster_server = cluster_server_cfg.games.chinese_chess_1,
 
-			server_cfg = server_cfg.games.chinese_chess,
+			server_cfg = server_cfg.games.chinese_chess_1,
 		}
 	},
 
@@ -68,13 +68,13 @@ return {
         launch_seq = 5,
         launch_num = 1,
         default_arg = {
-            file_path = './logs/',          --文件路径
+            file_path = './logs_1/',          --文件路径
             filename = 'server.log',   --文件名
             limit_size = 0,            --最小分割大小
             max_age = 7,               --最大保留天数
             max_backups = 7,           --最大保留文件数
             sys_cmd = [[
-                /usr/bin/pkill -HUP -f skynet.chinese_chess_config.lua\n
+                /usr/bin/pkill -HUP -f skynet.chinese_chess_config.lua.load_mods_1.lua\n
             ]],              --系统命令
         }
     },
