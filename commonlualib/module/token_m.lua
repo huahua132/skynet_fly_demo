@@ -3,8 +3,7 @@ local crypt = require "skynet.crypt"
 local tti = require "skynet-fly.cache.tti"
 local time_util = require "skynet-fly.utils.time_util"
 local log = require "skynet-fly.log"
-
-local g_cache = tti:new(60 * 60 * 100)
+local env_util = require "skynet-fly.utils.env_util"
 
 local ipairs = ipairs
 local assert = assert
@@ -12,6 +11,10 @@ local type = type
 local table = table
 local tonumber = tonumber
 local tostring = tostring
+
+local g_cache = tti:new(60 * 60 * 100)
+
+local g_self_cluster_name = env_util.get_svr_name() .. ':' .. env_util.get_svr_id()
 
 local CMD = {}
 
@@ -24,7 +27,7 @@ function CMD.create_token(player_list, timeout)
         --生成登录token
         local cur_time = time_util.time()
         local claim = {
-            iss = "token_m",                                --签发者
+            iss = g_self_cluster_name,                      --签发者
             exp = cur_time + timeout,                       --过期时间
             nbf = cur_time,                                 --生效时间
         }
