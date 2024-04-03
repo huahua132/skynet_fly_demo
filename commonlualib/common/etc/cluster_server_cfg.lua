@@ -2,12 +2,16 @@
 local M = {}
 
 local register = "redis"    --连接信息注册到redis
---cluster_port 规范为服务类型拼接游戏id拼接 3 例如 09 .. 01 .. 3
+--cluster_port 规范为服务类型拼接自增id拼接 3 例如 09 .. 01 .. 3
 M.games = {
-    chinese_chess = {
+    chinese_chess_1 = {
         host = "127.0.0.1:9013",
         register = register,        
-    }    
+    },
+    chinese_chess_2 = {
+        host = "127.0.0.1:9023",
+        register = register,
+    }
 }
 
 --后台配置 10开头

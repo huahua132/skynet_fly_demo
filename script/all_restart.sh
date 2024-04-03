@@ -44,7 +44,8 @@ cd ../../
 #启动游戏
 cd games/chinese_chess
 bash ${make_cmd}
-bash script/restart.sh load_mods.lua
+bash script/restart.sh load_mods_1.lua
+bash script/restart.sh load_mods_2.lua
 cd ../../
 
 #启动机器人

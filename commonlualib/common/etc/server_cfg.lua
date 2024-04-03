@@ -1,12 +1,20 @@
 --所有服务的系统配置
 local M = {}
---debug_port 规范为服务类型拼接游戏id拼接 1 例如 09 .. 01 .. 1
+--debug_port 规范为服务类型拼接自增id拼接 1 例如 09 .. 01 .. 1
 --游戏配置 09开头
 M.games = {
-    chinese_chess = {
+    chinese_chess_1 = {
+        svr_id = 1,         --服务ID
+        thread = 8,         --工作线程数
+        debug_port = 9011,  --调试端口
+        logpath = './logs_1/',
+    },
+    chinese_chess_2 = {
+        svr_id = 2,
         thread = 8,
-        debug_port = 9011,
-    }
+        debug_port = 9021,
+        logpath = './logs_2/',
+    },
 }
 
 --后台配置 10开头
