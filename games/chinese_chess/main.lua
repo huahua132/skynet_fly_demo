@@ -10,4 +10,6 @@ skynet.start(function()
 	skynet.uniqueservice("room_game_login")
 
 	skynet.call('.logger','lua','add_hook','common.log_hook')
+
+	skynet.exit()
 end)

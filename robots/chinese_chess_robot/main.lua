@@ -8,4 +8,6 @@ skynet.start(function()
 	skynet.uniqueservice("cluster_server")
 	--调整日志服钩子函数处理
 	skynet.call('.logger','lua','add_hook','common.log_hook')
+
+	skynet.exit()
 end)
