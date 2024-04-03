@@ -6,11 +6,14 @@ local skynet = require "skynet"
 
 local assert = assert
 local pairs = pairs
+local tinsert = table.insert
+local tremote = table.remove
 
 local g_hall_interface = nil
 local g_player_entity = orm_table_client:instance("player")
 
 local g_player_map = {}
+local g_player_list = {}
 
 local M = {}
 function M.init(interface_mgr)
@@ -53,6 +56,7 @@ function M.on_login(player_id)
     g_player_map[player_id] = {
         heart_time = 0
     }
+    tinsert(g_player_list, player_id)
     player_info_notice(player_id)
 end
 
@@ -61,6 +65,12 @@ function M.on_loginout(player_id)
     --log.info("on_loginout >>> ", player_id)
     assert(g_player_map[player_id], "is not exists " .. player_id)
     g_player_map[player_id] = nil
+    for i = 1,#g_player_list do
+        if g_player_list[i] == player_id then
+            tremote(g_player_list, i)
+            break
+        end
+    end
 end
 
 --重连
@@ -84,8 +94,14 @@ function M.do_heart(player_id, pack_body)
 end
 
 ---------------------------CMD--------------------------------------------
+--获取玩家信息
 function M.cmd_get_info(player_id)
     return g_player_entity:get_one_entry(player_id)
+end
+
+--获取所有在线玩家ID
+function M.cmd_get_all_online()
+    return g_player_list
 end
 
 return M

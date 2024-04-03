@@ -41,6 +41,11 @@ function CMD.player_get_info(player_id)
     return player_logic.cmd_get_info(player_id)
 end
 
+--获取所有在线玩家ID
+function CMD.get_all_online()
+    return player_logic.cmd_get_all_online()
+end
+
 M.register_cmd = CMD
 
 return M

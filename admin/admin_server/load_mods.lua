@@ -109,4 +109,15 @@ return {
             }
         }
     },
+	--监控在线
+	monitor_online_m = {
+		launch_seq = 8000,
+		launch_num = 1,
+		default_arg = {
+			node_list = {
+				'hallserver',			 	 --大厅服
+				'chinese_chess',			 --象棋游戏服
+			}
+		}
+	},
 }
