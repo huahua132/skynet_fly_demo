@@ -67,7 +67,7 @@ local function create_one_robot_logic(idx)
 
     --给游戏服发送消息
     local function send_game_msg(packname, packbody)
-        if m_game_fd then
+        if m_game_fd and not websocket.is_close(m_game_fd) then
             ws_pbnet_util.send(nil, m_game_fd, packname, packbody)
         else
             --.warn("给游戏服发送消息 连接不存在 ", idx, m_player_id)
@@ -76,7 +76,7 @@ local function create_one_robot_logic(idx)
 
     --给大厅服发送消息
     local function send_hall_msg(packname, packbody)
-        if m_hall_fd then
+        if m_hall_fd and not websocket.is_close(m_hall_fd) then
             ws_pbnet_util.send(nil, m_hall_fd, packname, packbody)
         else
             --log.warn("给大厅服发送消息 连接不存在 ", idx, m_player_id)
