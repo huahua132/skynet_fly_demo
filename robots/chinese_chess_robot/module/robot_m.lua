@@ -122,7 +122,8 @@ local function create_one_robot_logic(idx)
         m_game_table_id = body.table_id
         m_game_fd = websocket.connect("ws://" .. host)
         if m_game_fd then
-            socket.onclose(m_game_fd, function()
+            socket.onclose(m_game_fd, function(close_fd)
+                websocket.close(close_fd)
                 --log.info("m_game_fd close:", m_game_fd)
                 m_game_fd = nil
             end)
@@ -173,9 +174,9 @@ local function create_one_robot_logic(idx)
             local host = data.host
             m_hall_fd = websocket.connect("ws://" .. host)
             if m_hall_fd then
-                local hall_id = m_hall_fd
-                socket.onclose(hall_id, function()
-                    if hall_id == m_hall_fd then
+                socket.onclose(m_hall_fd, function(close_fd)
+                    websocket.close(close_fd)
+                    if close_fd == m_hall_fd then
                         m_hall_fd = nil
                     end
                 end)
