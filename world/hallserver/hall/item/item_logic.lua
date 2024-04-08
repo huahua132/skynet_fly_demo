@@ -54,11 +54,9 @@ function M.cmd_add_item(player_id, id, num)
     end
 
     --同步到客户端
-    if g_hall_interface:is_online(player_id) then
-        item_msg:item_list_notice(player_id, {
-            item_list = {{id = id, count = count}}
-        })
-    end
+    item_msg:item_list_notice(player_id, {
+        item_list = {{id = id, count = count}}
+    })
 
     return count
 end
@@ -71,11 +69,9 @@ function M.cmd_reduce_item(player_id, id, num)
     end
 
     --同步到客户端
-    if g_hall_interface:is_online(player_id) then
-        item_msg:item_list_notice(player_id, {
-            item_list = {{id = id, count = count}}
-        })
-    end
+    item_msg:item_list_notice(player_id, {
+        item_list = {{id = id, count = count}}
+    })
 
     return ret,count
 end
