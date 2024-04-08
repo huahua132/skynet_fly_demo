@@ -91,7 +91,7 @@ function M.logining(player_id)
 end
 
 --重复登录
-function M.repeat_login(gate,fd,player_id)
+function M.repeat_login(player_id)
 	errors_msg:errors(player_id,errorcode.REPAET_LOGIN,"repeat_login")
 end
 
