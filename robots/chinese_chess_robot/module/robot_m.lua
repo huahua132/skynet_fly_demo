@@ -15,11 +15,12 @@ local GAME_ID_ENUM = require "common.enum.GAME_ID_ENUM"
 local game = require "scene.game"
 
 --http 请求设置5秒超时时间
-httpc.timeout = 500
+httpc.timeout = 6000
 
 local assert = assert
 local pcall = pcall
 local math = math
+local tostring = tostring
 --机器人
 
 local STATE_ENUM = {
@@ -67,7 +68,7 @@ local function create_one_robot_logic(idx)
 
     --给游戏服发送消息
     local function send_game_msg(packname, packbody)
-        if m_game_fd and not websocket.is_close(m_game_fd) then
+        if m_game_fd then
             ws_pbnet_util.send(nil, m_game_fd, packname, packbody)
         else
             --.warn("给游戏服发送消息 连接不存在 ", idx, m_player_id)
@@ -76,7 +77,7 @@ local function create_one_robot_logic(idx)
 
     --给大厅服发送消息
     local function send_hall_msg(packname, packbody)
-        if m_hall_fd and not websocket.is_close(m_hall_fd) then
+        if m_hall_fd then
             ws_pbnet_util.send(nil, m_hall_fd, packname, packbody)
         else
             --log.warn("给大厅服发送消息 连接不存在 ", idx, m_player_id)
@@ -124,7 +125,7 @@ local function create_one_robot_logic(idx)
         if m_game_fd then
             socket.onclose(m_game_fd, function(close_fd)
                 websocket.close(close_fd)
-                --log.info("m_game_fd close:", m_game_fd)
+                --log.info("m_game_fd close:", m_game_fd, close_fd)
                 m_game_fd = nil
             end)
 
@@ -162,10 +163,9 @@ local function create_one_robot_logic(idx)
         local isok,code,bodystr = pcall(httpc.request, "POST", get_login_server_host(), '/user/login', nil, g_header, json.encode(req))
         --log.info("请求登录:", idx, isok, code, bodystr)
         if not isok then
-            log.error("请求登录 网络错误:", idx, isok, code)
+            log.error("请求登录 网络错误:", idx, isok, tostring(code))
             return
         end
-
         local body = json.decode(bodystr)
         if body.code == CODE.OK then
             local data = body.data
@@ -176,6 +176,7 @@ local function create_one_robot_logic(idx)
             if m_hall_fd then
                 socket.onclose(m_hall_fd, function(close_fd)
                     websocket.close(close_fd)
+                    --log.info("hall close fd :", close_fd)
                     if close_fd == m_hall_fd then
                         m_hall_fd = nil
                     end
@@ -213,7 +214,7 @@ local function create_one_robot_logic(idx)
         local isok,code,bodystr = pcall(httpc.request, "POST", get_login_server_host(), '/user/signup', nil, g_header, json.encode(req))
         --log.info("请求注册:", idx, isok, code, bodystr)
         if not isok then
-            log.error("请求注册 网络错误:", idx, isok, code)
+            log.error("请求注册 网络错误:", idx, isok, tostring(code))
             return
         end
 
