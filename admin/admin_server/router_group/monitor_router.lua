@@ -109,6 +109,15 @@ return function(group)
         local query = c.req.query
         local cluster_name = assert(query.cluster_name, "not cluster_name") --集群服务的名字
         local server_name = assert(query.server_name, "not server_name")    --服务名字
+
+        if server_name == "total" then
+            rsp_body.set_rsp(c, {
+                run_time = 0,
+                server_info = {}
+            })
+            return
+        end
+
         local split_str = string_util.split(cluster_name,':')
         assert(#split_str == 2, "err cluster_name " .. cluster_name)
         local svr_name,svr_id = split_str[1],tonumber(split_str[2])

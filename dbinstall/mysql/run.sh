@@ -1,2 +1,2 @@
 #!/bin/bash
-mysqld start --user=root
+systemctl start mysql.service
