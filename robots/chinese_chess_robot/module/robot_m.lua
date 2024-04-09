@@ -155,6 +155,9 @@ local function create_one_robot_logic(idx)
     local m_STATE_HANDLE = {}
     --未登录大厅
     m_STATE_HANDLE[STATE_ENUM.UNLOGIN_HALL] = function()
+        if m_hall_heart_timer then
+            m_hall_heart_timer:cancel()
+        end
         --尝试登录
         local req = {
             account = m_account,
@@ -164,6 +167,7 @@ local function create_one_robot_logic(idx)
         --log.info("请求登录:", idx, isok, code, bodystr)
         if not isok then
             log.error("请求登录 网络错误:", idx, isok, tostring(code))
+            skynet.sleep(math.random(timer.second * 5, timer.second * 15))
             return
         end
         local body = json.decode(bodystr)
@@ -172,8 +176,8 @@ local function create_one_robot_logic(idx)
             m_player_id = data.player_id
             local token = data.token
             local host = data.host
-            m_hall_fd = websocket.connect("ws://" .. host)
-            if m_hall_fd then
+            isok,m_hall_fd = pcall(websocket.connect, "ws://" .. host)
+            if isok and m_hall_fd then
                 socket.onclose(m_hall_fd, function(close_fd)
                     websocket.close(close_fd)
                     --log.info("hall close fd :", close_fd)
@@ -192,6 +196,7 @@ local function create_one_robot_logic(idx)
                 send_hall_msg('.hallserver_login.LoginReq', login_req)
             else
                 log.error("连接大厅失败 ", host)
+                skynet.sleep(math.random(timer.second * 5, timer.second * 15))
             end
         else
             if body.code == CODE.NOT_USER then   --用户不存在 去注册 
@@ -215,6 +220,7 @@ local function create_one_robot_logic(idx)
         --log.info("请求注册:", idx, isok, code, bodystr)
         if not isok then
             log.error("请求注册 网络错误:", idx, isok, tostring(code))
+                  skynet.sleep(math.random(timer.second * 5, timer.second * 15))
             return
         end
 
