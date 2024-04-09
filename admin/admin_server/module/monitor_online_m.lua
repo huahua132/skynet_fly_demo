@@ -113,6 +113,10 @@ end
 
 local CMD = {}
 
+function CMD.get_node_list()
+    return g_config.node_list, g_monitor_log_dir
+end
+
 function CMD.start(config)
     g_config = config
     SELF_ADDRESS = skynet.self()
