@@ -8,7 +8,7 @@
 import { mapGetters } from 'vuex'
 export default {
   name: 'Dashboard',
-  components: {monitorDashBoard},
+  components: {},
 
   data() {
     return {
