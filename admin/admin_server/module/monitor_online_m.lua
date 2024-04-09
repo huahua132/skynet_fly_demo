@@ -30,16 +30,29 @@ contriner_client:register("logrotate_m")
 
 local g_monitor_log_dir = "./monitor_online_log/"
 
-local function rigister_rotate(svr_name,file_path,file_name)
+local TAR_TIMER_POINT_TYPE = {
+    online = timer_point.EVERY_MINUTE,
+    regiter = timer_point.EVERY_DAY,
+}
+
+local TAG_TIMER_POINT_CFG = {
+    online = {
+        max_age = 7,
+    },
+    regiter = {
+        max_age = 60,
+        point_type = timer_point.EVERY_MOUTH,  --每个月切割一次
+    }
+}
+
+local function rigister_rotate(svr_name, file_path, file_name, tag)
     if g_rigister_info[svr_name] then
         return
     end
 
-    local cfg = {
-        filename = file_name,          --文件名
-        file_path = file_path,         --文件夹
-        max_age = 7,                   --最大保留天数
-    }
+    local cfg = assert(TAG_TIMER_POINT_CFG[tag], "not exists tag :" .. tag)
+    cfg.filename = file_name
+    cfg.file_path = file_path
 
     if contriner_client:instance("logrotate_m"):mod_call("add_rotate", SELF_ADDRESS, cfg) then
         g_rigister_info[svr_name] = file_name
@@ -60,7 +73,7 @@ local function write_info(svr_name, tag, infostr)
     if not os.execute("mkdir -p " .. file_path) then
         error("create g_monitor_log_dir err")
     end
-    rigister_rotate(tag,file_path,file_name)
+    rigister_rotate(svr_name, file_path, file_name, tag)
     local file = io.open(fname, 'a+')
     if file then
         file:write(infostr .. '\n')
@@ -130,7 +143,9 @@ function CMD.start(config)
             g_time_map[svr_name] = {}
             for tag in pairs(tag_map) do
                 local handle = assert(EXCUTE_LOOP[tag], "not exists tag handle " .. tag)
-                g_time_map[svr_name][tag] = timer_point:new(timer_point.EVERY_MINUTE):builder(handle, svr_name, tag)
+                local point_type = assert(TAR_TIMER_POINT_TYPE[tag], "not exists tag point type " .. tag)
+                assert(TAG_TIMER_POINT_CFG[tag], "not exists tag cfg " .. tag)
+                g_time_map[svr_name][tag] = timer_point:new(point_type):builder(handle, svr_name, tag)
             end
         end
     end)
