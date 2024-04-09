@@ -19,6 +19,7 @@ local pairs = pairs
 local io = io
 local string = string
 local error = error
+local assert = assert
 
 local SELF_ADDRESS
 local g_config = nil
@@ -52,7 +53,26 @@ local function rigister_rotate(svr_name,file_path,file_name)
     end
 end
 
-local function monitor(svr_name)
+local function write_info(svr_name, tag, infostr)
+    local file_path = g_monitor_log_dir .. svr_name .. '/'
+    local file_name = tag .. '.log'
+    local fname = string.format("%s%s",file_path,file_name)
+    if not os.execute("mkdir -p " .. file_path) then
+        error("create g_monitor_log_dir err")
+    end
+    rigister_rotate(tag,file_path,file_name)
+    local file = io.open(fname, 'a+')
+    if file then
+        file:write(infostr .. '\n')
+        file:flush()
+        file:close()
+    else
+        log.error("open file err ",fname)
+    end
+end
+
+local EXCUTE_LOOP = {}
+EXCUTE_LOOP['online'] = function(svr_name, tag)
     if not os.execute("mkdir -p " .. g_monitor_log_dir) then
         error("create g_monitor_log_dir err")
     end
@@ -92,48 +112,39 @@ local function monitor(svr_name)
     end
 
     --log.info("monitor:", info)
-
-    local file_path = g_monitor_log_dir
-    local file_name = svr_name .. '.log'
-    local fname = string.format("%s%s",file_path,file_name)
-    if not os.execute("mkdir -p " .. file_path) then
-        error("create g_monitor_log_dir err")
-    end
-    rigister_rotate(svr_name,file_path,file_name)
-    local file = io.open(fname, 'a+')
-    if file then
-        local info_json = json.encode({[cur_date] = info})
-        file:write(info_json .. '\n')
-        file:flush()
-        file:close()
-    else
-        log.error("open file err ",fname)
-    end
+    write_info(svr_name, tag, json.encode({[cur_date] = info}))
 end
 
 local CMD = {}
 
-function CMD.get_node_list()
-    return g_config.node_list, g_monitor_log_dir
+function CMD.get_node_map()
+    return g_config.node_map, g_monitor_log_dir
 end
 
 function CMD.start(config)
     g_config = config
     SELF_ADDRESS = skynet.self()
-    local node_list = config.node_list
+    local node_map = config.node_map
     skynet.fork(function()
-        for _,svr_name in ipairs(node_list) do
-            g_time_map[svr_name] = timer_point:new(timer_point.EVERY_MINUTE):builder(monitor,svr_name)
+        for svr_name,tag_map in pairs(node_map) do
+            g_time_map[svr_name] = {}
+            for tag in pairs(tag_map) do
+                local handle = assert(EXCUTE_LOOP[tag], "not exists tag handle " .. tag)
+                g_time_map[svr_name][tag] = timer_point:new(timer_point.EVERY_MINUTE):builder(handle, svr_name, tag)
+            end
         end
     end)
     return true
 end
 
 function CMD.fix_exit()
+    --取消本服务发起的所有切割任务
     contriner_client:instance("logrotate_m"):mod_send("cancel", SELF_ADDRESS)
-    for _,time_obj in pairs(g_time_map) do
-        --取消定时器
-        time_obj:cancel()
+    for _,tag_map in pairs(g_time_map) do
+        for _,time_obj in pairs(tag_map) do
+            --取消定时器
+            time_obj:cancel()
+        end
     end
 end
 

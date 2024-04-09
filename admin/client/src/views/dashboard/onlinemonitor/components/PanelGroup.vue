@@ -9,11 +9,16 @@
             <el-option v-for="(item, index) in svrNameList" :key="index" :label="item" :value="item">
             </el-option>
         </el-select>
+
+        <el-select v-model="tag" placeholder="请选择数据标签">
+            <el-option v-for="(item, index) in tagList" :key="index" :label="item" :value="item">
+            </el-option>
+        </el-select>
     </div>
 </template>
 
 <script>
-import { getNodeList, getOnlineRecord } from '@/api/dashboard'
+import { getNodeMap, getOnlineRecord } from '@/api/dashboard'
 
 const day_options = [
     {value : 0, label : "当天"},
@@ -29,20 +34,29 @@ const day_options = [
 export default {
     data() {
         return {
-            pre_day : null,
-            svr_name : null,
+            pre_day : 0,
+            svr_name : "hallserver",
+            tag : "online",
             dayOption : day_options,
             svrNameList:[],
-            serverMap:{},
+            tagList:[],
+            nodeMap:{},
         }
     },
 
     created() {
         this.getsvrNameList()
+        this.handleSetLine()
     },
 
     watch: {
         svr_name : {
+            handler(val) {
+                this.setTagList(val)
+                this.handleSetLine()
+            }
+        },
+        tag : {
             handler(val) {
                 this.handleSetLine()
             }
@@ -55,17 +69,29 @@ export default {
     },
    
     methods: {
-        async getsvrNameList() {
-            const res = await getNodeList()
-            console.log("getsvrNameList>>>",res)
-            this.svrNameList = []
-            for (let svrName in res.data.node_map) {
-                this.svrNameList.push(svrName)
+        setTagList(svr_name) {
+            if (this.nodeMap[svr_name]) {
+                let tag_map = this.nodeMap[svr_name]
+                this.tagList = []
+                for (let tag in tag_map) {
+                    this.tagList.push(tag)
+                }
             }
         },
 
+        async getsvrNameList() {
+            const res = await getNodeMap()
+            console.log("getsvrNameList>>>",res)
+            this.svrNameList = []
+            this.nodeMap = res.data.node_map
+            for (let svrName in this.nodeMap) {
+                this.svrNameList.push(svrName)
+            }
+            this.setTagList(this.svr_name)
+        },
+
         async getOnlineRecord() {
-            const res = await getOnlineRecord(this.svr_name, this.pre_day)
+            const res = await getOnlineRecord(this.svr_name, this.pre_day, this.tag)
             let data = res.data
             console.log("getOnlineRecord>> ",data)
             if (data.result != "OK") {
@@ -99,7 +125,7 @@ export default {
         },
 
         handleSetLine() {
-            if (!this.svr_name){
+            if (!this.svr_name || !this.tag){
                 return
             }
             this.getOnlineRecord()

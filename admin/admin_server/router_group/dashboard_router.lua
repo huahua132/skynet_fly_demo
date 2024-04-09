@@ -27,14 +27,14 @@ local g_node_map = {}
 local g_cluster_servers_map = {}
 local g_file_cache = tti:new(timer.minute)  --本地缓存
 
-local function get_log_file_info(svr_name, pre_day)
-    local file_path = g_monitor_log_dir .. '/'
+local function get_log_file_info(svr_name, tag, pre_day)
+    local file_path = g_monitor_log_dir .. svr_name .. '/'
     if pre_day == 0 then --今天
-        file_path = string.format('%s%s.log',file_path,svr_name)
+        file_path = string.format('%s%s.log',file_path,tag)
     else
         local pre_time = time_util.day_time(-pre_day + 1,0,0,0)     --前几天
         local date = os.date("%Y%m%d",pre_time)
-        file_path = string.format('%s%s_%s.log',file_path,date,svr_name)
+        file_path = string.format('%s%s_%s.log',file_path,date,tag)
     end
 
     log.info("get_log_file >>> ",file_path)
@@ -62,18 +62,14 @@ end
 
 local function get_node_map()
     if not next(g_node_map) then
-        local node_list 
-        node_list,g_monitor_log_dir = contriner_client:instance("monitor_online_m"):mod_call("get_node_list")
-        for _,svr_name in ipairs(node_list) do
-            g_node_map[svr_name] = true
-        end
+        g_node_map,g_monitor_log_dir = contriner_client:instance("monitor_online_m"):mod_call("get_node_map")
     end
 
     return g_node_map
 end
 
 return function(group)
-    group:get('/node_list',function(c)
+    group:get('/node_map',function(c)
         local node_map = get_node_map()
         rsp_body.set_rsp(c,{
             node_map = node_map,
@@ -84,12 +80,14 @@ return function(group)
         get_node_map()
         local query = c.req.query
         local svr_name = assert(query.svr_name, "not svr_name") --集群服务的名字
-        local pre_day = assert(query.pre_day,"not pre_day")                 --前几天
+        local pre_day = assert(query.pre_day, "not pre_day")                 --前几天
+        local tag = assert(query.tag, "not tag")                --是在线 还是啥
         pre_day = tonumber(pre_day)
         assert(pre_day >= 0, "pre day err")
-        assert(g_node_map[svr_name], "svr_name not exists")          --不存在
+        local tag_map = assert(g_node_map[svr_name], "svr_name not exists")          --不存在
+        assert(tag_map[tag], "tag not exists")                  --不存在
         
-        local ret,info_list = get_log_file_info(svr_name, pre_day)
+        local ret,info_list = get_log_file_info(svr_name, tag, pre_day)
 
         rsp_body.set_rsp(c,{
             result = ret,

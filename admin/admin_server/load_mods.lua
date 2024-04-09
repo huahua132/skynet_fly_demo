@@ -114,9 +114,13 @@ return {
 		launch_seq = 8000,
 		launch_num = 1,
 		default_arg = {
-			node_list = {
-				'hallserver',			 	 --大厅服
-				'chinese_chess',			 --象棋游戏服
+			node_map = {
+				['hallserver'] = {			 --大厅服
+					online = true,
+				},
+				['chinese_chess'] = {		 --象棋游戏服
+					online = true,
+				}	 
 			}
 		}
 	},
