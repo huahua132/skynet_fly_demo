@@ -6,6 +6,7 @@ const role = require('./role')
 const monitor = require('./monitor')
 const realtimelist = require('./realtimelist')
 const warnlog = require('./warnlog')
+const dashboard = require('./dashboard')
 
 const mocks = [
   ...user,
@@ -13,6 +14,7 @@ const mocks = [
   ...monitor,
   ...realtimelist,
   ...warnlog,
+  ...dashboard,
 ]
 
 // for front mock
