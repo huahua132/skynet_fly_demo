@@ -1,7 +1,11 @@
 
 const node_map = {
-    "hall_server" : true,
-    "chinese_chess" : true,
+    "hallserver" : {
+        "online" : true,
+    },
+    "chinese_chess" : {
+        "online" : true
+    },
 }
 
 const lineChartData = [
@@ -18,10 +22,10 @@ const lineChartData = [
   
 module.exports = [
 {
-    url: '/dashboard/node_list',
+    url: '/dashboard/node_map',
     type: 'get',
     response: config => {
-    console.log("user node_list>>>>>>>>>>>>>>>>>>>>>>>>>>")
+    console.log("user node_map>>>>>>>>>>>>>>>>>>>>>>>>>>")
     return {
         code: 20000,
         data: {

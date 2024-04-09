@@ -1,19 +1,20 @@
 import request from '@/utils/request'
 
-export function getNodeList() {
+export function getNodeMap() {
   return request({
-    url: '/dashboard/node_list',
+    url: '/dashboard/node_map',
     method: 'get',
   })
 }
 
-export function getOnlineRecord(svr_name,pre_day) {
+export function getOnlineRecord(svr_name,pre_day, tag) {
   return request({
     url: '/dashboard/online_record',
     method: 'get',
     params: { 
       svr_name : svr_name,
-      pre_day : pre_day
+      pre_day : pre_day,
+      tag : tag
     }
   })
 }
