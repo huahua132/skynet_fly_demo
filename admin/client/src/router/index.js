@@ -52,7 +52,7 @@ export const constantRoutes = [
         path: 'dashboard',
         name: 'Dashboard',
         component: () => import('@/views/dashboard/index'),
-        meta: { title: '服务监控'}
+        meta: { title: '数据看板'}
       },
     ]
   },
@@ -66,6 +66,19 @@ export const constantRoutes = [
         name : 'Realtimelist',
         component: () => import('@/views/realtimelist/index'),
         meta: {title: '实时列表'},
+      }
+    ]
+  },
+
+  {
+    path: '/monitor',
+    component: Layout,
+    children: [
+      {
+        path : 'index',
+        name : 'Monitor',
+        component: () => import('@/views/monitor/index'),
+        meta: {title: '服务监控'},
       }
     ]
   },
