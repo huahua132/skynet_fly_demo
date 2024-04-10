@@ -28,6 +28,7 @@ local M = {}
 function M.init(interface_mgr)
 	g_interface_mgr = interface_mgr
 	assert(g_table_conf.player_num,"not player_num")
+	pb_netpack.load('../../commonlualib/common/proto')
 	pb_netpack.load('./proto')
 end
 
