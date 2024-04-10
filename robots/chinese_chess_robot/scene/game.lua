@@ -105,6 +105,9 @@ function M:on_handle(packname, packbody)
 
     --通知操作
     HANDLE_FUNC['.chinese_chess_game.nextDoing'] = function(body)
+        if not self.m_game_data then
+            return
+        end
         self.m_game_data.next_doing = body
         self:check_doing()
     end

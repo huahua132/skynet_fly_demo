@@ -47,12 +47,14 @@ M.world = {
         svr_id = 1,
         logpath = './logs_1/',
         debug_port = 11111,
+        loglevel = 'error',
     },
     loginserver_2 = {
         thread = 4,
         svr_id = 2,
         logpath = './logs_2/',
         debug_port = 11121,
+        loglevel = 'error',
     },
 
     hallserver_1 = {

@@ -31,7 +31,7 @@ return {
             file_path = './logs/',          --文件路径
             filename = 'server.log',   --文件名
             limit_size = 0,            --最小分割大小
-            max_age = 7,               --最大保留天数
+            max_age = 2,               --最大保留天数
             max_backups = 7,           --最大保留文件数
             sys_cmd = [[
                 /usr/bin/pkill -HUP -f skynet.chinese_chess_robot_config.lua\n
