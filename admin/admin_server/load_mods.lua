@@ -13,6 +13,8 @@ return {
 			redis = {
 				--rpc连接配置
 				rpc = redis_cfg.rpc,
+				--全服共用的redis
+				global = redis_cfg.global,
 			},
 
 			--cluster_server用的配置
@@ -116,11 +118,12 @@ return {
 		default_arg = {
 			node_map = {
 				['hallserver'] = {			 --大厅服
-					online = true,
+					online = true,		     --在线
+					regiter = true,			 --注册
 				},
 				['chinese_chess'] = {		 --象棋游戏服
-					online = true,
-				}	 
+					online = true,		     --在线
+				}
 			}
 		}
 	},
