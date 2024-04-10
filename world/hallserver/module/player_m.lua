@@ -5,6 +5,7 @@ local contriner_client = require "skynet-fly.client.contriner_client"
 local ENUM = require "common.enum.ENUM"
 local log = require "skynet-fly.log"
 local time_util = require "skynet-fly.utils.time_util"
+local regiter = require "common.redis.count.regiter"
 
 contriner_client:register("share_config_m")
 
@@ -30,7 +31,7 @@ function CMD.register(player_id, account)
     if not g_player_cli:create_one_entry({player_id = player_id, nickname = account, create_time = time_util.time()}) then
         return false
     end
-
+    skynet.fork(regiter.add, player_id)   --统计注册
     return true
 end
 

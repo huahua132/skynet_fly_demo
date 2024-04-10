@@ -11,8 +11,9 @@ local contriner_client = require "skynet-fly.client.contriner_client"
 local player_util = require "common.utils.player"
 local json = require "cjson"
 local log = require "skynet-fly.log"
-local os = os
+local regiter = require "common.redis.count.regiter"
 
+local os = os
 local tonumber = tonumber
 local ipairs = ipairs
 local pairs = pairs
@@ -20,6 +21,7 @@ local io = io
 local string = string
 local error = error
 local assert = assert
+local next = next
 
 local SELF_ADDRESS
 local g_config = nil
@@ -31,8 +33,8 @@ contriner_client:register("logrotate_m")
 local g_monitor_log_dir = "./monitor_online_log/"
 
 local TAR_TIMER_POINT_TYPE = {
-    online = timer_point.EVERY_MINUTE,
-    regiter = timer_point.EVERY_DAY,
+    online = timer_point.EVERY_MINUTE,          --在线打点
+    regiter = timer_point.EVERY_DAY,            --注册打点
 }
 
 local TAG_TIMER_POINT_CFG = {
@@ -85,6 +87,7 @@ local function write_info(svr_name, tag, infostr)
 end
 
 local EXCUTE_LOOP = {}
+--在线打点
 EXCUTE_LOOP['online'] = function(svr_name, tag)
     if not os.execute("mkdir -p " .. g_monitor_log_dir) then
         error("create g_monitor_log_dir err")
@@ -126,6 +129,21 @@ EXCUTE_LOOP['online'] = function(svr_name, tag)
 
     --log.info("monitor:", info)
     write_info(svr_name, tag, json.encode({[cur_date] = info}))
+end
+
+--注册打点
+EXCUTE_LOOP['regiter'] = function(svr_name, tag)
+    if not os.execute("mkdir -p " .. g_monitor_log_dir) then
+        error("create g_monitor_log_dir err")
+    end
+
+    local pre_date = os.date("%Y%m%d",time_util.day_time(-1, 0, 0, 0))
+    local info = regiter.get_predayinfo()
+    if not info or not next(info) then
+        return
+    end
+
+    write_info(svr_name, tag, json.encode({[pre_date] = info}))
 end
 
 local CMD = {}

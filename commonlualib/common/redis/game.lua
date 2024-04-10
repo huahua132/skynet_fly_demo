@@ -33,7 +33,6 @@ end
 --删除本服务的房间信息
 function M.del_all()
     local redis_cli = redis.instance("global")
-    log.info("del_all>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>", g_room_key)
     redis_cli:del(g_room_key)
 end
 
