@@ -22,7 +22,7 @@ function M.check_heart()
     local cur_time = time_util.time()
     for player_id,player in pairs(g_player_map) do
         if cur_time - player.heart_time > 60 then  --心跳超时
-            skynet.fork(g_hall_interface.goout, player_id) --踢出
+            skynet.fork(g_hall_interface.goout, g_hall_interface, player_id) --踢出
         end
     end
 end
