@@ -68,7 +68,7 @@ function M.table_creator(table_id)
 	--操作超时
 	local m_game_over = nil
 	local function doing_time_out(seat_player)
-		log.info("doing_time_out >>> ", seat_player)
+		--log.info("doing_time_out >>> ", seat_player)
 		seat_player:doing_end()
 
 		local seat_id = seat_player:get_seat_id()
@@ -177,7 +177,7 @@ end
 -----------------------------------------------------------------------
 	--开始游戏
 	local function game_start()
-		log.info("游戏开始:", m_table_id)
+		--log.info("游戏开始:", m_table_id)
 		m_game_state = GAME_STATE.playing
 		m_game_seat_id_list = {}
 		m_join_time_out:cancel()
@@ -207,7 +207,7 @@ end
 
 	--结束游戏
 	local function game_over(win_seat_id)
-		log.info("游戏结束:",win_seat_id, m_table_id)
+		--log.info("游戏结束:",win_seat_id, m_table_id)
 		m_game_state = GAME_STATE.over
 		--踢出所有玩家
 		for _,seat_player in ipairs(m_seat_list) do
@@ -247,7 +247,7 @@ end
             local alloc_seat_id = nil
             for seat_id,seater in ipairs(m_seat_list) do
                 if seater:is_empty() then
-					log.info("玩家坐下:",player_id)
+					--log.info("玩家坐下:",player_id)
                     seater:enter(player_id, seat_id)
                     m_player_seat_map[player_id] = seat_id
                     m_enter_num = m_enter_num + 1
@@ -284,17 +284,17 @@ end
 				m_player_seat_map[player_id] = nil
 			end
 
-			log.info("离开房间成功 ",player_id)
+			--log.info("离开房间成功 ",player_id)
 
 			return seat_id
 		end,
 		--玩家掉线
 		disconnect = function(player_id)
-			log.error("disconnect:",player_id)
+			--log.error("disconnect:",player_id)
 		end,
 		--玩家重连
 		reconnect = function(player_id)
-			log.error("reconnect:",player_id)
+			--log.error("reconnect:",player_id)
 		end,
 		--消息分发处理
 		handle = {

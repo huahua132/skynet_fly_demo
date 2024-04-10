@@ -166,7 +166,7 @@ local function create_one_robot_logic(idx)
         local isok,code,bodystr = pcall(httpc.request, "POST", get_login_server_host(), '/user/login', nil, g_header, json.encode(req))
         --log.info("请求登录:", idx, isok, code, bodystr)
         if not isok then
-            log.error("请求登录 网络错误:", idx, isok, tostring(code))
+            --log.error("请求登录 网络错误:", idx, isok, tostring(code))
             skynet.sleep(math.random(timer.second * 5, timer.second * 15))
             return
         end
@@ -202,7 +202,7 @@ local function create_one_robot_logic(idx)
             if body.code == CODE.NOT_USER then   --用户不存在 去注册 
                 m_state = STATE_ENUM.UNREGITER
             else
-                log.warn("请求登录 登录失败:",idx, code, bodystr)
+                --log.warn("请求登录 登录失败:",idx, code, bodystr)
             end
         end
     end
@@ -219,8 +219,8 @@ local function create_one_robot_logic(idx)
         local isok,code,bodystr = pcall(httpc.request, "POST", get_login_server_host(), '/user/signup', nil, g_header, json.encode(req))
         --log.info("请求注册:", idx, isok, code, bodystr)
         if not isok then
-            log.error("请求注册 网络错误:", idx, isok, tostring(code))
-                  skynet.sleep(math.random(timer.second * 5, timer.second * 15))
+            --log.error("请求注册 网络错误:", idx, isok, tostring(code))
+            skynet.sleep(math.random(timer.second * 5, timer.second * 15))
             return
         end
 
