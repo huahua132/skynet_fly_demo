@@ -7,13 +7,13 @@ export function getNodeMap() {
   })
 }
 
-export function getOnlineRecord(svr_name,pre_day, tag) {
+export function getOnlineRecord(svr_name, date, tag) {
   return request({
     url: '/dashboard/online_record',
     method: 'get',
     params: { 
       svr_name : svr_name,
-      pre_day : pre_day,
+      date : date,
       tag : tag
     }
   })

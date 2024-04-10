@@ -1,10 +1,16 @@
 
 const node_map = {
     "hallserver" : {
-        "online" : true,
+        "online" : {
+            "cur" : true,
+            "2024" : true,
+            "2023" : true,
+        }
     },
     "chinese_chess" : {
-        "online" : true
+        "online" : {
+            "cur" : true,
+        }
     },
 }
 
