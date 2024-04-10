@@ -1,10 +1,5 @@
 <template>
     <div>
-        <el-select v-model="pre_day" placeholder="请选择哪天">
-            <el-option v-for="item in dayOption" :key="item.value" :label="item.label" :value="item.value">
-            </el-option>
-        </el-select>
-
         <el-select v-model="svr_name" placeholder="请选择服务名">
             <el-option v-for="(item, index) in svrNameList" :key="index" :label="item" :value="item">
             </el-option>
@@ -14,30 +9,25 @@
             <el-option v-for="(item, index) in tagList" :key="index" :label="item" :value="item">
             </el-option>
         </el-select>
+
+        <el-select v-model="date" placeholder="请选择日期">
+            <el-option v-for="item in dayOption" :key="index" :label="item" :value="item">
+            </el-option>
+        </el-select>
     </div>
 </template>
 
 <script>
 import { getNodeMap, getOnlineRecord } from '@/api/dashboard'
 
-const day_options = [
-    {value : 0, label : "当天"},
-    {value : 1, label : "昨天"},
-    {value : 2, label : "前天"},
-    {value : 3, label : "前第三天"},
-    {value : 4, label : "前第四天"},
-    {value : 5, label : "前第五天"},
-    {value : 6, label : "前第六天"},
-    {value : 7, label : "前第七天"},
-]
 
 export default {
     data() {
         return {
-            pre_day : 0,
+            date : 'cur',
             svr_name : "hallserver",
             tag : "online",
-            dayOption : day_options,
+            dayOption : [],
             svrNameList:[],
             tagList:[],
             nodeMap:{},
@@ -52,16 +42,17 @@ export default {
     watch: {
         svr_name : {
             handler(val) {
-                this.setTagList(val)
+                this.setTagList()
                 this.handleSetLine()
             }
         },
         tag : {
             handler(val) {
+                this.setDateList()
                 this.handleSetLine()
             }
         },
-        pre_day : {
+        date : {
             handler(val) {
                 this.handleSetLine()
             }
@@ -69,14 +60,65 @@ export default {
     },
    
     methods: {
-        setTagList(svr_name) {
-            if (this.nodeMap[svr_name]) {
-                let tag_map = this.nodeMap[svr_name]
-                this.tagList = []
-                for (let tag in tag_map) {
-                    this.tagList.push(tag)
+        setDateList() {
+            let ishave_date = false
+            if (this.nodeMap[this.svr_name] && this.nodeMap[this.svr_name][this.tag]) {
+                let date_map = this.nodeMap[this.svr_name][this.tag]
+                this.dayOption = []
+                for (let d in date_map) {
+                    this.dayOption.push(d)
+                    if (this.date == d) {
+                        ishave_date = true
+                    }
                 }
             }
+            console.log("setDateList:", this.nodeMap, this.svr_name, this.tag, this.dayOption)
+            this.dayOption.sort(function(a, b) {
+                if (a == "cur") {
+                    return -1
+                }
+                if (b == "cur") {
+                    return 1
+                }
+
+                let na = Number(a)
+                let nb = Number(b)
+                if (na > nb) {
+                    return -1
+                } else if (na < nb) {
+                    return 1
+                } else {
+                    return 0
+                }
+            })
+
+            if (!ishave_date) {
+                this.date = this.dayOption[0]
+            }
+        },
+
+        setTagList() {
+            if (this.nodeMap[this.svr_name]) {
+                let tag_map = this.nodeMap[this.svr_name]
+                this.tagList = []
+                let ishave_tag = false
+                for (let tag in tag_map) {
+                    this.tagList.push(tag)
+                    if (tag == this.tag) {
+                        ishave_tag = true
+                    }
+                }
+                this.tagList.sort()
+                if (!ishave_tag) {
+                    if (this.tagList.length > 0) {
+                        this.tag = this.tagList[0]
+                    } else {
+                        this.tag = ""
+                    }
+                }
+            }
+           
+            this.setDateList()
         },
 
         async getsvrNameList() {
@@ -87,11 +129,11 @@ export default {
             for (let svrName in this.nodeMap) {
                 this.svrNameList.push(svrName)
             }
-            this.setTagList(this.svr_name)
+            this.setTagList()
         },
 
         async getOnlineRecord() {
-            const res = await getOnlineRecord(this.svr_name, this.pre_day, this.tag)
+            const res = await getOnlineRecord(this.svr_name, this.date, this.tag)
             let data = res.data
             console.log("getOnlineRecord>> ",data)
             if (data.result != "OK") {
@@ -125,7 +167,7 @@ export default {
         },
 
         handleSetLine() {
-            if (!this.svr_name || !this.tag){
+            if (!this.svr_name || !this.tag || !this.date){
                 return
             }
             this.getOnlineRecord()
