@@ -1,9 +1,10 @@
 local ormtable = require "skynet-fly.db.orm.ormtable"
 local ormadapter_mysql = require "skynet-fly.db.ormadapter.ormadapter_mysql"
 local math_util = require "skynet-fly.utils.math_util"
+local env_util = require "skynet-fly.utils.env_util"
 local skynet = require "skynet"
 
-local svr_id = tonumber(skynet.getenv('svr_id'))
+local svr_id = env_util.get_svr_id()
 
 local pairs = pairs
 local ipairs = ipairs

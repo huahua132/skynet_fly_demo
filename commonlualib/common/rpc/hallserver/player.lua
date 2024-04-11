@@ -63,4 +63,10 @@ function M.create_token(player_id, timeout)
     return token_list[1]
 end
 
+--新增游戏记录
+function M.add_game_record(player_id, date, id, is_win, game_id)
+    local cli = base.hallserver_player_m(player_id)
+    cli:byid_mod_send("add_game_record", player_id, date, id, is_win, game_id)
+end
+
 return M

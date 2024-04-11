@@ -11,6 +11,12 @@ local module_cfg = require "skynet-fly.etc.module_info".get_cfg()
 local errors_msg = require "common.msg.errors_msg"
 local game_msg = require "msg.game_msg"
 local timer = require "skynet-fly.timer"
+local orm_table_client = require "skynet-fly.client.orm_table_client"
+local table_util = require "skynet-fly.utils.table_util"
+local time_util = require "skynet-fly.utils.time_util"
+local player_rpc = require "common.rpc.hallserver.player"
+local json = require "cjson"
+local GAME_ID_ENUM = require "common.enum.GAME_ID_ENUM"
 
 local string = string
 local assert = assert
@@ -19,6 +25,10 @@ local table = table
 local math = math
 local pairs = pairs
 local next = next
+local os = os
+local tonumber = tonumber
+
+local g_record_cli = orm_table_client:new("record")   --对局记录
 
 local g_table_conf = module_cfg.table_conf
 local g_interface_mgr = nil
@@ -51,6 +61,13 @@ function M.table_creator(table_id)
 	local m_next_doing = {seat_id = 0,player_id = 0} --接下来谁操作
 	local m_win_player_id = 0					     --赢家
 	
+	--对局记录
+	local m_record_info = {
+		init_chess_list = nil, --初始象棋位置
+		move_pos_list = {},   --走棋记录
+		player_info_list = {}, --玩家信息
+		win_player_id = nil,   --赢家
+	}
 
 	local function dismisstable()
 		m_interface_mgr:kick_out_all()
@@ -199,7 +216,7 @@ end
 		end
 
 		m_chess_list,m_chess_map,m_boss_chess_map = chess_rule.get_init_chess_list()
-
+		m_record_info.init_chess_list = table_util.deep_copy(m_chess_list)
 		assert(next_doing_seat_id)
 		set_next_doing(next_doing_seat_id)
 
@@ -232,7 +249,43 @@ end
 		--输了减10分
 		lose_seat_player:reduce_score(10)
 
+		local lose_player_id = lose_seat_player:get_player().player_id
+
 		send_game_state()
+
+		m_record_info.player_info_list = {}
+		for seat_id, seat_player in pairs(m_seat_list) do
+			local info = {
+				player_id = seat_player:get_player().player_id,
+				team_type = seat_player:get_team_type(),
+			}
+			if info.player_id == m_win_player_id then
+				info.add_score = 10
+			else
+				info.add_score = -10
+			end
+
+			table.insert(m_record_info.player_info_list, info)
+		end
+		m_record_info.win_player_id = m_win_player_id
+
+		local cur_time = time_util.time()
+
+		skynet.fork(function()
+			local date = tonumber(os.date("%Y%m%d", cur_time))
+			local id = table_id .. ':' .. cur_time
+			local record = {
+				date = date,
+				id = id,
+				create_time = cur_time,
+				details = json.encode(m_record_info),
+			}
+			if g_record_cli:create_one_entry(record) then
+				player_rpc.add_game_record(m_win_player_id, date, id, 1, GAME_ID_ENUM.chinese_chess)
+				player_rpc.add_game_record(lose_player_id, date, id, -1, GAME_ID_ENUM.chinese_chess)
+			end
+		end)
+
 		m_interface_mgr:kick_out_all()
 		m_interface_mgr:send_alloc("dismisstable")
 		return true
@@ -366,6 +419,8 @@ end
 				seat_player:doing_end()
 				--log.error("moveRes:",pack_body)
 				m_game_msg:move_res(pack_body)
+
+				table.insert(m_record_info.move_pos_list, pack_body)
 
 				local next_seat_id = (seat_id % 2) + 1
 				if set_next_doing(next_seat_id) then
