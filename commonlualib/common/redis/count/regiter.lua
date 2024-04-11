@@ -40,7 +40,7 @@ end
 function M.get_predayinfo()
     local key = get_key(time_util.day_time(-1, 0, 0, 0))  --前一天 0点
     local redis = redis.instance("global")
-    return redis.hgetall(key)
+    return redis:hgetall(key)
 end
 
 return M
