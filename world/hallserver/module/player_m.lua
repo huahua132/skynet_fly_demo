@@ -6,6 +6,7 @@ local ENUM = require "common.enum.ENUM"
 local log = require "skynet-fly.log"
 local time_util = require "skynet-fly.utils.time_util"
 local regiter = require "common.redis.count.regiter"
+local env_util = require "skynet-fly.utils.env_util"
 
 contriner_client:register("share_config_m")
 
@@ -22,7 +23,8 @@ local SVR_MODULE_ID = {
 local CMD = {}
 
 local g_player_cli = orm_table_client:new("player")
-local g_svr_id = tonumber(skynet.getenv('svr_id'))
+local g_game_record_cli = orm_table_client:new("game_record")
+local g_svr_id = env_util.get_svr_id()
 
 local g_cur_module_id = assert(SVR_MODULE_ID[g_svr_id])
 
@@ -43,6 +45,11 @@ end
 --获取host
 function CMD.get_host()
     return g_host
+end
+
+--添加游戏记录
+function CMD.add_game_record(player_id, date, id, is_win, game_id)
+    g_game_record_cli:add_record(player_id, date, id, is_win, game_id)
 end
 
 function CMD.start()

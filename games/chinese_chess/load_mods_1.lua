@@ -2,11 +2,12 @@ local redis_cfg = loadfile("../../commonlualib/common/etc/redis_cfg.lua")()
 local server_cfg = loadfile("../../commonlualib/common/etc/server_cfg.lua")()
 local gate_cfg = loadfile("../../commonlualib/common/etc/gate_cfg.lua")()
 local cluster_server_cfg = loadfile("../../commonlualib/common/etc/cluster_server_cfg.lua")()
+local mysql_cfg = loadfile("../../commonlualib/common/etc/mysql_cfg.lua")()
 
 return {
 	--共享配置
 	share_config_m = {
-		launch_seq = 1,     --启动顺序，从小到大
+		launch_seq = 1000,     --启动顺序，从小到大
 		launch_num = 1,     --启动数量
 		default_arg = {     --默认配置
 			--room_game_login用的配置
@@ -31,9 +32,19 @@ return {
 		}
 	},
 
+	--mysql
+	mysql_m = {
+		launch_seq = 1500,
+		launch_num = 6, --启动6个
+        default_arg = {
+            db_conf = mysql_cfg.games.chinese_chess_1,
+            is_create = true,				--数据库不存在就创建
+        }
+	},
+
 	--大厅服
 	room_game_hall_m = {
-		launch_seq = 2, --第二个启动
+		launch_seq = 2000, --第二个启动
 		launch_num = 6, --启动6个
 		default_arg = {
 			hall_plug = "common.plug.hall_plug",         --大厅加载的插件lua模块文件名
@@ -42,7 +53,7 @@ return {
 
 	--匹配服
 	room_game_alloc_m = {
-		launch_seq = 3, --第三个启动
+		launch_seq = 3000, --第三个启动
 		launch_num = 1, --启动1个
 		default_arg = {
 			alloc_plug = "alloc.alloc_plug",       --匹配加载的插件lua模块文件名
@@ -52,7 +63,7 @@ return {
 
 	--房间服
 	room_game_table_m = {
-		launch_seq = 4, --第四个启动
+		launch_seq = 4000, --第四个启动
 		launch_num = 6, --启动6个
 		default_arg = {
 			table_plug = "table.table_plug",   --房间插件
@@ -65,7 +76,7 @@ return {
 
 	--日志切割
 	logrotate_m = {
-        launch_seq = 5,
+        launch_seq = 5000,
         launch_num = 1,
         default_arg = {
             file_path = './logs_1/',          --文件路径
@@ -81,13 +92,13 @@ return {
 
 	--debug入口
 	debug_console_m = {
-		launch_seq = 6,
+		launch_seq = 6000,
 		launch_num = 1,
 	},
 
 	--集群客户端
 	cluster_client_m = {
-		launch_seq = 7,
+		launch_seq = 7000,
 		launch_num = 1,
 		default_arg = {
 			node_map = {
@@ -100,7 +111,16 @@ return {
 
 	--token
 	token_m = {
-		launch_seq = 8,
+		launch_seq = 8000,
 		launch_num = 1,
-	}
+	},
+
+	-- orm
+	orm_table_m = {
+		launch_seq = 9000,
+		launch_num = 1,
+		mod_args = {
+			{instance_name = "record", orm_plug = "orm_entity.record_entity"},
+		}
+	},
 }
