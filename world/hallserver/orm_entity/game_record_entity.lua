@@ -51,14 +51,14 @@ function handle.add_record(player_id, date, id, is_win, game_id)
         return
     end
 
-    --只保留最近7天，100条记录
-    local pre_time = time_util.day_time(-7, 0, 0, 0)  --7天以前的时间戳
+    --只保留最近3天，100条记录
+    local pre_time = time_util.day_time(-7, 0, 0, 0)  --3天以前的时间戳
     local pre_date = tonumber(os.date("%Y%m%d", pre_time))
     local entry_list = g_ormobj:get_entry(player_id)
     for i = 1,#entry_list do
         local entry = entry_list[i]
         local date = entry:get('date')
-        if date <= pre_date then    --7天前的删除
+        if date <= pre_date then    --3天前的删除
             g_ormobj:delete_entry(player_id, date)
         end
     end
