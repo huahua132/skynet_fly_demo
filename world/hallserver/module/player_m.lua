@@ -48,8 +48,8 @@ function CMD.get_host()
 end
 
 --添加游戏记录
-function CMD.add_game_record(player_id, date, id, is_win, game_id)
-    g_game_record_cli:add_record(player_id, date, id, is_win, game_id)
+function CMD.add_game_record(...)
+    g_game_record_cli:add_record(...)
 end
 
 function CMD.start()
