@@ -29,6 +29,7 @@ function M.init()
     :int64("create_time")       --创建时间
     :int8("is_win")             --是否赢
     :uint16("game_id")          --游戏ID
+    :uint16("svr_id")           --服务ID
     :set_keys("player_id", "date", "id")
     :set_cache(10 * 60 * 100, 500, 100000)    --缓存10分钟，5秒同步一次更改，最大缓存10万条数据
     :builder(adapter)
@@ -37,7 +38,7 @@ function M.init()
 end
 
 --新增记录
-function handle.add_record(player_id, date, id, is_win, game_id)
+function handle.add_record(player_id, date, id, is_win, game_id, svr_id)
     local entry = g_ormobj:create_one_entry({
         player_id = player_id,
         date = date,
@@ -45,6 +46,7 @@ function handle.add_record(player_id, date, id, is_win, game_id)
         is_win = is_win,
         create_time = time_util.time(),
         game_id = game_id,
+        svr_id = svr_id,
     })
     
     if not entry then

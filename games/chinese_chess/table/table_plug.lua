@@ -17,6 +17,7 @@ local time_util = require "skynet-fly.utils.time_util"
 local player_rpc = require "common.rpc.hallserver.player"
 local json = require "cjson"
 local GAME_ID_ENUM = require "common.enum.GAME_ID_ENUM"
+local env_util = require "skynet-fly.utils.env_util"
 
 local string = string
 local assert = assert
@@ -29,6 +30,8 @@ local os = os
 local tonumber = tonumber
 
 local g_record_cli = orm_table_client:new("record")   --对局记录
+
+local g_svr_id = env_util.get_svr_id()
 
 local g_table_conf = module_cfg.table_conf
 local g_interface_mgr = nil
@@ -281,8 +284,8 @@ end
 				details = json.encode(m_record_info),
 			}
 			if g_record_cli:create_one_entry(record) then
-				player_rpc.add_game_record(m_win_player_id, date, id, 1, GAME_ID_ENUM.chinese_chess)
-				player_rpc.add_game_record(lose_player_id, date, id, -1, GAME_ID_ENUM.chinese_chess)
+				player_rpc.add_game_record(m_win_player_id, date, id, 1, GAME_ID_ENUM.chinese_chess, g_svr_id)
+				player_rpc.add_game_record(lose_player_id, date, id, -1, GAME_ID_ENUM.chinese_chess, g_svr_id)
 			end
 		end)
 
