@@ -48,11 +48,10 @@ function handle.add_record(player_id, date, id, is_win, game_id, svr_id)
         game_id = game_id,
         svr_id = svr_id,
     })
-    
-    if not entry then
-        return
-    end
+end
 
+--检测删除
+function handle.check_delete(player_id)
     --只保留最近3天，100条记录
     local pre_time = time_util.day_time(-7, 0, 0, 0)  --3天以前的时间戳
     local pre_date = tonumber(os.date("%Y%m%d", pre_time))
