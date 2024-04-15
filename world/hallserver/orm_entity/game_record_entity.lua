@@ -52,8 +52,8 @@ end
 
 --检测删除
 function handle.check_delete(player_id)
-    --只保留最近3天，100条记录
-    local pre_time = time_util.day_time(-7, 0, 0, 0)  --3天以前的时间戳
+    --只保留最近3天，50条记录
+    local pre_time = time_util.day_time(-3, 0, 0, 0)  --3天以前的时间戳
     local pre_date = tonumber(os.date("%Y%m%d", pre_time))
     local entry_list = g_ormobj:get_entry(player_id)
     for i = 1,#entry_list do
@@ -68,8 +68,8 @@ function handle.check_delete(player_id)
     table.sort(entry_list, function(a, b)
         return a:get('create_time') < b:get('create_time')
     end)
-    --保留100条
-    for i = #entry_list, 100 + 1, -1 do
+    --保留50条
+    for i = #entry_list, 50 + 1, -1 do
         local entry = entry_list[i]
         local date = entry:get('date')
         local id = entry:get('id')
