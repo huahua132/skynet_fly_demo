@@ -14,6 +14,7 @@ local ipairs = ipairs
 local table = table
 local assert = assert
 local os = os
+local tonumber = tonumber
 
 local g_ormobj = nil
 
@@ -35,8 +36,8 @@ function M.init()
     assert(g_ormobj, "builder err")
 
     timer_point:new(timer_point.EVERY_DAY):builder(function()
-        --每天删除一次前第3天的数据
-        local pre_time = time_util.day_time(-3, 0, 0, 0)
+        --每天删除一次前第2天的数据
+        local pre_time = time_util.day_time(-2, 0, 0, 0)
         local pre_date = os.date("%Y%m%d", pre_time)
         g_ormobj:delete_entry(pre_date)
     end)
