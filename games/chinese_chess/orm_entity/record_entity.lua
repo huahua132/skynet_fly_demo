@@ -38,7 +38,7 @@ function M.init()
     timer_point:new(timer_point.EVERY_DAY):builder(function()
         --每天删除一次前第2天的数据
         local pre_time = time_util.day_time(-2, 0, 0, 0)
-        local pre_date = os.date("%Y%m%d", pre_time)
+        local pre_date = tonumber(os.date("%Y%m%d", pre_time))
         g_ormobj:delete_entry(pre_date)
     end)
 
