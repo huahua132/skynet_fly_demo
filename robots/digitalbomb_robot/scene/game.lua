@@ -120,6 +120,7 @@ end
 
 --操作
 function M:doing()
+    if not self.m_send_msg then return end
     if not self.m_game_data then return end
     local next_doing = self.m_game_data.next_doing
     local min_num = next_doing.min_num
