@@ -1,4 +1,4 @@
-package chinese_chess_login;
+package game_login;
 
 message LoginReq {
 	optional string token = 1;

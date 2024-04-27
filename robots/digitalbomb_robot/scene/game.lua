@@ -12,7 +12,7 @@ local mt = {__index = M}
 
 --初始化
 function M:init()
-    pb_netpack.load('../../games/chinese_chess/proto')
+    pb_netpack.load('../../games/digitalbomb/proto')
 end
 
 --新建
@@ -76,7 +76,7 @@ function M:on_handle(packname, packbody)
 
         if body.isreconnect == 1 then   --如果是重连
             --请求游戏状态
-            self.m_send_msg('.chinese_chess_game.gameStateReq', {
+            self.m_send_msg('.digitalbomb_game.GameStatusReq', {
                 player_id = self.m_player_id
             })
         else                            --首次进入
@@ -90,29 +90,24 @@ function M:on_handle(packname, packbody)
     --进入桌子成功
     HANDLE_FUNC['.game_hall.JoinRes'] = function()
         --请求游戏状态
-        self.m_send_msg('.chinese_chess_game.gameStateReq', {
+        self.m_send_msg('.digitalbomb_game.GameStatusReq', {
             player_id = self.m_player_id
         })
     end
 
     --游戏状态数据
-    HANDLE_FUNC['.chinese_chess_game.gameStateRes'] = function(body)
+    HANDLE_FUNC['.digitalbomb_game.GameStatusRes'] = function(body)
         self.m_game_data = body
         self:check_doing()
     end
 
     --通知操作
-    HANDLE_FUNC['.chinese_chess_game.nextDoing'] = function(body)
+    HANDLE_FUNC['.digitalbomb_game.NextDoingCast'] = function(body)
         if not self.m_game_data then
             return
         end
         self.m_game_data.next_doing = body
         self:check_doing()
-    end
-
-    --棋子移动
-    HANDLE_FUNC['.chinese_chess_game.moveRes'] = function(body)
-        
     end
 
     local handle = HANDLE_FUNC[packname]
@@ -127,43 +122,26 @@ end
 function M:doing()
     if not self.m_game_data then return end
     local next_doing = self.m_game_data.next_doing
-    local can_move_list = next_doing.can_move_list
-    if not can_move_list then return end
+    local min_num = next_doing.min_num
+    local max_num = next_doing.max_num
 
-    --先随机走一步  后续看能不能弄个智能的象棋AI
-    local index = math.random(1, #can_move_list)
-    local one_can_move = can_move_list[index]
-    local chess_id = one_can_move.chess_id
-    local row_list = one_can_move.row_list
-    local col_list = one_can_move.col_list
-
-    local pos_index = math.random(1, #row_list)
-    local row = row_list[pos_index]
-    local col = col_list[pos_index]
+    local opt_num = math.random(min_num, max_num)
 
     --log.info("doing:", one_can_move, pos_index, row, col)
-    self.m_send_msg('.chinese_chess_game.moveReq', {
-        chess_id = chess_id,
-        move_row = row,
-        move_col = col,
+    self.m_send_msg('.digitalbomb_game.DoingReq', {
+        opt_num = opt_num
     })
 end
 
 -- 检查是否需要操作
 function M:check_doing()
     if not self.m_game_data then return end
-    
+
     local next_doing = self.m_game_data.next_doing
-    if next_doing.player_id == self.m_player_id then
-        local remain_once_time = next_doing.remain_once_time
+    if next_doing.doing_player_id == self.m_player_id then
         local left = timer.second
-        local right = timer.second * 10
-        if right > remain_once_time and remain_once_time >= left then
-            right = remain_once_time
-        end
-        if self.m_doing_timer then
-            self.m_doing_timer:cancel()
-        end
+        local right = timer.second * 5
+        
         local time = math.random(left, right)
         --log.info("check_doing >>>> ", time)
         self.m_doing_timer = timer:new(time, 1, self.doing, self)

@@ -3,7 +3,7 @@ local log = require "skynet-fly.log"
 local ws_pbnet_util = require "skynet-fly.utils.net.ws_pbnet_util"
 local pb_netpack = require "skynet-fly.netpack.pb_netpack"
 local timer = require "skynet-fly.timer"
-local errors_msg = require "common.msg.errors_msg"
+local errors_msg = require "gamecommon.msg.errors_msg"
 local skynet = require "skynet"
 local g_modules_list = require "hall.hall"
 
@@ -24,7 +24,7 @@ M.disconn_time_out = timer.minute                   --掉线一分钟就清理
 --初始化
 function M.init(interface_mgr)
 	--加载协议
-	pb_netpack.load('../../commonlualib/common/proto')
+	pb_netpack.load('../../commonlualib/gamecommon/proto')
 	pb_netpack.load('./proto')
 	g_interface_mgr = interface_mgr
 	errors_msg = errors_msg:new(interface_mgr)

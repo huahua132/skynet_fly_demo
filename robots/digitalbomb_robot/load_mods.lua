@@ -17,9 +17,9 @@ return {
 			},
 
 			--cluster_server用的配置
-			cluster_server = cluster_server_cfg.robots.chinese_chess_robot,
+			cluster_server = cluster_server_cfg.robots.digitalbomb_robot,
 
-			server_cfg = server_cfg.robots.chinese_chess_robot,
+			server_cfg = server_cfg.robots.digitalbomb_robot,
 		}
 	},
 
@@ -34,7 +34,7 @@ return {
             max_age = 2,               --最大保留天数
             max_backups = 7,           --最大保留文件数
             sys_cmd = [[
-                /usr/bin/pkill -HUP -f skynet.chinese_chess_robot_config.lua\n
+                /usr/bin/pkill -HUP -f skynet.digitalbomb_robot_config.lua\n
             ]],              --系统命令
         }
     },
@@ -62,7 +62,7 @@ return {
 		launch_seq = 5,
 		launch_num = 1,
 		default_arg = {
-			robot_num = 5001,    --启动机器人数量
+			robot_num = 5000,    --启动机器人数量
 		}
 	},
 
@@ -71,7 +71,7 @@ return {
 		launch_seq = 6,
 		launch_num = 6,
 		default_arg = {
-			game_name = "chinese_chess",
+			game_name = "digitalbomb",
 		}
 	}
 }

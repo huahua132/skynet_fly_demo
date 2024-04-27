@@ -31,8 +31,7 @@ end
 
 --匹配成功锁 (匹配成功后 对局没有确定是否加入时，不能再进行匹配)
 local function match_succ_lock_key(player_id)
-    local cfg = module_info.get_cfg()
-    return cfg.instance_name .. ":match_lock:" .. player_id
+    return "match_lock:" .. player_id
 end
 
 local g_game_cli = nil

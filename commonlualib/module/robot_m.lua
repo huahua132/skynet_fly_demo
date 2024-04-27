@@ -14,6 +14,8 @@ local GAME_ID_ENUM = require "common.enum.GAME_ID_ENUM"
 
 local game = require "scene.game"
 
+local g_config = nil
+
 --http 请求设置5秒超时时间
 httpc.timeout = 6000
 
@@ -53,7 +55,7 @@ local g_header = {
 
 local function create_one_robot_logic(idx)
     local m_state = STATE_ENUM.UNLOGIN_HALL
-    local m_account = 'robot_' .. idx
+    local m_account = 'robot_' .. GAME_ID_ENUM[g_config.game_name] .. '_' .. idx
     local m_password = 'robot 123456'
     local m_channel = CHANNEL.robot
 
@@ -86,7 +88,7 @@ local function create_one_robot_logic(idx)
 
     local m_HALL_SERVER_HANDLE = {}
     --登录大厅成功
-    m_HALL_SERVER_HANDLE['.hallserver_login.LoginRes'] = function(body)
+    m_HALL_SERVER_HANDLE['.game_login.LoginRes'] = function(body)
         m_hall_matching = false
         --登录大厅成功
         m_state = STATE_ENUM.ONLINE_HALL
@@ -193,7 +195,7 @@ local function create_one_robot_logic(idx)
                     token = token,
                     player_id = m_player_id,
                 }
-                send_hall_msg('.hallserver_login.LoginReq', login_req)
+                send_hall_msg('.game_login.LoginReq', login_req)
             else
                 log.error("连接大厅失败 ", host)
                 skynet.sleep(math.random(timer.second * 5, timer.second * 15))
@@ -240,7 +242,7 @@ local function create_one_robot_logic(idx)
         end
         --匹配游戏
         if not m_hall_matching then
-            send_hall_msg('.hallserver_match.MatchGameReq', {game_id = GAME_ID_ENUM.chinese_chess})
+            send_hall_msg('.hallserver_match.MatchGameReq', {game_id = GAME_ID_ENUM[g_config.game_name]})
         end
     end
 
@@ -271,8 +273,9 @@ function CMD.launch(idx)
 end
 
 function CMD.start(config)
+    g_config = config
     --加载pb协议
-    pb_netpack.load('../../commonlualib/common/proto')
+    pb_netpack.load('../../commonlualib/gamecommon/proto')
 	pb_netpack.load('../../world/hallserver/proto')
     game:init()
     return true

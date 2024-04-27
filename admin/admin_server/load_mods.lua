@@ -90,6 +90,8 @@ return {
 				['centerserver'] = true,        --中心服
 				['loginserver'] = true,         --登录服
 				['matchserver'] = true,         --匹配服
+				['digitalbomb'] = true,			--数字炸弹
+				['digitalbomb_robot'] = true,	--数字炸弹机器人
 			},
 			watch = 'redis',  --监听redis的方式做服务发现
 		}
@@ -108,6 +110,8 @@ return {
 				'centerserver',
 				'loginserver',
 				'matchserver',
+				'digitalbomb',
+				'digitalbomb_robot',
             }
         }
     },

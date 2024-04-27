@@ -1,5 +1,5 @@
 
-local player_logic = require "hall.player.player_logic"
+local player_logic = require "gamecommon.hall.player.player_logic"
 local skynet = require "skynet"
 
 
@@ -25,7 +25,7 @@ end
 
 M.handle = {
     --心跳
-    ['.chinese_chess_hall.HeartReq'] = function(player_id, packname, pack_body)
+    ['.game_hall.HeartReq'] = function(player_id, packname, pack_body)
        return player_logic.do_heart(player_id, pack_body)
     end,
 }

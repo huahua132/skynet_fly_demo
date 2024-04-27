@@ -1,4 +1,4 @@
-package chinese_chess_hall;
+package game_hall;
 
 message JoinReq {
 	optional string table_id = 1;

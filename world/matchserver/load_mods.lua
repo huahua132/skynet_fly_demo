@@ -53,6 +53,7 @@ return {
                 ['hallserver'] = true,       --大厅服
                 ['chinese_chess'] = true,    --中国象棋
                 ['centerserver'] = true,     --中心服
+                ['digitalbomb'] = true,      --数字炸弹
             },
             watch = 'redis',  --监听redis的方式做服务发现
         }
@@ -61,9 +62,10 @@ return {
     --匹配逻辑
     match_m = {
         launch_seq = 5,
-        launch_num = 1,
+        launch_num = 2,
         mod_args = {
             {instance_name = "chinese_chess"},
+            {instance_name = "digitalbomb"},
         }
     },
 }

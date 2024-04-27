@@ -3,7 +3,7 @@ local errorcode = require "common.enum.errorcode"
 local GAME_STATE = require "enum.GAME_STATE"
 local skynet = require "skynet"
 local contriner_client = require "skynet-fly.client.contriner_client"
-local ENUM = require "enum.ENUM"
+local ENUM = require "common.enum.ENUM"
 local cfg = require "skynet-fly.etc.module_info".get_cfg()
 local base_info = require "skynet-fly.etc.module_info".get_base_info()
 local game_redis = require "common.redis.game"
@@ -31,6 +31,11 @@ local M = {}
 
 local CMD = {}
 
+--是否存在桌子
+function CMD.exists(table_id)
+	return g_table_info[table_id] ~= nil
+end
+
 --销毁桌子
 function CMD.dismisstable(table_id)
 	g_alloc_interface.dismisstable(table_id)
@@ -49,7 +54,7 @@ function CMD.createtable(player_list)
 	end
 	g_table_info[table_id] = player_list
 	--创建token
-	local token_list = contriner_client:instance("token_m"):mod_call("create_token", player_list, ENUM.TOKEN_TIME_OUT)
+	local token_list = contriner_client:instance("token_m"):mod_call("create_token", player_list, ENUM.LOGIN_TOKEN_TIME_OUT)
 	return table_id, token_list
 end
 
@@ -71,11 +76,6 @@ function M.init(alloc_interface) --初始化
 		local confclient = contriner_client:new("share_config_m")
         local room_game_login = confclient:mod_call('query','room_game_login')
         g_info.host = room_game_login.gateconf.host
-
-		if base_info.version == 1 then
-			--删除残留的房间信息
-			game_redis.del_all()
-		end
 	end)
 end
 

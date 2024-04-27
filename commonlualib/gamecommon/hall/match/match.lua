@@ -1,5 +1,5 @@
 
-local match_logic = require "hall.match.match_logic"
+local match_logic = require "gamecommon.hall.match.match_logic"
 
 
 local M = {}
@@ -10,7 +10,7 @@ end
 
 M.handle = {
     --匹配
-    ['.chinese_chess_hall.JoinReq'] = function(player_id, packname, pack_body)
+    ['.game_hall.JoinReq'] = function(player_id, packname, pack_body)
        return match_logic.do_join(player_id, pack_body)
     end,
 }
