@@ -14,7 +14,7 @@ return {
 			room_game_login = {
 				gateservice = "ws_gate", --gate 或者 ws_gate
 				--gate连接配置
-				gateconf = gate_cfg.games.chinese_chess_1,
+				gateconf = gate_cfg.games.digitalbomb_1,
 				login_plug = "common.plug.login_plug",  --login加载的插件lua模块文件名
 			},
 
@@ -26,22 +26,12 @@ return {
 			},
 
 			--cluster_server用的配置
-			cluster_server = cluster_server_cfg.games.chinese_chess_1,
+			cluster_server = cluster_server_cfg.games.digitalbomb_1,
 
-			server_cfg = server_cfg.games.chinese_chess_1,
+			server_cfg = server_cfg.games.digitalbomb_1,
 		}
 	},
-
-	--mysql
-	mysql_m = {
-		launch_seq = 1500,
-		launch_num = 6, --启动6个
-        default_arg = {
-            db_conf = mysql_cfg.games.chinese_chess_1,
-            is_create = true,				--数据库不存在就创建
-        }
-	},
-
+	
 	--大厅服
 	room_game_hall_m = {
 		launch_seq = 2000, --第二个启动
@@ -85,7 +75,7 @@ return {
             max_age = 7,               --最大保留天数
             max_backups = 7,           --最大保留文件数
             sys_cmd = [[
-                /usr/bin/pkill -HUP -f skynet.chinese_chess_config.lua.load_mods_1.lua\n
+                /usr/bin/pkill -HUP -f skynet.digitalbomb_config.lua.load_mods_1.lua\n
             ]],              --系统命令
         }
     },
@@ -113,14 +103,5 @@ return {
 	token_m = {
 		launch_seq = 8000,
 		launch_num = 1,
-	},
-
-	-- orm
-	orm_table_m = {
-		launch_seq = 9000,
-		launch_num = 1,
-		mod_args = {
-			{instance_name = "record", orm_plug = "orm_entity.record_entity"},
-		}
 	},
 }

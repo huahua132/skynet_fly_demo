@@ -73,6 +73,8 @@ return {
 				['logserver'] = true,       --日志服
 				['matchserver'] = true,     --匹配服
 				['hallserver'] = true,      --大厅服
+				['chinese_chess'] = true,   --象棋服
+				['digitalbomb'] = true,     --数字炸弹服
 			},
 			watch = 'redis',  --监听redis的方式做服务发现
 		}

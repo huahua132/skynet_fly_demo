@@ -16,6 +16,18 @@ M.games = {
         maxclient = 10000,
         host = '127.0.0.1:9022',
     },
+    digitalbomb_1 = {
+        address = '0.0.0.0',
+        port = 9032,
+        maxclient = 10000,
+        host = '127.0.0.1:9032',
+    },
+    digitalbomb_2 = {
+        address = '0.0.0.0',
+        port = 9042,
+        maxclient = 10000,
+        host = '127.0.0.1:9042',
+    },
 }
 
 --世界配置 11

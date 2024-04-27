@@ -11,6 +11,14 @@ M.games = {
     chinese_chess_2 = {
         host = "127.0.0.1:9023",
         register = register,
+    },
+    digitalbomb_1 = {
+        host = "127.0.0.1:9033",
+        register = register,
+    },
+    digitalbomb_2 = {
+        host = "127.0.0.1:9043",
+        register = register,
     }
 }
 
@@ -63,6 +71,10 @@ M.robots = {
     chinese_chess_robot = {
         host = "127.0.0.1:12013",
         register = register,        
+    },
+    digitalbomb_robot = {
+        host = "127.0.0.1:12023",
+        register = register, 
     }
 }
 return M

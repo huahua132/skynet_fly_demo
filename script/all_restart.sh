@@ -48,8 +48,19 @@ bash script/restart.sh load_mods_1.lua
 bash script/restart.sh load_mods_2.lua
 cd ../../
 
+cd games/digitalbomb
+bash ${make_cmd}
+bash script/restart.sh load_mods_1.lua
+bash script/restart.sh load_mods_2.lua
+cd ../../
+
 #启动机器人
 cd robots/chinese_chess_robot
+bash ${make_cmd}
+bash script/restart.sh load_mods.lua
+cd ../../
+
+cd robots/digitalbomb_robot
 bash ${make_cmd}
 bash script/restart.sh load_mods.lua
 cd ../../

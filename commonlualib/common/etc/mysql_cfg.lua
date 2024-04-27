@@ -27,7 +27,7 @@ M.world.hallserver_2.database = 'hall_2'
 
 M.games = {
     chinese_chess_1 = table_util.deep_copy(db1),
-    chinese_chess_2 = table_util.deep_copy(db1)
+    chinese_chess_2 = table_util.deep_copy(db1),
 }
 
 M.games.chinese_chess_1.database = 'game_1'

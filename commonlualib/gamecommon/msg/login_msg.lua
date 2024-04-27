@@ -14,9 +14,9 @@ function M:new(interface_mgr)
 end
 
 function M:login_res(player_id,login_res)
-	self.interface_mgr:send_msg(player_id,'.hallserver_login.LoginRes',login_res)
+	self.interface_mgr:send_msg(player_id,'.game_login.LoginRes',login_res)
 end
 
-M.login_req_pack_name = '.hallserver_login.LoginReq'
+M.login_req_pack_name = '.game_login.LoginReq'
 
 return M

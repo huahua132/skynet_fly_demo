@@ -15,6 +15,18 @@ M.games = {
         debug_port = 9021,
         logpath = './logs_2/',
     },
+    digitalbomb_1 = {
+        svr_id = 1,         --服务ID
+        thread = 8,         --工作线程数
+        debug_port = 9031,  --调试端口
+        logpath = './logs_1/',
+    },
+    digitalbomb_2 = {
+        svr_id = 2,         --服务ID
+        thread = 8,         --工作线程数
+        debug_port = 9041,  --调试端口
+        logpath = './logs_2/',
+    },
 }
 
 --后台配置 10开头
@@ -75,6 +87,10 @@ M.robots = {
     chinese_chess_robot = {
         thread = 8,
         debug_port = 12011,
+    },
+    digitalbomb_robot = {
+        thread = 8,
+        debug_port = 12021,
     }
 }
 

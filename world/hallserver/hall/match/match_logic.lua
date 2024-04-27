@@ -4,6 +4,7 @@ local errorcode = require "common.enum.errorcode"
 local game_redis = require "common.redis.game"
 local match_msg = require "msg.match_msg"
 local rpc_matchserver_match = require "common.rpc.matchserver.match"
+local cluster_client = require "skynet-fly.client.cluster_client"
 
 local next = next
 
@@ -18,7 +19,16 @@ local function check_join_room_game(player_id)
     if not game_room_info or not next(game_room_info) then
         return
     end
-    M.cmd_join_game(player_id, game_room_info.token, game_room_info.host, game_room_info.table_id)
+    local cli = cluster_client:instance(game_room_info.svr_name, "room_game_alloc_m")
+    cli:set_svr_id(game_room_info.svr_id)
+    local ret = cli:one_mod_call("exists", game_room_info.table_id)
+    if #ret.result > 0 and ret.result[1] then 
+        M.cmd_join_game(player_id, game_room_info.token, game_room_info.host, game_room_info.table_id)
+    else
+        --说明房间已经不存在了
+        --删除房间信息
+        game_redis.del_game_room_info(player_id)
+    end
 end
 
 ---------------------------客户端事件----------------------------------

@@ -8,7 +8,7 @@ local log = require "skynet-fly.log"
 local chess_rule = require "table.chess_rule"
 local TEAM_TYPE = require "enum.TEAM_TYPE"
 local module_cfg = require "skynet-fly.etc.module_info".get_cfg()
-local errors_msg = require "common.msg.errors_msg"
+local errors_msg = require "gamecommon.msg.errors_msg"
 local game_msg = require "msg.game_msg"
 local timer = require "skynet-fly.timer"
 local orm_table_client = require "skynet-fly.client.orm_table_client"
@@ -41,7 +41,7 @@ local M = {}
 function M.init(interface_mgr)
 	g_interface_mgr = interface_mgr
 	assert(g_table_conf.player_num,"not player_num")
-	pb_netpack.load('../../commonlualib/common/proto')
+	pb_netpack.load('../../commonlualib/gamecommon/proto')
 	pb_netpack.load('./proto')
 end
 
