@@ -20,12 +20,14 @@ M.games = {
         thread = 8,         --工作线程数
         debug_port = 9031,  --调试端口
         logpath = './logs_1/',
+        loglevel = 'error',
     },
     digitalbomb_2 = {
         svr_id = 2,         --服务ID
         thread = 8,         --工作线程数
         debug_port = 9041,  --调试端口
         logpath = './logs_2/',
+        loglevel = 'error',
     },
 }
 
