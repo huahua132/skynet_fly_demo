@@ -7,6 +7,7 @@ local rpc_matchserver_match = require "common.rpc.matchserver.match"
 local cluster_client = require "skynet-fly.client.cluster_client"
 
 local next = next
+local tonumber = tonumber
 
 local M = {}
 
@@ -21,7 +22,7 @@ local function check_join_room_game(player_id)
     end
     local cli = cluster_client:instance(game_room_info.svr_name, "room_game_alloc_m")
     cli:set_svr_id(game_room_info.svr_id)
-    local ret = cli:one_mod_call("exists", game_room_info.table_id)
+    local ret = cli:one_mod_call("exists", game_room_info.table_id, tonumber(game_room_info.create_time))
     if #ret.result > 0 and ret.result[1] then 
         M.cmd_join_game(player_id, game_room_info.token, game_room_info.host, game_room_info.table_id)
     else

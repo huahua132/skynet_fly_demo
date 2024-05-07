@@ -32,8 +32,17 @@ local M = {}
 local CMD = {}
 
 --是否存在桌子
-function CMD.exists(table_id)
-	return g_table_info[table_id] ~= nil
+function CMD.exists(table_id, create_time)
+	if not g_table_info[table_id] then
+		return false
+	end
+
+	local t_info = g_table_info[table_id]
+	if t_info.create_time ~= create_time then
+		return false
+	else
+		return true
+	end
 end
 
 --销毁桌子
@@ -47,12 +56,15 @@ function CMD.get_info()
 end
 
 --创建桌子
-function CMD.createtable(player_list)
+function CMD.createtable(player_list, create_time)
 	local table_id = g_alloc_interface.create_table("default")
 	if not table_id then
 		return nil
 	end
-	g_table_info[table_id] = player_list
+	g_table_info[table_id] = {
+		player_list = player_list,
+		create_time = create_time,
+	}
 	--创建token
 	local token_list = contriner_client:instance("token_m"):mod_call("create_token", player_list, ENUM.LOGIN_TOKEN_TIME_OUT)
 	return table_id, token_list
@@ -102,10 +114,13 @@ function M.dismisstable(table_id) --解散桌子
 	--log.info("dismisstable:",table_id)
 	g_info.cur_table_num = g_info.cur_table_num - 1
 
-	local player_list = assert(g_table_info[table_id])
+	local t_info = assert(g_table_info[table_id])
+	local player_list = t_info.player_list
 	for _,player_id in ipairs(player_list) do
 		game_redis.del_game_room_info(player_id)
 	end
+
+	g_table_info[table_id] = nil
 end
 
 function M.tablefull()

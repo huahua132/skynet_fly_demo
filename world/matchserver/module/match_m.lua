@@ -88,7 +88,7 @@ local function match_loop()
     if not game_node_info then
         return
     end
-
+    local cur_time = time_util.time()
     local redis_cli = redis.instance("global")
     local member_list = redis_cli:zrevrange(match_key(), 0, 999)
     for i = 1,#member_list, 2 do
@@ -99,7 +99,7 @@ local function match_loop()
 
         --匹配成功，请求游戏服创建房间
         g_game_cli:set_svr_id(game_node_info.svr_id)
-        local ret = g_game_cli:byid_mod_call("createtable", match_list) --创建桌子
+        local ret = g_game_cli:byid_mod_call("createtable", match_list, cur_time) --创建桌子
         --log.info("match_loop >>> ", ret)
         if ret and #ret.result > 0 then
             local table_id = ret.result[1]
@@ -137,6 +137,7 @@ local function match_loop()
                 table.insert(args, {"hset", key, "total_cnt", #match_list})                   --总人数
                 table.insert(args, {"hset", key, "accept_cnt", 0})                            --接受人数
                 table.insert(args, {"hset", key, "host", game_node_info.host})                --host
+                table.insert(args, {"hset", key, "create_time", cur_time})                    --创建时间
                 table.insert(args, {"expire", key, ENUM.MATCH_ACCEPT_TIME_OUT})               --过期时间
                 local ret = redis_cli:pipeline(args,{})
                 if ret[#ret].out == 1 then
@@ -244,6 +245,7 @@ function CMD.accept_session(player_id, session_id)
             end
 
             local host = result.host
+            local create_time = result.create_time
             local spstr = string_util.split(session_id, '-')
             local svr_name, svr_id, table_id = spstr[1], tonumber(spstr[2]), spstr[3]
 
@@ -259,6 +261,7 @@ function CMD.accept_session(player_id, session_id)
                         svr_name = svr_name,
                         svr_id = svr_id,
                         token = token,
+                        create_time = create_time,
                     }
                 end
             end
