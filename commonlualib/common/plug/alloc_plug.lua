@@ -45,11 +45,6 @@ function CMD.exists(table_id, create_time)
 	end
 end
 
---销毁桌子
-function CMD.dismisstable(table_id)
-	g_alloc_interface.dismisstable(table_id)
-end
-
 --获取信息
 function CMD.get_info()
 	return g_info

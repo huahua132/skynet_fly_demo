@@ -51,7 +51,6 @@ end
 function M:dismisstable()
     --log.info("dismisstable >>> ", self.m_table_id)
     self.m_interface_mgr:kick_out_all()
-    self.m_interface_mgr:send_alloc("dismisstable")
 end
 
 --通知操作
@@ -112,7 +111,6 @@ function M:game_over(player_id)
             seater:game_over()
         end
     end
-    self:dismisstable()
     return true
 end
 -----------------------------------------------------------------------
