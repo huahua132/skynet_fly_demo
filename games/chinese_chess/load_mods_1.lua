@@ -58,6 +58,7 @@ return {
 		default_arg = {
 			alloc_plug = "common.plug.alloc_plug",       --匹配加载的插件lua模块文件名
 			MAX_TABLES = 10000,  --最多1万个游戏桌子
+			max_empty_time = 60,            --空置一分钟就解散
 		}
 	},
 

@@ -74,7 +74,6 @@ function M.table_creator(table_id)
 
 	local function dismisstable()
 		m_interface_mgr:kick_out_all()
-		m_interface_mgr:send_alloc("dismisstable")
 	end
 	local m_join_time_out
 	if table_id ~= 1 then  --测试创建
@@ -290,7 +289,6 @@ end
 		end)
 
 		m_interface_mgr:kick_out_all()
-		m_interface_mgr:send_alloc("dismisstable")
 		return true
 	end
 	m_game_over = game_over
