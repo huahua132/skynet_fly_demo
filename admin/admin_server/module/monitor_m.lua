@@ -2,7 +2,7 @@
 --对集群服务进行监控
 -------------------------------------------------------
 local skynet = require "skynet"
-local cluster_client = require "skynet-fly.client.cluster_client"
+local frpc_client = require "skynet-fly.client.frpc_client"
 local timer_point = require "skynet-fly.time_extend.timer_point"
 local string_util = require "skynet-fly.utils.string_util"
 local time_util = require "skynet-fly.utils.time_util"
@@ -61,7 +61,7 @@ local function monitor(svr_name)
     end
 
     local cur_date = os.date("%H:%M:%S", time_util.time())
-    local svr_debug_console = cluster_client:instance(svr_name,"debug_console_m")
+    local svr_debug_console = frpc_client:instance(svr_name,"debug_console_m")
     local svr_info_map = {}
     local ret = svr_debug_console:all_mod_call('call','mem')
     if not ret then return end

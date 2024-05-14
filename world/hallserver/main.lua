@@ -7,7 +7,7 @@ skynet.start(function()
 
 	contriner_launcher.run()
 	--启动集群连接入口
-	skynet.uniqueservice("cluster_server")
+	skynet.uniqueservice("frpc_server")
 
     --登录服
     skynet.uniqueservice("room_game_login")

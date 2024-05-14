@@ -1,6 +1,6 @@
 local server_cfg = loadfile("../../commonlualib/common/etc/server_cfg.lua")()
 local redis_cfg = loadfile("../../commonlualib/common/etc/redis_cfg.lua")()
-local cluster_server_cfg = loadfile("../../commonlualib/common/etc/cluster_server_cfg.lua")()
+local frpc_server_cfg = loadfile("../../commonlualib/common/etc/frpc_server_cfg.lua")()
 
 return {
         --共享配置
@@ -17,7 +17,7 @@ return {
 			},
 
 			--cluster_server用的配置
-			cluster_server = cluster_server_cfg.world.matchserver,
+			frpc_server = frpc_server_cfg.world.matchserver,
 
 			server_cfg = server_cfg.world.matchserver
 		}
@@ -44,7 +44,7 @@ return {
     },
 
     --集群客户端
-    cluster_client_m = {
+    frpc_client_m = {
         launch_seq = 4,
         launch_num = 1,
         default_arg = {

@@ -1,5 +1,5 @@
 local base = require "common.rpc.hallserver.base"
-local cluster_client = require "skynet-fly.client.cluster_client"
+local frpc_client = require "skynet-fly.client.frpc_client"
 local string_util = require "skynet-fly.utils.string_util"
 
 local tonumber = tonumber
@@ -20,7 +20,7 @@ end
 
 -- 获取自增ID所属的模块ID
 function M.get_module_id()
-    local cli = cluster_client:instance("hallserver", "player_m")
+    local cli = frpc_client:instance("hallserver", "player_m")
     local ret = cli:one_balance_call("get_module_id")
     if not ret then return end
 

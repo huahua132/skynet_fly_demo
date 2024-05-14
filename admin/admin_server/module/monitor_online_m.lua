@@ -2,7 +2,7 @@
 --监控在线
 -------------------------------------------------------
 local skynet = require "skynet"
-local cluster_client = require "skynet-fly.client.cluster_client"
+local frpc_client = require "skynet-fly.client.frpc_client"
 local timer_point = require "skynet-fly.time_extend.timer_point"
 local string_util = require "skynet-fly.utils.string_util"
 local time_util = require "skynet-fly.utils.time_util"
@@ -94,7 +94,7 @@ EXCUTE_LOOP['online'] = function(svr_name, tag)
     end
 
     local cur_date = os.date("%H:%M:%S", time_util.time())
-    local player_cli = cluster_client:instance(svr_name, "room_game_hall_m")
+    local player_cli = frpc_client:instance(svr_name, "room_game_hall_m")
     local ret = player_cli:all_broadcast_call("get_all_online")
     if not ret then return end
     
@@ -106,8 +106,7 @@ EXCUTE_LOOP['online'] = function(svr_name, tag)
         local cluster_name = v.cluster_name
         local svr_id = string_util.split(cluster_name, ':')[2]
         local result = v.result
-        local player_map_list = result[1]
-        for server_id, retlist in pairs(player_map_list) do
+        for server_id, retlist in pairs(result) do
             local player_list = retlist[1]
             info.total = info.total + #player_list
 
