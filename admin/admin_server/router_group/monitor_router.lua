@@ -1,6 +1,6 @@
 local rsp_body = require "common.rsp_body"
 local contriner_client = require "skynet-fly.client.contriner_client"
-local cluster_client = require "skynet-fly.client.cluster_client"
+local frpc_client = require "skynet-fly.client.frpc_client"
 local tti = require "skynet-fly.cache.tti"
 local timer = require "skynet-fly.timer"
 local time_util = require "skynet-fly.utils.time_util"
@@ -125,7 +125,7 @@ return function(group)
         assert(#split_str == 2, "err server_name " .. cluster_name)
         local address = ':'..split_str[2]
 
-        local instance = cluster_client:instance(svr_name,"debug_console_m"):set_svr_id(svr_id)
+        local instance = frpc_client:instance(svr_name,"debug_console_m"):set_svr_id(svr_id)
         local ret = instance:byid_mod_call('run_time')
         
         local server_ret = instance:byid_mod_call('call','info',address)

@@ -1,6 +1,6 @@
 local rsp_body = require "common.rsp_body"
 local contriner_client = require "skynet-fly.client.contriner_client"
-local cluster_client = require "skynet-fly.client.cluster_client"
+local frpc_client = require "skynet-fly.client.frpc_client"
 local timer = require "skynet-fly.timer"
 local time_util = require "skynet-fly.utils.time_util"
 local file_util = require "skynet-fly.utils.file_util"
@@ -55,7 +55,7 @@ return function(group)
         local svr_name,svr_id = split_str[1],tonumber(split_str[2])
 
         local info_list = {}
-        local instance = cluster_client:instance(svr_name,"debug_console_m"):set_svr_id(svr_id)
+        local instance = frpc_client:instance(svr_name,"debug_console_m"):set_svr_id(svr_id)
 
         local ret = instance:byid_mod_call('call','mem')
         if ret then

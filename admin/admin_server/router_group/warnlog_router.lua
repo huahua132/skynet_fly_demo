@@ -1,5 +1,5 @@
 local rsp_body = require "common.rsp_body"
-local cluster_client = require "skynet-fly.client.cluster_client"
+local frpc_client = require "skynet-fly.client.frpc_client"
 local log = require "skynet-fly.log"
 
 local assert = assert
@@ -10,7 +10,7 @@ return function(group)
         local query = c.req.query
         local pre_day = assert(query.pre_day,"not pre_day")                 --前几天
         pre_day = tonumber(pre_day)
-        local instance = cluster_client:instance("logserver","warn_m"):set_svr_id(1)
+        local instance = frpc_client:instance("logserver","warn_m"):set_svr_id(1)
         local ret = instance:byid_mod_call('read', pre_day)
         local context = ret.result
         log.info("warnlog_router:", context)

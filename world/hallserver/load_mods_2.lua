@@ -1,11 +1,11 @@
 local server_cfg = loadfile("../../commonlualib/common/etc/server_cfg.lua")()
 local http_cfg = loadfile("../../commonlualib/common/etc/http_cfg.lua")()
-local cluster_server_cfg = loadfile("../../commonlualib/common/etc/cluster_server_cfg.lua")()
+local frpc_server_cfg = loadfile("../../commonlualib/common/etc/frpc_server_cfg.lua")()
 local gate_cfg = loadfile("../../commonlualib/common/etc/gate_cfg.lua")()
 local mysql_cfg = loadfile("../../commonlualib/common/etc/mysql_cfg.lua")()
 local cfg = loadfile('load_mods_1.lua')()
 
-cfg.share_config_m.default_arg.cluster_server = cluster_server_cfg.world.hallserver_2
+cfg.share_config_m.default_arg.frpc_server = frpc_server_cfg.world.hallserver_2
 cfg.share_config_m.default_arg.server_cfg = server_cfg.world.hallserver_2
 cfg.share_config_m.default_arg.room_game_login.gateconf = gate_cfg.world.hallserver_2
 

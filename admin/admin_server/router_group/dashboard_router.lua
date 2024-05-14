@@ -1,6 +1,6 @@
 local rsp_body = require "common.rsp_body"
 local contriner_client = require "skynet-fly.client.contriner_client"
-local cluster_client = require "skynet-fly.client.cluster_client"
+local frpc_client = require "skynet-fly.client.frpc_client"
 local tti = require "skynet-fly.cache.tti"
 local timer = require "skynet-fly.timer"
 local time_util = require "skynet-fly.utils.time_util"

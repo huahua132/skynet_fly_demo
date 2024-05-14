@@ -1,6 +1,6 @@
 local log = require "skynet-fly.log"
 local skynet = require "skynet"
-local cluster_client = require "skynet-fly.client.cluster_client"
+local frpc_client = require "skynet-fly.client.frpc_client"
 local tti = require "skynet-fly.cache.tti"
 local timer = require "skynet-fly.timer"
 
@@ -13,7 +13,7 @@ return function(log_str,msg)
     local log_type = log_info.log_type
 
     if log_type == log.FATAL or log_type == log.TRACEBACK then
-        local warn = cluster_client:instance("logserver","warn_m")
+        local warn = frpc_client:instance("logserver","warn_m")
         local sublen = 64
         local substr = nil
         if msg:len() < sublen then

@@ -1,5 +1,5 @@
 local log = require "skynet-fly.log"
-local cluster_client = require "skynet-fly.client.cluster_client"
+local frpc_client = require "skynet-fly.client.frpc_client"
 local skynet = require "skynet"
 local timer = require "skynet-fly.timer"
 local redis = require "skynet-fly.db.redisf"
@@ -145,7 +145,7 @@ local function match_loop()
                     for j,player_id in ipairs(match_list) do
                         local svr_id = player_util.get_svr_id_by_player_id(player_id)
                         --log.info("get_svr_id_by_player_id >>> ",player_id, svr_id)
-                        local hallcli = cluster_client:instance("hallserver", "room_game_hall_m")
+                        local hallcli = frpc_client:instance("hallserver", "room_game_hall_m")
                         hallcli:set_svr_id(svr_id)              --指定服
                         hallcli:set_mod_num(player_id)          --指定mod_num 
                         hallcli:byid_mod_send("match_succ", player_id, session_id, GAME_ID_ENUM[module_info.get_cfg().instance_name], ENUM.MATCH_ACCEPT_TIME_OUT)
@@ -279,7 +279,7 @@ function CMD.accept_session(player_id, session_id)
                 --通知加入对局
                 local svr_id = player_util.get_svr_id_by_player_id(l_player_id)
                 --log.info("get_svr_id_by_player_id >>> ",l_player_id, svr_id)
-                local hallcli = cluster_client:instance("hallserver", "room_game_hall_m")
+                local hallcli = frpc_client:instance("hallserver", "room_game_hall_m")
                 hallcli:set_svr_id(svr_id)                --指定服
                 hallcli:set_mod_num(l_player_id)          --指定mod_num 
                 hallcli:byid_mod_send("match_join_game", l_player_id, info.token, host, table_id)
@@ -293,7 +293,7 @@ function CMD.start(config)
     --log.info("start match_m", config, module_info.get_cfg())
     
     skynet.fork(function()
-        g_game_cli = cluster_client:new(config.instance_name, "room_game_alloc_m")
+        g_game_cli = frpc_client:new(config.instance_name, "room_game_alloc_m")
         --注册一个5秒一次的定时器
         g_timer_obj = timer:new(timer.second * 5, 0, syn_game_info)
         --匹配循环

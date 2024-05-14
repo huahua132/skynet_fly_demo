@@ -1,6 +1,6 @@
 local server_cfg = loadfile("../../commonlualib/common/etc/server_cfg.lua")()
 local redis_cfg = loadfile("../../commonlualib/common/etc/redis_cfg.lua")()
-local cluster_server_cfg = loadfile("../../commonlualib/common/etc/cluster_server_cfg.lua")()
+local frpc_server_cfg = loadfile("../../commonlualib/common/etc/frpc_server_cfg.lua")()
 local gate_cfg = loadfile("../../commonlualib/common/etc/gate_cfg.lua")()
 local mysql_cfg = loadfile("../../commonlualib/common/etc/mysql_cfg.lua")()
 
@@ -19,7 +19,7 @@ return {
 			},
 
 			--cluster_server用的配置
-			cluster_server = cluster_server_cfg.world.hallserver_1,
+			frpc_server = frpc_server_cfg.world.hallserver_1,
 
 			server_cfg = server_cfg.world.hallserver_1,
 
@@ -65,7 +65,7 @@ return {
     },
 
 	--集群客户端
-    cluster_client_m = {
+    frpc_client_m = {
 		launch_seq = 5000,
 		launch_num = 1,
 		default_arg = {

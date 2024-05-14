@@ -1,6 +1,6 @@
 local server_cfg = loadfile("../../commonlualib/common/etc/server_cfg.lua")()
 local redis_cfg = loadfile("../../commonlualib/common/etc/redis_cfg.lua")()
-local cluster_server_cfg = loadfile("../../commonlualib/common/etc/cluster_server_cfg.lua")()
+local frpc_server_cfg = loadfile("../../commonlualib/common/etc/frpc_server_cfg.lua")()
 
 return {
         --共享配置
@@ -14,7 +14,7 @@ return {
 			},
 
 			--cluster_server用的配置
-			cluster_server = cluster_server_cfg.world.logserver,
+			frpc_server = frpc_server_cfg.world.logserver,
 
 			server_cfg = server_cfg.world.logserver
 		}
