@@ -103,6 +103,7 @@ end
 function M.leavetable(table_id,player_id)  --离开桌子
 	--log.info("leavetable:",table_id,player_id)
 	g_info.cur_player_num = g_info.cur_player_num - 1
+	game_redis.del_game_room_info(player_id)
 end
 
 function M.dismisstable(table_id) --解散桌子
