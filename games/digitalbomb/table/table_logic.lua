@@ -111,6 +111,8 @@ function M:game_over(player_id)
             seater:game_over()
         end
     end
+
+    self:dismisstable()
     return true
 end
 -----------------------------------------------------------------------
