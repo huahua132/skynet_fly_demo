@@ -12,7 +12,9 @@ M.games = {
             address = '127.0.0.1',
             port = 9013,
             maxclient = 2048,
-        },        
+        },
+        secret_key = "sadasfdsfgpdsjgsdogdfgdoigjs",
+		is_encrypt = true,
     },
     chinese_chess_2 = {
         host = "127.0.0.1:9023",
@@ -31,6 +33,8 @@ M.games = {
             port = 9033,
             maxclient = 2048,
         },
+        secret_key = "fdsgdfogihaoiehweiurgsddfj",
+		is_encrypt = true,
     },
     digitalbomb_2 = {
         host = "127.0.0.1:9043",
@@ -96,6 +100,8 @@ M.world = {
             port = 11113,
             maxclient = 2048,
         },
+        secret_key = "sdfsdsdfsdhdhfgdsgfdsfs",
+		is_encrypt = true,
     },
     loginserver_2 = {
         host = "127.0.0.1:11123",
@@ -115,6 +121,8 @@ M.world = {
             port = 11213,
             maxclient = 2048,
         },
+        secret_key = "dfgdfhgfjhgjkghhfdgdfsd",
+		is_encrypt = true,
     },
     hallserver_2 = {
         host = "127.0.0.1:11223",
