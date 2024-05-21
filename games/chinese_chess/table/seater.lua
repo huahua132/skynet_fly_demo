@@ -30,12 +30,13 @@ function M:enter(player_id, seat_id)
 	self.player = player.get_player_info(player_id)
 	self.score = item.get_item(player_id, ITEM.score)
 	self.seat_id = seat_id
-
+	
 	if not self.player or not self.score then
 		return false
 	end
 
 	self.state = SEAT_STATE.waitting
+	return true
 end
 
 --离开

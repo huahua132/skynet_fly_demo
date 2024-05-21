@@ -216,7 +216,7 @@ end
 				end
 			end
 		end
-
+		
 		m_chess_list,m_chess_map,m_boss_chess_map = chess_rule.get_init_chess_list()
 		m_record_info.init_chess_list = table_util.deep_copy(m_chess_list)
 		assert(next_doing_seat_id)
@@ -273,20 +273,20 @@ end
 
 		local cur_time = time_util.time()
 
-		skynet.fork(function()
-			local date = tonumber(os.date("%Y%m%d", cur_time))
-			local id = table_id .. ':' .. cur_time
-			local record = {
-				date = date,
-				id = id,
-				create_time = cur_time,
-				details = json.encode(m_record_info),
-			}
-			if g_record_cli:create_one_entry(record) then
-				player_rpc.add_game_record(m_win_player_id, date, id, 1, GAME_ID_ENUM.chinese_chess, g_svr_id)
-				player_rpc.add_game_record(lose_player_id, date, id, -1, GAME_ID_ENUM.chinese_chess, g_svr_id)
-			end
-		end)
+		-- skynet.fork(function()
+		-- 	local date = tonumber(os.date("%Y%m%d", cur_time))
+		-- 	local id = table_id .. ':' .. cur_time
+		-- 	local record = {
+		-- 		date = date,
+		-- 		id = id,
+		-- 		create_time = cur_time,
+		-- 		details = json.encode(m_record_info),
+		-- 	}
+		-- 	if g_record_cli:create_one_entry(record) then
+		-- 		player_rpc.add_game_record(m_win_player_id, date, id, 1, GAME_ID_ENUM.chinese_chess, g_svr_id)
+		-- 		player_rpc.add_game_record(lose_player_id, date, id, -1, GAME_ID_ENUM.chinese_chess, g_svr_id)
+		-- 	end
+		-- end)
 
 		m_interface_mgr:kick_out_all()
 		return true
@@ -303,7 +303,10 @@ end
             for seat_id,seater in ipairs(m_seat_list) do
                 if seater:is_empty() then
 					--log.info("玩家坐下:",player_id)
-                    seater:enter(player_id, seat_id)
+                    if not seater:enter(player_id, seat_id) then
+						log.warn("坐下失败 ", player_id, seat_id)
+						return
+					end
                     m_player_seat_map[player_id] = seat_id
                     m_enter_num = m_enter_num + 1
                     alloc_seat_id = seat_id
