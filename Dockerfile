@@ -14,14 +14,8 @@ ENV LD_LIBRARY_PATH=/opt/rh/devtoolset-9/root/usr/lib64:/opt/rh/devtoolset-9/roo
 
 RUN git clone https://github.com/huahua132/skynet_fly_demo \
 && cd skynet_fly_demo \
-&& git submodule update --init \
 && cd dbinstall \
 && bash setup.sh
-
-# 编译
-RUN cd skynet_fly_demo/skynet_fly && git submodule update --init && make linux && yum clean all \
-&& cd ../../ \
-&& chmod -R 777 skynet_fly_demo
 
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
