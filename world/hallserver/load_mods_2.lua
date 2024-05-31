@@ -14,6 +14,7 @@ cfg.logrotate_m.default_arg.sys_cmd = [[
 	/usr/bin/pkill -HUP -f skynet.hallserver_config.lua.load_mods_2.lua\n
 ]]
 
+cfg.mysql_m.default_arg.instance_name = mysql_cfg.world.hallserver_2.database
 cfg.mysql_m.default_arg.db_conf = mysql_cfg.world.hallserver_2
 
 return cfg
