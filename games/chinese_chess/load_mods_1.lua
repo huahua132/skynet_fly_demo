@@ -37,6 +37,7 @@ return {
 		launch_seq = 1500,
 		launch_num = 6, --启动6个
         default_arg = {
+			instance_name = mysql_cfg.games.chinese_chess_1.database,
             db_conf = mysql_cfg.games.chinese_chess_1,
             is_create = true,				--数据库不存在就创建
         }

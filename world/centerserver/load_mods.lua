@@ -25,6 +25,7 @@ return {
         launch_seq = 2000,
         launch_num = 6, --启动6个
         default_arg = {
+            instance_name = mysql_cfg.world.centerserver.database,
             db_conf = mysql_cfg.world.centerserver,
             is_create = true,				--数据库不存在就创建
         }
