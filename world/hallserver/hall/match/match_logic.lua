@@ -23,7 +23,7 @@ local function check_join_room_game(player_id)
     local cli = frpc_client:instance(game_room_info.svr_name, "room_game_alloc_m")
     cli:set_svr_id(game_room_info.svr_id)
     local ret = cli:one_mod_call("exists", game_room_info.table_id, tonumber(game_room_info.create_time))
-    if #ret.result > 0 and ret.result[1] then 
+    if ret and #ret.result > 0 and ret.result[1] then 
         M.cmd_join_game(player_id, game_room_info.token, game_room_info.host, game_room_info.table_id)
     else
         --说明房间已经不存在了
