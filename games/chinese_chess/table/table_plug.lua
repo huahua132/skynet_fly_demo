@@ -45,8 +45,8 @@ function M.init(interface_mgr)
 	pb_netpack.load('./proto')
 end
 
-M.send = ws_pbnet_util.send
-M.broadcast = ws_pbnet_util.broadcast
+M.ws_send = ws_pbnet_util.send
+M.ws_broadcast = ws_pbnet_util.broadcast
 
 --游戏桌子创建者
 function M.table_creator(table_id)

@@ -20,11 +20,11 @@ local M = {}
 --登录检测的超时时间
 M.time_out = timer.second * 5
 --解包函数
-M.unpack = ws_pbnet_util.unpack
+M.ws_unpack = ws_pbnet_util.unpack
 --发包函数
-M.send = ws_pbnet_util.send
+M.ws_send = ws_pbnet_util.send
 --广播函数
-M.broadcast = ws_pbnet_util.broadcast
+M.ws_broadcast = ws_pbnet_util.broadcast
 
 function M.init(interface_mgr)
 	--加载pb文件

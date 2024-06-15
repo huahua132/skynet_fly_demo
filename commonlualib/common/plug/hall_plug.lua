@@ -16,9 +16,9 @@ local g_interface_mgr = nil
 local M = {}
 
 --指定解包函数
-M.unpack = ws_pbnet_util.unpack
-M.send = ws_pbnet_util.send
-M.broadcast = ws_pbnet_util.broadcast
+M.ws_unpack = ws_pbnet_util.unpack
+M.ws_send = ws_pbnet_util.send
+M.ws_broadcast = ws_pbnet_util.broadcast
 M.disconn_time_out = timer.minute                   --掉线一分钟就清理
 
 --初始化

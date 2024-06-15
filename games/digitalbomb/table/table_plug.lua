@@ -18,9 +18,9 @@ local MINE_MAX = 100
 
 local M = {}
 
-M.send = ws_pbnet_util.send
+M.ws_send = ws_pbnet_util.send
 --广播函数
-M.broadcast = ws_pbnet_util.broadcast
+M.ws_broadcast = ws_pbnet_util.broadcast
 
 function M.init(interface_mgr)
 	g_interface_mgr = interface_mgr
