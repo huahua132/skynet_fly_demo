@@ -12,9 +12,8 @@ return {
 		default_arg = {     --默认配置
 			--room_game_login用的配置
 			room_game_login = {
-				gateservice = "ws_gate", --gate 或者 ws_gate
 				--gate连接配置
-				gateconf = gate_cfg.games.chinese_chess_1,
+				wsgateconf = gate_cfg.games.chinese_chess_1,
 				login_plug = "common.plug.login_plug",  --login加载的插件lua模块文件名
 			},
 

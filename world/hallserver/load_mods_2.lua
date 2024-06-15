@@ -7,7 +7,7 @@ local cfg = loadfile('load_mods_1.lua')()
 
 cfg.share_config_m.default_arg.frpc_server = frpc_server_cfg.world.hallserver_2
 cfg.share_config_m.default_arg.server_cfg = server_cfg.world.hallserver_2
-cfg.share_config_m.default_arg.room_game_login.gateconf = gate_cfg.world.hallserver_2
+cfg.share_config_m.default_arg.room_game_login.wsgateconf = gate_cfg.world.hallserver_2
 
 cfg.logrotate_m.default_arg.file_path = './logs_2/'
 cfg.logrotate_m.default_arg.sys_cmd = [[

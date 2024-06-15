@@ -82,7 +82,7 @@ function M.init(alloc_interface) --初始化
 	skynet.fork(function()
 		local confclient = contriner_client:new("share_config_m")
         local room_game_login = confclient:mod_call('query','room_game_login')
-        g_info.host = room_game_login.gateconf.host
+        g_info.host = room_game_login.wsgateconf.host
 	end)
 end
 
