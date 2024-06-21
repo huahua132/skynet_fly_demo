@@ -405,6 +405,10 @@ end
 				end
 
 				local can_move_list = m_can_move_map[chess_id]
+				if not can_move_list then
+					log.error("cant`t move chess ", chess_id)
+					return
+				end
 				local isok = false
 				for _,one_pos in ipairs(can_move_list) do
 					if one_pos.row == move_row and one_pos.col == move_col then
