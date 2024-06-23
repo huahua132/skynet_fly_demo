@@ -38,6 +38,10 @@ function M.init()
     --设置前端入口
     app:static_file("/","../client/dist/index.html")
 
+    --游戏前端入口路径
+    app:static_dir("/game/","../game_client/build/web-mobile")
+    --游戏前端入口
+    app:static_dir("/game/","../game_client/build/web-mobile/index.html")
 	app:run()
 end
 
