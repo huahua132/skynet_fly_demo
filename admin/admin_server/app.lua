@@ -27,6 +27,7 @@ function M.init()
         "/user/handshake",
         "/user/login",
         "/static/*filepath",
+        "/game",
     })
 
     --权限校验
