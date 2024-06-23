@@ -22,7 +22,7 @@ function M.init()
 
     --设置token验证中间件
     app:use(token_auth_mid.auth{
-        "/admin",
+        "/",
         "/favicon.ico",
         "/user/handshake",
         "/user/login",
@@ -35,9 +35,9 @@ function M.init()
 
     router(app)
     --设置前端入口路径
-    app:static_dir("/admin/","../client/dist")
+    app:static_dir("/","../client/dist")
     --设置前端入口
-    app:static_file("/admin/","../client/dist/index.html")
+    app:static_file("/","../client/dist/index.html")
 
     --游戏前端入口路径
     app:static_dir("/game/","../game_client/build/web-mobile")
