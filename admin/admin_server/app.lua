@@ -22,7 +22,7 @@ function M.init()
 
     --设置token验证中间件
     app:use(token_auth_mid.auth{
-        "/",
+        "/admin",
         "/favicon.ico",
         "/user/handshake",
         "/user/login",
