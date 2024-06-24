@@ -85,7 +85,7 @@ function M.auth(white_list) --验证白名单
                 return
             end
 
-            log.error("token:",token)
+            log.error("token:", token, payload)
             context.token_auth = payload
             context:next()
         end

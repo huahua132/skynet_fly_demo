@@ -26,7 +26,7 @@ function M.init()
         "/favicon.ico",
         "/user/handshake",
         "/user/login",
-        "/*filepath",
+        "/static/*filepath",
     })
 
     --权限校验
