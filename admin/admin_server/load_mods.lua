@@ -62,7 +62,7 @@ return {
 		launch_seq = 5000,
 		launch_num = 6, --启动6个
         default_arg = {
-			instance_name = "admin",
+			instance_name = mysql_cfg.admin.database,
             db_conf = mysql_cfg.admin,
 			is_create = true,				--数据库不存在就创建
         }
