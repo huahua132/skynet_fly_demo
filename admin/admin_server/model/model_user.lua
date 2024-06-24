@@ -65,7 +65,6 @@ function M.login(username, password)
     user_info.key = nil                             --密钥也是
     log.info("login>>", user_info.roles, routes_map)
     g_users_client:change_save_one_entry({username = user_info.username, last_login_time = time_util.time()})
-
     return {token = token_auth_mid.create_token(username,user_info.roles,routes_map)} 
 end
 

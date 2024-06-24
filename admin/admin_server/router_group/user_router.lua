@@ -107,6 +107,7 @@ end
 
 local function info(c)
     local username = c.token_auth.username
+    assert(username, "not username")
     local data,code,msg = model_user.get_info(username)
     rsp_body.set_rsp(c,data,code,msg)
 end
