@@ -36,7 +36,11 @@ M.admin = {
     admin_server = {
         thread = 4,
         debug_port = 10011,
-    }
+    },
+    game_client_server = {
+        thread = 4,
+        debug_port = 10021,
+    },
 }
 
 --世界配置 11开头

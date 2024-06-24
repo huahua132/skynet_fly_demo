@@ -18,7 +18,23 @@ M.admin = {
 			second_conn_limit = 2000, --相同ip 1秒内建立连接数限制
 			keep_live_limit = 2000,  --相同ip 保持活跃数量限制
         }
-    }
+    },
+
+	game_client_server = {
+		agent = {
+			protocol = 'http',
+			dispatch = 'app',			   --APP入口 app.lua
+			keep_alive_time = 300,         --最长保活时间
+			second_req_limit = 2000,       --1秒内请求数量限制
+        },
+        master = {
+			protocol = 'http',
+			port = 81,         --端口
+			max_client = 2048, --最大连接数
+			second_conn_limit = 2000, --相同ip 1秒内建立连接数限制
+			keep_live_limit = 2000,  --相同ip 保持活跃数量限制
+        }
+	}
 }
 
 --世界配置 11开头
