@@ -19,3 +19,4 @@ games/*/*_config.lua*
 games/*/module_info*
 
 redis-6.0.8
+etc_prod
