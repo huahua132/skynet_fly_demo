@@ -41,6 +41,12 @@ bash ${make_cmd}
 bash script/restart.sh load_mods.lua
 cd ../../
 
+#启动web游戏客户端服务
+cd admin/game_client_server
+bash ${make_cmd}
+bash script/restart.sh load_mods.lua
+cd ../../
+
 #启动游戏
 cd games/chinese_chess
 bash ${make_cmd}
