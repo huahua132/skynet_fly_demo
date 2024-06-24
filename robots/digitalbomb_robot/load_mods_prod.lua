@@ -12,4 +12,6 @@ cfg.share_config_m.default_arg.redis.global = redis_cfg.global
 cfg.share_config_m.default_arg.frpc_server = frpc_server_cfg.robots.digitalbomb_robot
 cfg.share_config_m.default_arg.server_cfg = server_cfg.robots.digitalbomb_robot
 
+cfg.robot_launch_m.default_arg.robot_num = 100
+
 return cfg
