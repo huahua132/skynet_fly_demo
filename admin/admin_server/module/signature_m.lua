@@ -34,7 +34,6 @@ function CMD.get(username)
 end
 
 function CMD.start()
-    skynet_util.lua_dispatch(CMD)
     return true
 end
 
