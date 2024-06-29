@@ -1,8 +1,6 @@
-import { handshake, login, logout, getInfo } from '@/api/user'
+import { login, logout, getInfo } from '@/api/user'
 import { getToken, setToken, removeToken, setUserName } from '@/utils/auth'
 import router, { resetRouter } from '@/router'
-const ECDHCrypto = require('ecdh-crypto');
-const crypto = require('crypto')
 
 const state = {
   token: getToken(),
@@ -37,65 +35,20 @@ const mutations = {
 const actions = {
   // user login
   login({ commit, state }, userInfo) {
-    console.log("userlogin>>>>>>>>>>>>>>>>>>>>>>>>>>>")
-    let dh = ECDHCrypto.createECDHCrypto()
-    console.log("userlogin1>>>>>>>>>>>>>>>>>>>>>>>>>>>")
-    let serverdh = ECDHCrypto.createECDHCrypto()    //mock那边创建在这里创建，正常是服务端创建的
-    let challenge = ''
-    return new Promise((resolve, reject) => {
-      handshake({}).then(response => {
-        const { data } = response
-        console.log("userlogin2>>>>>>>>>>>>>>>>>>>>>>>>>>>", response)
-        challenge = Buffer.from(data, 'base64')
+   
+    const { username, password } = userInfo
+    let token = username + "@" + password
+    console.log("login >>>>>1", username, password, token)
 
-        let server_key = serverdh.asPublicECDHCrypto()
-        let client_key = dh.asPublicECDHCrypto()
-        console.log("handshake 1 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>:", challenge, client_key)
-        let server_ecdh = serverdh.createECDH()
-        let server_shared_secret = server_ecdh.computeSecret(dh.publicCodePoint)
-        console.log("ssssssssssssssssss>>>>>>>>>>", server_shared_secret.toString('base64'))
-        console.log("handshake 2 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>", client_key.toString('pem'), server_key.toString('pem'))
-        return handshake({key : client_key.toString('pem'), server_key : server_key.toString('pem'), server_secret : server_shared_secret.toString('base64')})
-      }).then(response => {
+    return new Promise((resolve, reject) => {
+      login({token : token}).then(response => {
         const { data } = response
-        console.log("server key1:", data)
-        let server_dh = new ECDHCrypto(data, 'pem')
-        let client_ecdh = dh.createECDH()
-        let shared_secret = client_ecdh.computeSecret(server_dh.publicCodePoint)
-        console.log("server key2:", shared_secret.toString('base64'))
-        const hmac = crypto.createHmac('sha256', shared_secret)
-        commit('SET_SECRET', shared_secret)
-        hmac.update(challenge)
-        const hash = hmac.digest('hex');
-        console.log("hash:",hash)
-        return handshake({challenge : hash})
-      }).then(response => {
-        const { data } = response
-        if (data != "OK") {
-          reject('handshake failed, please Login again.')
-        }
-       
-        const { username, password } = userInfo
-        console.log("login >>>>>1", username, password)
-        let token = btoa(username) + "@" + btoa(password)
-        console.log("login >>>>>2", token, state.secret)
-        let iv = crypto.randomBytes(16);
-        const cipher = crypto.createCipheriv('aes-256-gcm', state.secret, iv)
-        console.log("login >>>>>3", cipher)
-        let encrypted = cipher.update(token, 'utf8', 'base64')
-        console.log("login >>>>>4", encrypted)
-        encrypted += cipher.final('base64')
-        console.log("login >>>>>5", encrypted)
-        const tag = cipher.getAuthTag();
-        console.log("login>>>>>>>>>>>>>>", encrypted, tag)
-        commit('SET_NAME', username)
-        return login({ token : encrypted, iv : iv.toString('base64'), tag : tag.toString('base64') })
-      }).then(response => {
-        const { data } = response
+        console.log("login >>>>2", data)
         commit('SET_TOKEN', data.token)
+        commit('SET_NAME', username)
         setToken(data.token)
-        console.log("set username:", state.username)
-        setUserName(state.username)
+        console.log("set username:", username)
+        setUserName(username)
         resolve()
       }).catch(error => {
         // 处理任何步骤中发生的错误
