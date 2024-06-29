@@ -10,6 +10,7 @@ local ENUM = require "common.enum.ENUM"
 local GAME_ID_ENUM = require "common.enum.GAME_ID_ENUM"
 local module_info = require "skynet-fly.etc.module_info"
 local watch_syn_client = require "skynet-fly.rpc.watch_syn_client"
+local SYN_CHANNEL_NAME = require "common.enum.SYN_CHANNEL_NAME"
 
 local tonumber = tonumber
 local ipairs = ipairs
@@ -286,7 +287,7 @@ function CMD.start(config)
         g_match_loop_timer:after_next()
     end)
 
-    watch_syn_client.watch(config.instance_name, "alloc_info", "syn_game_info", syn_game_info)
+    watch_syn_client.watch(config.instance_name, SYN_CHANNEL_NAME.alloc_info, "syn_game_info", syn_game_info)
     
     return true
 end
