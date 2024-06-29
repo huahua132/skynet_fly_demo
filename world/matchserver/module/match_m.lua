@@ -9,6 +9,7 @@ local player_util = require "common.utils.player"
 local ENUM = require "common.enum.ENUM"
 local GAME_ID_ENUM = require "common.enum.GAME_ID_ENUM"
 local module_info = require "skynet-fly.etc.module_info"
+local watch_syn_client = require "skynet-fly.rpc.watch_syn_client"
 
 local tonumber = tonumber
 local ipairs = ipairs
@@ -35,42 +36,27 @@ local function match_succ_lock_key(player_id)
 end
 
 local g_game_cli = nil
-local g_timer_obj = nil
 local g_match_loop_timer = nil
 
-local g_gameinfolist = {}
+local g_gameinfo_map = {}
 
-local function syn_game_info()
-    --给所有节点发
-    local gameinfo_list = {}
-    local ret = g_game_cli:all_mod_call("get_info")
-    if not ret then return end
+local function syn_game_info(cluster_name, info)
+    local spstr = string_util.split(cluster_name, ':')
+    local svr_name, svr_id = spstr[1], tonumber(spstr[2])
 
-    for _,v in ipairs(ret) do
-        local result = v.result
-        local info = result[1]
-        if info then
-            local cluster_name = v.cluster_name
-            local spstr = string_util.split(cluster_name, ':')
-            local svr_name, svr_id = spstr[1], tonumber(spstr[2])
-        
-            table.insert(gameinfo_list, {
-                host = info.host,
-                cur_player_num = info.cur_player_num,
-                cur_table_num = info.cur_table_num,
-                max_table_num = info.max_table_num,
-                svr_name = svr_name,
-                svr_id = svr_id,
-            })
-        end
-    end
-
-    g_gameinfolist = gameinfo_list
+    g_gameinfo_map[cluster_name] = {
+        host = info.host,
+        cur_player_num = info.cur_player_num,
+        cur_table_num = info.cur_table_num,
+        max_table_num = info.max_table_num,
+        svr_name = svr_name,
+        svr_id = svr_id,
+    }
 end
 
 local function get_game_node()
     local min_table_v = nil
-    for _,v in ipairs(g_gameinfolist) do
+    for _,v in pairs(g_gameinfo_map) do
         if not min_table_v or v.cur_table_num < min_table_v.cur_table_num then
             min_table_v = v
         end
@@ -294,20 +280,19 @@ function CMD.start(config)
     
     skynet.fork(function()
         g_game_cli = frpc_client:new(config.instance_name, "room_game_alloc_m")
-        --注册一个5秒一次的定时器
-        g_timer_obj = timer:new(timer.second * 5, 0, syn_game_info)
         --匹配循环
         g_match_loop_timer = timer:new(timer.second * 5, 0, match_loop)
         --执行完再注册下一次
         g_match_loop_timer:after_next()
     end)
+
+    watch_syn_client.watch(config.instance_name, "alloc_info", "syn_game_info", syn_game_info)
     
     return true
 end
 
 function CMD.fix_exit()
     --确定退出了，就可以取消定时器了
-    g_timer_obj:cancel()
     g_match_loop_timer:cancel()
 end
 

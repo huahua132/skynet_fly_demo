@@ -7,6 +7,8 @@ local ENUM = require "common.enum.ENUM"
 local cfg = require "skynet-fly.etc.module_info".get_cfg()
 local base_info = require "skynet-fly.etc.module_info".get_base_info()
 local game_redis = require "common.redis.game"
+local watch_server = require "skynet-fly.rpc.watch_server"
+local SYN_CHANNEL_NAME = require "common.enum.SYN_CHANNEL_NAME"
 
 contriner_client:register("share_config_m", "token_m")
 
@@ -15,6 +17,7 @@ local table = table
 local ipairs = ipairs
 local assert = assert
 local next = next
+local os = os
 
 local g_alloc_interface = nil
 
@@ -24,6 +27,16 @@ local g_info = {
 	cur_player_num = 0,
 	host = "",
 }
+
+local g_last_syn_time = 0
+
+local function syn_alloc_info()
+	local cur_time = os.time()
+	if cur_time - g_last_syn_time > 5 then							--至少5秒才同步一次
+		g_last_syn_time = cur_time
+		watch_server.pubsyn(SYN_CHANNEL_NAME.alloc_info, g_info)
+	end
+end
 
 local g_table_info = {}
 
@@ -43,11 +56,6 @@ function CMD.exists(table_id, create_time)
 	else
 		return true
 	end
-end
-
---获取信息
-function CMD.get_info()
-	return g_info
 end
 
 --创建桌子
@@ -83,6 +91,8 @@ function M.init(alloc_interface) --初始化
 		local confclient = contriner_client:new("share_config_m")
         local room_game_login = confclient:mod_call('query','room_game_login')
         g_info.host = room_game_login.wsgateconf.host
+		log.info("init >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+		syn_alloc_info()
 	end)
 end
 
@@ -93,17 +103,20 @@ end
 function M.createtable(table_name, table_id, config, create_player_id) --创建桌子
 	--log.info("createtable:",table_id)
 	g_info.cur_table_num = g_info.cur_table_num + 1
+	syn_alloc_info()
 end
 
 function M.entertable(table_id,player_id)  --进入桌子
 	--log.info("entertable:",table_id,player_id)
 	g_info.cur_player_num = g_info.cur_player_num + 1
+	syn_alloc_info()
 end
 
 function M.leavetable(table_id,player_id)  --离开桌子
 	--log.info("leavetable:",table_id,player_id)
 	g_info.cur_player_num = g_info.cur_player_num - 1
 	game_redis.del_game_room_info(player_id)
+	syn_alloc_info()
 end
 
 function M.dismisstable(table_id) --解散桌子
@@ -117,6 +130,7 @@ function M.dismisstable(table_id) --解散桌子
 	end
 
 	g_table_info[table_id] = nil
+	syn_alloc_info()
 end
 
 function M.tablefull()
