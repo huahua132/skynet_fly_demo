@@ -5,7 +5,6 @@ local skynet = require "skynet"
 local contriner_client = require "skynet-fly.client.contriner_client"
 local ENUM = require "common.enum.ENUM"
 local cfg = require "skynet-fly.etc.module_info".get_cfg()
-local base_info = require "skynet-fly.etc.module_info".get_base_info()
 local game_redis = require "common.redis.game"
 local watch_server = require "skynet-fly.rpc.watch_server"
 local SYN_CHANNEL_NAME = require "common.enum.SYN_CHANNEL_NAME"

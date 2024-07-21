@@ -10,7 +10,6 @@ local client_path = ENUM.client_path
 
 local function login(c)
     local req = c.req
-    local session = req.session
     local token = assert(req.body.token,"not token")
     local username, password = token:match("(.+)@(.+)")
     log.info("login >>>> ",username, password)

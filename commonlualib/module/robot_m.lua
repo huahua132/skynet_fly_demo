@@ -165,7 +165,7 @@ local function create_one_robot_logic(idx)
             account = m_account,
             password = m_password,
         }
-        local isok,code,bodystr = pcall(httpc.request, "POST", get_login_server_host(), '/user/login', nil, g_header, json.encode(req))
+        local isok,_,bodystr = pcall(httpc.request, "POST", get_login_server_host(), '/user/login', nil, g_header, json.encode(req))
         --log.info("请求登录:", idx, isok, code, bodystr)
         if not isok then
             --log.error("请求登录 网络错误:", idx, isok, tostring(code))

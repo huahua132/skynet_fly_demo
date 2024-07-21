@@ -22,13 +22,12 @@ local ipairs = ipairs
 
 contriner_client:register("monitor_m")
 
-local g_monitor_log_dir = nil
 local g_register_map = {}
 local g_cluster_list = {}
 
 local function get_register_map()
     if not next(g_register_map) then
-        g_register_map,g_monitor_log_dir = contriner_client:instance("monitor_m"):mod_call("get_rigister_info")
+        g_register_map = contriner_client:instance("monitor_m"):mod_call("get_rigister_info")
         for cluster_name,server_map in pairs(g_register_map) do
             tinsert(g_cluster_list,cluster_name)
         end

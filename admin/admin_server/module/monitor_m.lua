@@ -24,7 +24,6 @@ contriner_client:register("logrotate_m")
 local g_monitor_log_dir = "./monitor_log/"
 
 local SELF_ADDRESS
-local g_config = nil
 local g_time_map = {}
 local g_rigister_info = {}
 
@@ -76,14 +75,7 @@ local function monitor(svr_name)
             if name == "hot_containe" and split[5] then
                 name = split[5]
             end
-            local launch_date = ""
-            if split[7] then
-                launch_date = split[7]
-            end
-            local version = 0
-            if split[8] then
-                version = tonumber(split[8])
-            end
+           
             server_name_map[server_id] = name.. '_' .. server_id
             svr_info_map[v.cluster_name][name .. '_' .. server_id] = {
                 mem = mem,
@@ -173,7 +165,6 @@ end
 
 function CMD.start(config)
     SELF_ADDRESS = skynet.self()
-    g_config = config
     local node_list = config.node_list
     skynet.fork(function()
         for _,svr_name in ipairs(node_list) do

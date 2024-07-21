@@ -6,7 +6,7 @@ local skynet = require "skynet"
 local M = {}
 
 function M.init(interface_mgr)
-    game_record_logic.init(interface_mgr)
+    game_record_logic.init()
 end
 
 M.handle = {

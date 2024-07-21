@@ -24,7 +24,7 @@ local function login(c)
     if not isok then
         rsp_body.set_rsp(c, nil, errcode, errmsg)
     else
-        local player_id, hall_server_id = errcode, errmsg
+        local player_id = errcode
         local host = rpc_hall_player.get_host(player_id)
         assert(host, "can`t get host")
         local token = rpc_hall_player.create_token(player_id, ENUM.LOGIN_TOKEN_TIME_OUT)

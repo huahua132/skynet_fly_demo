@@ -4,8 +4,6 @@ local env_util = require "skynet-fly.utils.env_util"
 local player_util = require "common.utils.player"
 local json = require "cjson"
 
-local g_room_key = 'gameroom'
-
 local function room_key(svr_id)
     return 'gameroom:' .. svr_id
 end

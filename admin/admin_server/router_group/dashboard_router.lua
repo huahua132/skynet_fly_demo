@@ -24,7 +24,6 @@ contriner_client:register("monitor_online_m")
 
 local g_monitor_log_dir = nil
 local g_node_map = {}
-local g_cluster_servers_map = {}
 local g_file_cache = tti:new(timer.minute)  --本地缓存
 local g_pre_load_time = 0
 

@@ -19,7 +19,7 @@ local type = type
 local M = {}
 
 function M.login(username, password)
-    local user_info,code,msg = g_users_client:get_one_entry(username)
+    local user_info = g_users_client:get_one_entry(username)
     if not user_info then
         log.info("use not exists ", username)
         return

@@ -1,6 +1,5 @@
 local redis_cfg = loadfile("../../commonlualib/common/etc/redis_cfg.lua")()
 local server_cfg = loadfile("../../commonlualib/common/etc/server_cfg.lua")()
-local gate_cfg = loadfile("../../commonlualib/common/etc/gate_cfg.lua")()
 local frpc_server_cfg = loadfile("../../commonlualib/common/etc/frpc_server_cfg.lua")()
 
 return {
