@@ -1,5 +1,4 @@
 local server_cfg = loadfile("../../commonlualib/common/etc/server_cfg.lua")()
-local http_cfg = loadfile("../../commonlualib/common/etc/http_cfg.lua")()
 local frpc_server_cfg = loadfile("../../commonlualib/common/etc/frpc_server_cfg.lua")()
 local gate_cfg = loadfile("../../commonlualib/common/etc/gate_cfg.lua")()
 local mysql_cfg = loadfile("../../commonlualib/common/etc/mysql_cfg.lua")()

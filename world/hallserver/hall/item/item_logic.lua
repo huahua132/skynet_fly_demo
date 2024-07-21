@@ -6,12 +6,10 @@ local orm_table_client = require "skynet-fly.client.orm_table_client"
 local assert = assert
 local pairs = pairs
 
-local g_hall_interface = nil
 local g_item_entity = orm_table_client:instance("item")
 
 local M = {}
 function M.init(interface_mgr)
-    g_hall_interface = interface_mgr
     item_msg = item_msg:new(interface_mgr)
 end
 ---------------------------其他逻辑------------------------------------

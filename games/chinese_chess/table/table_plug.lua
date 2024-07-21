@@ -50,7 +50,6 @@ M.ws_broadcast = ws_pbnet_util.broadcast
 
 --游戏桌子创建者
 function M.table_creator(table_id)
-	local m_HANDLE = {}
 	local m_table_id = table_id
 	local m_interface_mgr = g_interface_mgr:new(table_id)
 	local m_errors_msg = errors_msg:new(m_interface_mgr)

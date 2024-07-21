@@ -39,7 +39,7 @@ end
 
 --新增记录
 function handle.add_record(player_id, date, id, is_win, game_id, svr_id)
-    local entry = g_ormobj:create_one_entry({
+    g_ormobj:create_one_entry({
         player_id = player_id,
         date = date,
         id = id,

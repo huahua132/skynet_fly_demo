@@ -27,7 +27,6 @@ function M.auth()
         end
 
         local routes_map = token_auth.routes_map
-        local params = context.params
         local matched = context.matched
         local path = matched.path
         local method = context.req.method

@@ -10,9 +10,7 @@ local contriner_client = require "skynet-fly.client.contriner_client"
 contriner_client:register("token_m")
 
 local assert = assert
-local x_pcall = x_pcall
 
-local g_interface_mgr = nil   --接口
 local g_login_req_pack_name = assert(login_msg.login_req_pack_name, "not exists login_req_pack_name")
 
 local M = {}

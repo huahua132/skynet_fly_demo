@@ -16,8 +16,6 @@ local type = type
 local pairs = pairs
 local tinsert = table.insert
 
-local watch_client = nil
-
 local M = {}
 
 function M.create_token(username,roles,routes_map)
