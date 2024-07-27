@@ -5,14 +5,17 @@ local game_redis = require "common.redis.game"
 local match_msg = require "msg.match_msg"
 local rpc_matchserver_match = require "common.rpc.matchserver.match"
 local frpc_client = require "skynet-fly.client.frpc_client"
+local state_data = require "skynet-fly.hotfix.state_data"
 
 local next = next
 local tonumber = tonumber
 
+local g_local_info = state_data.alloc_table("g_local_info")
+
 local M = {}
 
 function M.init(interface_mgr)
-    match_msg = match_msg:new(interface_mgr)
+    g_local_info.match_msg = match_msg:new(interface_mgr)
 end
 -----------------------------其他逻辑---------------------------------
 local function check_join_room_game(player_id)
@@ -57,7 +60,7 @@ function M.do_match_game(player_id, pack_body)
     local game_room_info = game_redis.get_game_room_info(player_id)
     if game_room_info and next(game_room_info) then
         log.error("exists game_room_info ",player_id, game_room_info)
-        return 
+        return nil, errorcode.GAME_ROOM_EXISTS, "GAME_ROOM_EXISTS"
     end
 
     --log.info("do_match_game2 >>> ",player_id, pack_body)
@@ -66,7 +69,7 @@ function M.do_match_game(player_id, pack_body)
     end
     --log.info("do_match_game3 >>> ",player_id, pack_body)
     --回复匹配
-    match_msg:match_game_res(player_id, {game_id = game_id})
+    g_local_info.match_msg:match_game_res(player_id, {game_id = game_id})
 
     return true
 end
@@ -86,7 +89,7 @@ function M.do_cancel_match_game(player_id, pack_body)
     end
 
     --回复取消匹配
-    match_msg:cancel_match_game_res(player_id, {game_id = game_id})
+    g_local_info.match_msg:cancel_match_game_res(player_id, {game_id = game_id})
 
     return true
 end
@@ -107,7 +110,7 @@ function M.do_accept_match(player_id, pack_body)
     end
 
     --回复接受对局
-    match_msg:accept_match_res(player_id, {game_id = game_id, session_id = session_id})
+    g_local_info.match_msg:accept_match_res(player_id, {game_id = game_id, session_id = session_id})
 
     return true
 end
@@ -117,14 +120,14 @@ end
 function M.cmd_match_succ(player_id, session_id, game_id, remain_time)
     --log.info("cmd_match_succ >>> ",player_id, session_id, game_id, remain_time)
     --通知匹配成功
-    match_msg:match_game_notice(player_id, {game_id = game_id, session_id = session_id, remain_time = remain_time})
+    g_local_info.match_msg:match_game_notice(player_id, {game_id = game_id, session_id = session_id, remain_time = remain_time})
 end
 
 --加入对局
 function M.cmd_join_game(player_id, token, host, table_id)
     --log.info("cmd_join_game >>>>> ", player_id, token, host, table_id)
     --通知加入对局
-    match_msg:join_game_notice(player_id, {
+    g_local_info.match_msg:join_game_notice(player_id, {
         gamehost = host, 
         gametoken = token,
         table_id = table_id

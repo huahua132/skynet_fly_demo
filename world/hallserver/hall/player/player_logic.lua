@@ -7,23 +7,24 @@ local interface = require "hall.player.interface"
 local event_mgr = require "common.event_mgr"
 local timer_point = require "skynet-fly.time_extend.timer_point"
 local EVENT_ID = require "enum.EVENT_ID"
+local state_data = require "skynet-fly.hotfix.state_data"
 
 local assert = assert
 local pairs = pairs
 local tinsert = table.insert
 local tremote = table.remove
 
-local g_hall_interface = nil
 local g_player_entity = orm_table_client:instance("player")
 
-local g_p_info_map = {}                --在线玩家信息表
-local g_p_heart_map = {}               --在线玩家心跳
-local g_player_list = {}               --在线玩家列表
+local g_local_info = state_data.alloc_table("g_local_info")
+local g_p_info_map = state_data.alloc_table("g_p_info_map")                 --在线玩家信息表
+local g_p_heart_map = state_data.alloc_table("g_p_heart_map")               --在线玩家心跳
+local g_player_list = state_data.alloc_table("g_player_list")               --在线玩家列表
 
 local M = {}
 function M.init(interface_mgr)
-    g_hall_interface = interface_mgr
-    player_msg = player_msg:new(interface_mgr)
+    g_local_info.hall_interface = interface_mgr
+    g_local_info.player_msg = player_msg:new(interface_mgr)
     timer_point:new(timer_point.EVERY_DAY):builder(function()
         --跨天
         for i = 1, #g_player_list do
@@ -34,10 +35,11 @@ end
 ---------------------------其他逻辑------------------------------------
 --检测心跳
 function M.check_heart()
+    --log.info("check_heart >>>> ")
     local cur_time = time_util.time()
     for player_id,heart_time in pairs(g_p_heart_map) do
         if cur_time - heart_time > 60 then  --心跳超时
-            skynet.fork(g_hall_interface.goout, g_hall_interface, player_id) --踢出
+            skynet.fork(g_local_info.hall_interface, g_local_info.hall_interface, player_id) --踢出
         end
     end
 end
@@ -47,7 +49,7 @@ local function player_info_notice(player_id)
     local player_info = g_p_info_map[player_id]
     if not player_info then return end
     --log.info("player_info_notice ", player_info)
-    player_msg:player_info_notice(player_id, player_info)
+    g_local_info.player_msg:player_info_notice(player_id, player_info)
 end
 
 ---------------------------客户端事件----------------------------------
