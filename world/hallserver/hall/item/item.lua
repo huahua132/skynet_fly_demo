@@ -1,5 +1,5 @@
 
-local item_logic = require "hall.item.item_logic"
+local item_logic = hotfix_require "hall.item.item_logic"
 local skynet = require "skynet"
 
 
