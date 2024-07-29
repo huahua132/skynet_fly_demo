@@ -113,11 +113,11 @@ function M:set_doing_time(total_time, one_time)
 end
 
 --开始操作
-function M:start_doing(time_out_callback)
+function M:start_doing(time_out_callback, ...)
 	if self.remain_total_time > self.once_time then
-		self.time_obj = timer:new(self.once_time, 1, time_out_callback, self)
+		self.time_obj = timer:new(self.once_time, 1, time_out_callback, ...)
 	else
-		self.time_obj = timer:new(self.remain_total_time, 1, time_out_callback, self)
+		self.time_obj = timer:new(self.remain_total_time, 1, time_out_callback, ...)
 	end
 end
 
