@@ -63,6 +63,9 @@ quit
 访问后台
 `http://127.0.0.1`
 
+访问游戏
+`http://127.0.0.1:81`
+
 [介绍文档](https://huahua132.github.io/2024/02/17/think/skynet_fly_demo/)
 
 # docker 部署
@@ -79,6 +82,9 @@ docker run --net="host" -d --name=mysql_container -e MYSQL_ROOT_PASSWORD=123456 
 
 访问后台
 `http://127.0.0.1`
+
+访问游戏
+`http://127.0.0.1:81`
 
 # 客户端
 [中国象棋](https://github.com/huahua132/chinesechess)
