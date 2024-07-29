@@ -33,7 +33,7 @@ function M.on_login(player_id)
     --log.info("on_login >>> ", player_id)
     assert(not g_player_map[player_id], "is exists " .. player_id)
     g_player_map[player_id] = {
-        heart_time = 0
+        heart_time = time_util.time()
     }
     tinsert(g_player_list, player_id)
 end

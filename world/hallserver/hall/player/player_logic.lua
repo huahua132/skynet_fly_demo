@@ -62,7 +62,7 @@ function M.on_login(player_id)
     end
     --log.info("on_login >>> ", player_id)
     assert(not g_p_heart_map[player_id], "is exists " .. player_id)
-    g_p_heart_map[player_id] = 0
+    g_p_heart_map[player_id] = time_util.time()
     g_p_info_map[player_id] = player_info
 
     tinsert(g_player_list, player_id)
