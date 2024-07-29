@@ -66,8 +66,8 @@ function M:new(table_id, interface)
         m_can_move_map = {},
     }
 
-	if table_id ~= 1 then  --测试创建
-		t.m_join_time_out = timer:new(timer.minute, 1, m_interface_mgr.kick_out_all, m_interface_mgr)
+	if table_id ~= 1 then  -- 1是测试创建的房间
+		t.m_join_time_out = timer:new(timer.minute, 1, m_interface_mgr.kick_out_all, m_interface_mgr, "join time out")
 	end
 
     --座位初始化
@@ -277,7 +277,7 @@ function M:game_over(win_seat_id)
         end
     end)
 
-    self.m_interface_mgr:kick_out_all()
+    self.m_interface_mgr:kick_out_all("game over")
     return true
 end
 -----------------------------------------------------------------------
@@ -318,7 +318,8 @@ function M:enter(player_id)
 end
 
 --玩家离开
-function M:leave(player_id)
+function M:leave(player_id, reason)
+    --log.info("leave ", player_id, reason)
     local seat_id = self.m_player_seat_map[player_id]
     if not seat_id then
         log.error("not in table ",player_id)
@@ -327,7 +328,7 @@ function M:leave(player_id)
 
     local seater = self.m_seat_list[seat_id]
     if not seater:is_can_leave() then
-        log.warn("can`t leave game_state = ", self.m_game_state)
+        log.warn_fmt("can`t leave player_id = %s game_state = %s reason = %s", player_id, self.m_game_state, reason)
         return
     else
         seater:leave()

@@ -1,5 +1,5 @@
 
-local player_logic = require "gamecommon.hall.player.player_logic"
+local player_logic = hotfix_require "gamecommon.hall.player.player_logic"
 local skynet = require "skynet"
 
 

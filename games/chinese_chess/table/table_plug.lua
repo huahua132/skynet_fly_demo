@@ -40,8 +40,8 @@ function M.table_creator(table_id)
            return m_logic:enter(player_id)
         end,
 		--玩家离开桌子
-		leave = function(player_id)
-			return m_logic:leave(player_id)
+		leave = function(player_id, reason)
+			return m_logic:leave(player_id, reason)
 		end,
 		--玩家掉线
 		disconnect = function(player_id)

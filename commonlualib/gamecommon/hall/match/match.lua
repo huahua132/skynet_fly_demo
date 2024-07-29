@@ -1,5 +1,5 @@
 
-local match_logic = require "gamecommon.hall.match.match_logic"
+local match_logic = hotfix_require "gamecommon.hall.match.match_logic"
 
 
 local M = {}

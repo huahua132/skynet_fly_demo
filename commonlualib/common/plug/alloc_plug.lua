@@ -90,7 +90,6 @@ function M.init(alloc_interface) --初始化
 		local confclient = contriner_client:new("share_config_m")
         local room_game_login = confclient:mod_call('query','room_game_login')
         g_info.host = room_game_login.wsgateconf.host
-		log.info("init >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
 		syn_alloc_info()
 	end)
 end
