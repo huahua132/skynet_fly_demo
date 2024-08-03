@@ -11,6 +11,7 @@ local GAME_ID_ENUM = require "common.enum.GAME_ID_ENUM"
 local module_info = require "skynet-fly.etc.module_info"
 local watch_syn_client = require "skynet-fly.rpc.watch_syn_client"
 local SYN_CHANNEL_NAME = require "common.enum.SYN_CHANNEL_NAME"
+local errorcode = require "common.enum.errorcode"
 
 local tonumber = tonumber
 local ipairs = ipairs
@@ -175,7 +176,7 @@ function CMD.match(player_id)
     local ret = redis.instance("global"):script_run(script_str, 3, player_id, match_key(), match_succ_lock_key(player_id), 0)
     --log.info("match2>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>", ret)
     if ret ~= 1 then
-        return nil
+        return nil, errorcode.MATCHING, "matching"
     end
 
     return true

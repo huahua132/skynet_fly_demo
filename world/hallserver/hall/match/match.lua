@@ -16,6 +16,14 @@ function M.on_reconnect(player_id)
     match_logic.on_reconnect(player_id)
 end
 
+function M.on_disconnect(player_id)
+    match_logic.on_disconnect(player_id)
+end
+
+function M.on_loginout(player_id)
+    match_logic.on_loginout(player_id)
+end
+
 M.handle = {
     --匹配
     ['.hallserver_match.MatchGameReq'] = function(player_id, packname, pack_body)
