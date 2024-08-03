@@ -1,5 +1,6 @@
 local skynet = require "skynet"
 local engine_web = require "skynet-fly.web.engine_web"
+local cors_mid = require "skynet-fly.web.middleware.cors_mid"
 
 local M = {}
 
@@ -9,13 +10,8 @@ local app = engine_web:default()
 M.dispatch = engine_web.dispatch(app)
 --初始化
 function M.init()
-    app:use(function(c)
-        c.res:set_header('X-Powered-By', 'skynet_fly framework')
-        c.res:set_header('Access-Control-Allow-Origin', '*')
-        c.res:set_header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
-        c.res:set_header('Access-Control-Allow-Headers', 'Keep-Alive,Content-Type,Authorization')
-        c:next()
-    end)
+    app:use(cors_mid.mid)
+    app:options('/*', cors_mid.end_point)
 
     --游戏前端入口路径
     app:static_dir("/","../game_client/build/web-mobile")

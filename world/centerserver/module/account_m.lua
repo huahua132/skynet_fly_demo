@@ -46,20 +46,30 @@ local MAX_INCRID = 9999999
 local function register(account_info, channel)
     assert(channel <= 9999, "overflow  channel = ",channel)
     local account = account_info.account --账号
-    assert(account:len() >= 6, "account not long enough")
+    local account_len = account:len()
+    if account_len < 6 or account_len > 32 then
+        return nil, CODE.ACCOUNT_LEN, "the account length needs to be between 6 and 32 characters"
+    end
     local orm_clinet = get_orm_by_account(account)
     if orm_clinet:get_one_entry(account) then
         return nil, CODE.EXISTS_USER, "EXISTS_USER"
     end
 
     local module_id, svr_id = rpc_hallserver_player_m.get_module_id()
-    assert(module_id, "register err ")
+    if not module_id then
+        return nil, CODE.SERVER_ERR, "can`t get module_id"
+    end
 
     local incrid = g_alloc_client:incr(module_id)
-    assert(incrid <= MAX_INCRID, "incr overflow")
+    if incrid > MAX_INCRID then
+        return nil, CODE.SERVER_ERR, "incr overflow"
+    end
+
     local player_id = player_util.builder_player_id(channel, svr_id, incrid)
     local ret = rpc_hallserver_player_m.register(player_id, account)
-    assert(ret, "register err")
+    if not ret then
+        return nil, CODE.SERVER_ERR, "hall register err svr_id = " .. svr_id
+    end
 
     account_info.key = crypt.randomkey()
     account_info.password = crypt_util.HMAC.SHA256(account_info.password, account_info.key)
@@ -71,7 +81,7 @@ local function register(account_info, channel)
     if orm_clinet:create_one_entry(account_info) then
         return true
     else
-        return nil
+        return nil, CODE.SERVER_ERR, "create entry err"
     end
 end
 
