@@ -59,7 +59,7 @@ end
 local function get_game_node()
     local min_table_v = nil
     for _,v in pairs(g_gameinfo_map) do
-        if not min_table_v or v.cur_table_num < min_table_v.cur_table_num then
+        if not min_table_v or v.cur_table_num < min_table_v.cur_table_num and frpc_client:is_active(v.svr_name, v.svr_id) then
             min_table_v = v
         end
     end
