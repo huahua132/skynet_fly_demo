@@ -11,6 +11,7 @@ local next = next
 local tonumber = tonumber
 
 local g_local_info = state_data.alloc_table("g_local_info")
+local g_matching_map = state_data.alloc_table("g_matching_map")
 
 local M = {}
 
@@ -18,6 +19,8 @@ function M.init(interface_mgr)
     g_local_info.match_msg = match_msg:new(interface_mgr)
 end
 -----------------------------其他逻辑---------------------------------
+
+--检查重连游戏
 local function check_join_room_game(player_id)
     local game_room_info = game_redis.get_game_room_info(player_id)
     if not game_room_info or not next(game_room_info) then
@@ -35,14 +38,39 @@ local function check_join_room_game(player_id)
     end
 end
 
+--检查取消匹配
+local function check_cancel_matching(player_id)
+    if not g_matching_map[player_id] then
+        return
+    end
+    local game_server = g_matching_map[player_id]
+    --log.info("check_cancel_matching >>> ", player_id)
+    local ret, errcode, errmsg = rpc_matchserver_match.cancel_match(game_server, player_id)
+    if not ret then
+        log.warn("check_cancel_matching err ", errcode, errmsg)
+    end
+    g_matching_map[player_id] = nil
+end
+
 ---------------------------客户端事件----------------------------------
 --玩家登录
 function M.on_login(player_id)
     check_join_room_game(player_id)
 end
+
 --玩家重连
 function M.on_reconnect(player_id)
     check_join_room_game(player_id)
+end
+
+--玩家掉线
+function M.on_disconnect(player_id)
+    check_cancel_matching(player_id)
+end
+
+--玩家登出
+function M.on_loginout(player_id)
+    check_cancel_matching(player_id)
 end
 
 ---------------------------客户端消息处理-------------------------------
@@ -63,14 +91,22 @@ function M.do_match_game(player_id, pack_body)
         return nil, errorcode.GAME_ROOM_EXISTS, "GAME_ROOM_EXISTS"
     end
 
+    --匹配中
+    if g_matching_map[player_id] then
+        log.warn("do_match_game ", player_id)
+        return nil, errorcode.MATCHING, "MATCHING"
+    end
     --log.info("do_match_game2 >>> ",player_id, pack_body)
-    if not rpc_matchserver_match.match(game_server, player_id) then
-        return nil
+    local ret, errcode, errmsg = rpc_matchserver_match.match(game_server, player_id)
+    if not ret then
+        log.warn("do_match_game err ", errcode, errmsg)
+        return ret, errcode, errmsg
     end
     --log.info("do_match_game3 >>> ",player_id, pack_body)
     --回复匹配
     g_local_info.match_msg:match_game_res(player_id, {game_id = game_id})
 
+    g_matching_map[player_id] = game_server
     return true
 end
 
@@ -84,13 +120,20 @@ function M.do_cancel_match_game(player_id, pack_body)
         return nil, errorcode.GAME_NOT_EXISTS, "GAME_NOT_EXISTS"
     end
 
-    if not rpc_matchserver_match.cancel_match(game_server, player_id) then
-        return nil
+    if not g_matching_map[player_id] then
+        log.warn("do_cancel_match_game not matching ", player_id)
+        return nil, errorcode.NOT_MATCHING, "NOT_MATCHING"
+    end
+
+    local ret, errcode, errmsg = rpc_matchserver_match.cancel_match(game_server, player_id)
+    if not ret then
+        log.warn("do_cancel_match_game err ", errcode, errmsg)
+        return ret, errcode, errmsg
     end
 
     --回复取消匹配
     g_local_info.match_msg:cancel_match_game_res(player_id, {game_id = game_id})
-
+    g_matching_map[player_id] = nil
     return true
 end
 

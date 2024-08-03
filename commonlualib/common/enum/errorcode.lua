@@ -15,4 +15,6 @@ return {
 	ACCOUNT_EXISTS = 12,     --账号已存在
 	GAME_NOT_EXISTS = 13,    --游戏不存在
 	GAME_ROOM_EXISTS = 14,   --已存在游戏房间
+	MATCHING = 15,		     --匹配中
+	NOT_MATCHING = 16,       --没在匹配中
 }
