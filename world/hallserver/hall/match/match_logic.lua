@@ -163,6 +163,7 @@ end
 function M.cmd_match_succ(player_id, session_id, game_id, remain_time)
     --log.info("cmd_match_succ >>> ",player_id, session_id, game_id, remain_time)
     --通知匹配成功
+    g_matching_map[player_id] = nil
     g_local_info.match_msg:match_game_notice(player_id, {game_id = game_id, session_id = session_id, remain_time = remain_time})
 end
 

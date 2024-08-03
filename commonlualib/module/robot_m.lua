@@ -11,6 +11,7 @@ local ws_pbnet_util = require "skynet-fly.utils.net.ws_pbnet_util"
 local pb_netpack = require "skynet-fly.netpack.pb_netpack"
 local time_util = require "skynet-fly.utils.time_util"
 local GAME_ID_ENUM = require "common.enum.GAME_ID_ENUM"
+local errorcode = require "common.enum.errorcode"
 
 local game = require "scene.game"
 
@@ -140,6 +141,16 @@ local function create_one_robot_logic(idx)
             m_state = STATE_ENUM.GAMEING
         else
             log.error("连接游戏失败 ",idx, host)
+        end
+    end
+
+    --错误消息处理
+    m_HALL_SERVER_HANDLE['.errors.Error'] = function(body)
+        local code = body.code
+        local _ = body.msg
+        local _ = body.packname
+        if code == errorcode.MATCHING then
+            m_hall_matching = true
         end
     end
 
