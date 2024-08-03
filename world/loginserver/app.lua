@@ -2,6 +2,7 @@ local skynet = require "skynet"
 local engine_web = require "skynet-fly.web.engine_web"
 local router = require "router"
 local log = require "skynet-fly.log"
+local cors_mid = require "skynet-fly.web.middleware.cors_mid"
 
 local M = {}
 
@@ -11,14 +12,8 @@ local app = engine_web:new()
 M.dispatch = engine_web.dispatch(app)
 --初始化
 function M.init()
-    app:options('/*', function(c)
-        c.res:set_header('X-Powered-By', 'skynet_fly framework')
-        c.res:set_header('Access-Control-Allow-Origin', '*')
-        c.res:set_header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
-        c.res:set_header('Access-Control-Allow-Headers', 'Keep-Alive,Content-Type,Authorization')
-        c.res:set_rsp("OK", 200)
-        log.error("options:")
-    end)
+    app:use(cors_mid.mid)
+    app:options('/*', cors_mid.end_point)
     
     app:set_no_route(function(c)
 		local method = c.req.method

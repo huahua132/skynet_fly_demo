@@ -3,6 +3,7 @@ local engine_web = require "skynet-fly.web.engine_web"
 local router = require "router"
 local token_auth_mid = require "middleware.token_auth_mid"
 local permission_mid = require "middleware.permission_mid"
+local cors_mid = require "skynet-fly.web.middleware.cors_mid"
 
 local M = {}
 
@@ -12,13 +13,8 @@ local app = engine_web:default()
 M.dispatch = engine_web.dispatch(app)
 --初始化
 function M.init()
-    app:use(function(c)
-        c.res:set_header('X-Powered-By', 'skynet_fly framework')
-        c.res:set_header('Access-Control-Allow-Origin', '*')
-        c.res:set_header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
-        c.res:set_header('Access-Control-Allow-Headers', 'Keep-Alive,Content-Type,Authorization')
-        c:next()
-    end)
+    app:use(cors_mid.mid)
+    app:options('/*', cors_mid.end_point)
 
     --设置token验证中间件
     app:use(token_auth_mid.auth{
