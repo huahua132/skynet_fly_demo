@@ -15,6 +15,8 @@ local MAX_PAGE_COUNT = 20
 local CACHE_TIME = 60 * 10
 local g_svr_id = env_util.get_svr_id()
 
+local g_get_filed_map = {['nickname'] = true, ['last_logout_time'] = true}
+
 local g_friend_cli = orm_table_client:instance("friend")
 
 local g_local_info = state_data.alloc_table("g_local_info")
@@ -92,7 +94,14 @@ function M.friend_list_req(player_id, pack_body)
 
     for svr_id, list in pairs(need_get_info_map) do
         if g_svr_id == svr_id then  --同服
-
+            local info_map = player_interface.get_players_info(list, g_get_filed_map)
+            for pid, info in pairs(info_map) do
+                local index = friend_index_map[pid]
+                local friend_info = firend_list[index]
+                for filed in pairs(g_get_filed_map) do
+                    friend_info[filed] = info[filed]
+                end
+            end
         else
 
         end

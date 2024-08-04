@@ -8,6 +8,7 @@ local svr_id = env_util.get_svr_id()
 local pairs = pairs
 local ipairs = ipairs
 local table = table
+local assert = assert
 
 local g_ormobj = nil
 
@@ -31,6 +32,24 @@ function M.init()
     :set_cache(60 * 60 * 100, 500, 100000)    --缓存1个小时，5秒同步一次更改，最大缓存10万条数据
     :builder(adapter)
     return g_ormobj
+end
+
+function handle.get_players_info(player_list, filed_map)
+    local ret_map = {}
+    for i = 1, #player_list do
+        local player_id = player_list[i]
+        local entry = g_ormobj:get_one_entry(player_id)
+        local entry_data = entry:get_entry_data()
+
+        local info = {}
+        for field in pairs(filed_map) do
+            assert(entry_data[field], "get_players_info filed not exists :" .. field)
+            info[field] = entry_data[field]
+        end
+        ret_map[player_id] = info
+    end
+
+    return ret_map
 end
 
 M.handle = handle

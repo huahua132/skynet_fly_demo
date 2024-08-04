@@ -13,4 +13,9 @@ function M.get_info(player_id)
     error("调用了未实现的接口 get_info")
 end
 
+--批量获取玩家信息
+function M.get_players_info(player_list, filed_map)
+    error("调用了未实现的接口 get_players_info")
+end
+
 return M
