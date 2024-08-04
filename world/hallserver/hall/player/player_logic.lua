@@ -21,6 +21,17 @@ local g_p_info_map = state_data.alloc_table("g_p_info_map")                 --�
 local g_p_heart_map = state_data.alloc_table("g_p_heart_map")               --在线玩家心跳
 local g_player_list = state_data.alloc_table("g_player_list")               --在线玩家列表
 
+local function get_field_value(tab, filed_map)
+    local new = {}
+
+    for filed_name in pairs(filed_map) do
+        assert(tab[filed_name], "get_field_value not exists filedname : " .. filed_name)
+        new[filed_name] = tab[filed_name]
+    end
+
+    return new
+end
+
 local M = {}
 function M.init(interface_mgr)
     g_local_info.hall_interface = interface_mgr
@@ -137,6 +148,29 @@ end
 --获取玩家信息
 function interface.get_info(player_id)
     return M.cmd_get_info
+end
+
+--批量获取玩家信息
+function M.get_players_info(player_list, filed_map)
+    local ret_map = {}
+    local not_online_list = {}
+    for i = 1, #player_list do
+        local player_id = player_list[i]
+        if g_p_info_map[player_id] then
+            ret_map[player_id] = get_field_value(g_p_info_map[player_id], filed_map)
+        else
+            tinsert(not_online_list, player_id)
+        end
+    end
+
+    if #not_online_list > 0 then
+        local map = g_player_entity:get_players_info(not_online_list, filed_map)
+        for k,v in pairs(map) do
+            ret_map[k] = v
+        end
+    end
+
+    return ret_map
 end
 
 return M
