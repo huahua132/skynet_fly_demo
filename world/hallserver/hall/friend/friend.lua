@@ -12,7 +12,7 @@ local friend_logic = hotfix_require "hall.friend.friend_logic"
 local M = {}
 
 function M.init(interface_mgr)
-   
+    friend_logic.init(interface_mgr)
 end
 
 function M.on_login(player_id)
@@ -32,7 +32,9 @@ function M.on_disconnect(player_id)
 end
 
 M.handle = {
-
+    ['hallserver_friend.FriendListReq'] = function(player_id, packname, pack_body)
+        return friend_logic.friend_list_req(player_id, pack_body)
+    end
 }
 
 local CMD = {}
