@@ -1,7 +1,5 @@
 
 local game_record_logic = hotfix_require "hall.game_record.game_record_logic"
-local skynet = require "skynet"
-
 
 local M = {}
 

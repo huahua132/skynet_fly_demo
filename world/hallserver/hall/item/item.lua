@@ -1,7 +1,5 @@
 
 local item_logic = hotfix_require "hall.item.item_logic"
-local skynet = require "skynet"
-
 
 local M = {}
 
