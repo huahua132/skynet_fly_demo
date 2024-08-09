@@ -2,6 +2,9 @@ local skynet = require "skynet"
 local contriner_client = require "skynet-fly.client.contriner_client"
 local log = require "skynet-fly.log"
 local time_util = require "skynet-fly.utils.time_util"
+local watch_client = require "skynet-fly.rpc.watch_client"
+local string_util = require "skynet-fly.utils.string_util"
+local PUB_CHANNEL_NAME = require "common.enum.PUB_CHANNEL_NAME"
 contriner_client:register("logrotate_m")
 
 local CMD = {}
@@ -9,6 +12,8 @@ local CMD = {}
 local io = io
 local os = os
 local string = string
+local pairs = pairs
+
 local SELF_ADDRESS = skynet.self()
 
 local g_cfg = {
@@ -19,13 +24,16 @@ local g_cfg = {
 
 local g_file_name = g_cfg.file_path .. g_cfg.filename
 
---上报
-function CMD.report(svr_name,svr_id,log)
+--记录
+local function record(cluster_name,logstr)
     if not os.execute("mkdir -p " .. g_cfg.file_path) then
         error("create g_monitor_log_dir err")
     end
+    log.error("record1111 >>>> ", cluster_name, logstr)
+    local str = string_util.split(cluster_name, ':')
+    local svr_name, svr_id = str[1], str[2]
     local file = io.open(g_file_name,'a+')
-    local log_str = '[' .. svr_name .. ']' .. '[' .. svr_id ..']' .. log
+    local log_str = '[' .. svr_name .. ']' .. '[' .. svr_id ..']' .. logstr
     file:write(log_str .. '\n')
     file:flush()
     file:close()
@@ -43,7 +51,6 @@ function CMD.read(pre_day)
     end
 
     local file = io.open(filename, 'r')
-    log.info("read:", pre_day, filename)
     if file then
         local content = file:read "a"
         file:close()
@@ -53,7 +60,7 @@ function CMD.read(pre_day)
     return nil
 end
 
-function CMD.start()
+function CMD.start(config)
     skynet.fork(function()
         if contriner_client:instance("logrotate_m"):mod_call("add_rotate", SELF_ADDRESS, g_cfg) then
             --logrotate的服务更新之后需要重新发送切割任务
@@ -62,6 +69,10 @@ function CMD.start()
             end)
         else
             log.error("rigister_rotate err ")
+        end
+
+        for svr_name in pairs(config.node_map) do
+            watch_client.watch(svr_name, PUB_CHANNEL_NAME.WANI_LOG, "record_handle", record)
         end
     end)
     return true
