@@ -18,8 +18,8 @@ return function(log_str,msg)
         else
             substr = msg:sub(1,sublen)
         end
-
         if not warn_cache:get_cache(substr) then
+           
             watch_server.publish(PUB_CHANNEL_NAME.WANI_LOG, log_str)
             warn_cache:set_cache(substr, true)
         end

@@ -5,13 +5,14 @@ local time_util = require "skynet-fly.utils.time_util"
 local log = require "skynet-fly.log"
 
 skynet.start(function()
+	skynet.call('.logger','lua','add_hook','common.log_hook')
 	skynet.error("start admin server !!!>>>>>>>>>>>>>>>>>")
 	contriner_launcher.run()
 
 	--启动集群连接入口
 	skynet.uniqueservice("frpc_server")
 
-	skynet.call('.logger','lua','add_hook','common.log_hook')
+
 
 	timer_point:new(timer_point.EVERY_MINUTE)
     :builder(function()
