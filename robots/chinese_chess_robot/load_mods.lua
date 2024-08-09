@@ -44,18 +44,6 @@ return {
 		launch_num = 1,
 	},
 
-	--集群客户端
-	frpc_client_m = {
-		launch_seq = 4,
-		launch_num = 1,
-		default_arg = {
-			node_map = {
-				['logserver'] = true,
-			},
-			watch = 'redis',  --监听redis的方式做服务发现
-		}
-	},
-
 	--机器人启动管理
 	robot_launch_m = {
 		launch_seq = 5,

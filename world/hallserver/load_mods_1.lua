@@ -70,7 +70,6 @@ return {
 		launch_num = 1,
 		default_arg = {
 			node_map = {
-				['logserver'] = true,       --日志服
 				['matchserver'] = true,     --匹配服
 				['hallserver'] = true,      --大厅服
 				['chinese_chess'] = true,   --象棋服

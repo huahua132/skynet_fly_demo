@@ -49,7 +49,6 @@ return {
         launch_num = 1,
         default_arg = {
             node_map = {
-                ['logserver']  = true,       --日志服
                 ['hallserver'] = true,       --大厅服
                 ['chinese_chess'] = true,    --中国象棋
                 ['centerserver'] = true,     --中心服
