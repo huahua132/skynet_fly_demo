@@ -29,7 +29,7 @@ local function record(cluster_name,logstr)
     if not os.execute("mkdir -p " .. g_cfg.file_path) then
         error("create g_monitor_log_dir err")
     end
-    log.error("record1111 >>>> ", cluster_name, logstr)
+   
     local str = string_util.split(cluster_name, ':')
     local svr_name, svr_id = str[1], str[2]
     local file = io.open(g_file_name,'a+')
