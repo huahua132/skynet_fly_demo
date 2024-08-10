@@ -4,18 +4,16 @@ local orm_table_client = require "skynet-fly.client.orm_table_client"
 local state_data = require "skynet-fly.hotfix.state_data"
 local tti = require "skynet-fly.cache.tti"
 local friend_msg = require "msg.friend_msg"
-local player_util = require "common.utils.player"
-local env_util = require "skynet-fly.utils.env_util"
 local player_interface = require "hall.player.interface"
+local player_rpc = require "common.rpc.hallserver.player"
 
 local tinsert = table.insert
 local pairs = pairs
 
 local MAX_PAGE_COUNT = 20
 local CACHE_TIME = 60 * 10
-local g_svr_id = env_util.get_svr_id()
 
-local g_get_filed_map = {['nickname'] = true, ['last_logout_time'] = true}
+local g_get_field_map = {['nickname'] = true, ['last_logout_time'] = true}
 
 local g_friend_cli = orm_table_client:instance("friend")
 
@@ -79,31 +77,21 @@ function M.friend_list_req(player_id, pack_body)
         friend_list = {},
     }
 
-    local need_get_info_map = {}
+    local player_list = {}
     local friend_index_map = {}
     for i = start_index, end_index do
         if i > len then break end
         local info = firend_list[i]
-        local svr_id = player_util.get_svr_id_by_player_id(info.friend_id)
-        if not need_get_info_map[svr_id] then
-            need_get_info_map[svr_id] = {}
-        end
-        tinsert(need_get_info_map[svr_id], info.friend_id)
+        tinsert(player_list, info.friend_id)
         friend_index_map[info.friend_id] = i
     end
 
-    for svr_id, list in pairs(need_get_info_map) do
-        if g_svr_id == svr_id then  --同服
-            local info_map = player_interface.get_players_info(list, g_get_filed_map)
-            for pid, info in pairs(info_map) do
-                local index = friend_index_map[pid]
-                local friend_info = firend_list[index]
-                for filed in pairs(g_get_filed_map) do
-                    friend_info[filed] = info[filed]
-                end
-            end
-        else
-
+    local info_map = player_rpc.get_players_info(player_list, g_get_field_map)
+    for pid, info in pairs(info_map) do
+        local index = friend_index_map[pid]
+        local friend_info = firend_list[index]
+        for field in pairs(g_get_field_map) do
+            friend_info[field] = info[field]
         end
     end
 
