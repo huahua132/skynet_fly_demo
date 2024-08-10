@@ -118,12 +118,13 @@ return {
     -- orm
 	orm_table_m = {
 		launch_seq = 7000,
-		launch_num = 3,
+		launch_num = 5,
 		mod_args = {
             {instance_name = "player", orm_plug = "orm_entity.player_entity"},
 			{instance_name = "item", orm_plug = "orm_entity.item_entity"},
 			{instance_name = "game_record", orm_plug = "orm_entity.game_record_entity"},
 			{instance_name = "friend", orm_plug = "orm_entity.friend_entity"},
+			{instance_name = "friend_req", orm_plug = "orm_entity.friend_req_entity"}
 		}
 	},
 
