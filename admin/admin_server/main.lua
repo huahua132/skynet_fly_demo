@@ -12,8 +12,6 @@ skynet.start(function()
 	--启动集群连接入口
 	skynet.uniqueservice("frpc_server")
 
-
-
 	timer_point:new(timer_point.EVERY_MINUTE)
     :builder(function()
         log.info("每分钟:", os.date("[%Y%m%d %H:%M:%S",time_util.time()))
