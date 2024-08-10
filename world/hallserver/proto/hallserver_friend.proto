@@ -20,3 +20,49 @@ message FriendListRes {
     optional uint32 total_count = 3;        //总数量
     repeated OneFriend friend_list = 4;     //好友列表
 }
+
+//请求添加好友
+message AddFriendReq {
+    optional int64 player_id = 1;           //玩家ID
+}
+
+//回复添加好友
+message AddFriendRes {
+    optional int64 player_id = 1;           //玩家ID
+}
+
+//通知请求添加好友列表
+message AddReqListNotice {
+    repeated int64 player_id_list = 1;      //玩家ID列表
+    repeated string nickname_list = 2;      //玩家昵称列表
+}
+
+//同意添加好友请求
+message AgreeAddFriendReq {
+    optional int64 player_id = 1;           //玩家ID
+}
+
+//同意添加好友回复
+message AgreeAddFriendRes {
+    optional int64 player_id = 1;           //玩家ID
+}
+
+//拒绝添加好友请求
+message RefuseAddFriendReq {
+    optional int64 player_id = 1;           //玩家ID
+}
+
+//拒绝添加好友回复
+message RefuseAddFriendRes {
+    optional int64 player_id = 1;           //玩家ID
+}
+
+//删除好友请求
+message DelFriendReq {
+    optional int64 player_id = 1;           //玩家ID
+}
+
+//删除好友回复
+message DelFriendRes {
+    optional int64 player_id = 1;           //玩家ID
+}

@@ -107,6 +107,8 @@ function M.friend_list_req(player_id, pack_body)
     end
 
     g_local_info.friend_msg:friend_list_res(player_id, res_list)
+    
+    return true
 end
 
 return M
