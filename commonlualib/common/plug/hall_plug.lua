@@ -3,7 +3,7 @@ local log = require "skynet-fly.log"
 local ws_pbnet_util = require "skynet-fly.utils.net.ws_pbnet_util"
 local pb_netpack = require "skynet-fly.netpack.pb_netpack"
 local timer = require "skynet-fly.timer"
-local errors_msg = require "gamecommon.msg.errors_msg"
+local errors_msg = require "common.msg.errors_msg"
 local skynet = require "skynet"
 local g_modules_list = require "hall.hall"
 
