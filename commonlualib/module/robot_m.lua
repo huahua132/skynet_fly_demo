@@ -89,7 +89,7 @@ local function create_one_robot_logic(idx)
 
     local m_HALL_SERVER_HANDLE = {}
     --登录大厅成功
-    m_HALL_SERVER_HANDLE['.game_login.LoginRes'] = function(body)
+    m_HALL_SERVER_HANDLE['.login.LoginRes'] = function(body)
         m_hall_matching = false
         --登录大厅成功
         m_state = STATE_ENUM.ONLINE_HALL
@@ -206,7 +206,7 @@ local function create_one_robot_logic(idx)
                     token = token,
                     player_id = m_player_id,
                 }
-                send_hall_msg('.game_login.LoginReq', login_req)
+                send_hall_msg('.login.LoginReq', login_req)
             else
                 log.error("连接大厅失败 ", host)
                 skynet.sleep(math.random(timer.second * 5, timer.second * 15))
