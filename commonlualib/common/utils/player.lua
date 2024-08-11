@@ -4,6 +4,7 @@ local assert = assert
 local tonumber = tonumber
 local string = string
 local math = math
+local tinsert = table.insert
 
 local M = {}
 --构建玩家ID
@@ -34,6 +35,20 @@ end
 function M.get_svr_id_by_player_id(player_id)
     local offset = INCRID_LIMIT
     return math.floor(player_id / offset) % SVRID_LIMIT
+end
+
+-- 按服区分
+function M.get_svr_id_by_player_list(player_list)
+    local svr_map = {}
+    for i = 1, #player_list do
+        local player_id = player_list[i]
+        local svr_id = M.get_svr_id_by_player_id(player_id)
+        if not svr_map[svr_id] then
+            svr_map[svr_id] = {}
+        end
+        tinsert(svr_map[svr_id], player_id)
+    end
+    return svr_map
 end
 
 assert(M.get_channel_id_by_player_id(1100120021234567) == 1001)
