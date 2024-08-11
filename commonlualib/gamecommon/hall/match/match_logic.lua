@@ -1,5 +1,5 @@
 local log = require "skynet-fly.log"
-local hall_msg = require "common.msg.hall_msg"
+local hall_msg = require "gamecommon.msg.hall_msg"
 local state_data = require "skynet-fly.hotfix.state_data"
 
 local next = next
