@@ -91,7 +91,6 @@ return {
 		launch_num = 1,
 		default_arg = {
 			node_map = {
-				['logserver'] = true,
 				['hallserver'] = true,
 			},
 			watch = 'redis',  --监听redis的方式做服务发现

@@ -43,6 +43,7 @@ local g_match_loop_timer = nil
 local g_gameinfo_map = {}
 
 local function syn_game_info(cluster_name, info)
+    log.fatal("syn_game_info >>>> ", cluster_name)
     local spstr = string_util.split(cluster_name, ':')
     local svr_name, svr_id = spstr[1], tonumber(spstr[2])
 

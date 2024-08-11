@@ -2,7 +2,7 @@ local server_cfg = loadfile("../../commonlualib/common/etc/server_cfg.lua")()
 local redis_cfg = loadfile("../../commonlualib/common/etc/redis_cfg.lua")()
 local frpc_server_cfg = loadfile("../../commonlualib/common/etc/frpc_server_cfg.lua")()
 
-return {
+local cfg = {
         --共享配置
 	share_config_m = {
 		launch_seq = 1,     --启动顺序，从小到大
@@ -43,5 +43,33 @@ return {
     warn_m = {
         launch_seq = 4,
         launch_num = 1,
-    }
+    },
+
+	--集群客户端
+    frpc_client_m = {
+		launch_seq = 5,
+		launch_num = 1,
+		default_arg = {
+			node_map = {
+				['centerserver'] = true,    --中心服
+				['hallserver'] = true,      --大厅服
+                ['loginserver'] = true,     --日志服
+				['matchserver'] = true,		--匹配服
+				['admin_server'] = true,    --后台服
+
+				--游戏服
+				['chinese_chess'] = true,   --中国象棋
+				['digitalbomb'] = true,     --数字炸弹
+
+				--游戏机器人
+				['chinese_chess_robot'] = true, --象棋机器人
+				['digitalbomb_robot'] = true,   --数字炸弹机器人
+			},
+			watch = 'redis',  --监听redis的方式做服务发现
+		}
+	},
 }
+
+cfg.warn_m.default_arg = cfg.frpc_client_m.default_arg
+
+return cfg

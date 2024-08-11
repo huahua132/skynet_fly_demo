@@ -13,7 +13,7 @@ return function(group)
         local instance = frpc_client:instance("logserver","warn_m"):set_svr_id(1)
         local ret = instance:byid_mod_call('read', pre_day)
         local context = ret.result
-        log.info("warnlog_router:", context)
+        
         local result = nil
         if context then
             result = "OK"

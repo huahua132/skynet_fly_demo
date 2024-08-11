@@ -63,7 +63,6 @@ return {
 			node_map = {
 				['centerserver'] = true,    --中心服
 				['hallserver'] = true,      --大厅服
-				['logserver'] = true,       --日志服
 			},
 			watch = 'redis',  --监听redis的方式做服务发现
 		}

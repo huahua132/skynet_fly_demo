@@ -1,9 +1,19 @@
 local base = require "common.rpc.hallserver.base"
+local player_util = require "common.utils.player"
 local frpc_client = require "skynet-fly.client.frpc_client"
+local contriner_client = require "skynet-fly.client.contriner_client"
 local string_util = require "skynet-fly.utils.string_util"
+local env_util = require "skynet-fly.utils.env_util"
+local table_util = require "skynet-fly.utils.table_util"
+local log = require "skynet-fly.log"
+
+contriner_client:register("room_game_hall_m")
 
 local tonumber = tonumber
 local table = table
+local pairs = pairs
+
+local g_svr_id = env_util.get_svr_id()
 
 local M = {}
 
@@ -67,6 +77,29 @@ end
 function M.add_game_record(player_id, date, id, is_win, game_id, svr_id)
     local cli = base.hallserver_player_m(player_id)
     cli:byid_mod_send("add_game_record", player_id, date, id, is_win, game_id, svr_id)
+end
+
+--获取玩家信息
+function M.get_players_info(player_list, field_map)
+    local svr_map = player_util.get_svr_id_by_player_list(player_list)
+    local res = {}
+    for svr_id, list in pairs(svr_map) do
+        --本服
+        if svr_id == g_svr_id then
+            local ret_map = contriner_client:instance("room_game_hall_m"):balance_call("player_get_players_info", list, field_map)
+            table_util.merge(res, ret_map)
+        else
+        --其他服
+            local ret_map = frpc_client:instance("hallserver", "room_game_hall_m"):set_svr_id(svr_id):byid_balance_call("player_get_players_info", list, field_map)
+            if not ret_map then
+                log.error_fmt("get_players_info call err svr_id = %s", svr_id)
+            else
+                table_util.merge(res, ret_map)
+            end
+        end
+    end
+
+    return res
 end
 
 return M

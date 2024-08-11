@@ -46,6 +46,16 @@ function CMD.get_all_online()
     return player_logic.cmd_get_all_online()
 end
 
+--批量获取玩家字段信息
+function CMD.player_get_players_info(player_list, field_list)
+    return player_logic.cmd_get_players_info(player_list, field_list)
+end
+
+--批量获取本server下的玩家字段信息
+function CMD.player_get_players_info_by_local(player_list, field_list)
+    return player_logic.cmd_get_players_info_by_local(player_list, field_list)
+end
+
 M.register_cmd = CMD
 
 return M
