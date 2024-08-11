@@ -2,7 +2,7 @@ local skynet = require "skynet"
 local pb_netpack = require "skynet-fly.netpack.pb_netpack"
 local module_cfg = require "skynet-fly.etc.module_info".get_cfg()
 local table_logic = require "table.table_logic"
-local errors_msg = require "gamecommon.msg.errors_msg"
+local errors_msg = require "common.msg.errors_msg"
 local log = require "skynet-fly.log"
 local ws_pbnet_util = require "skynet-fly.utils.net.ws_pbnet_util"
 

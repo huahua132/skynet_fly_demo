@@ -1,5 +1,5 @@
 local log = require "skynet-fly.log"
-local errors_msg = require "gamecommon.msg.errors_msg"
+local errors_msg = require "common.msg.errors_msg"
 local game_msg = require "msg.game_msg"
 local GAME_STATE = require "enum.GAME_STATE"
 local timer = require "skynet-fly.timer"
