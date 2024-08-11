@@ -25,6 +25,7 @@ M.disconn_time_out = timer.minute                   --掉线一分钟就清理
 function M.init(interface_mgr)
 	--加载协议
 	pb_netpack.load('../../commonlualib/gamecommon/proto')
+	pb_netpack.load('../../commonlualib/common/proto')
 	pb_netpack.load('./proto')
 	g_interface_mgr = interface_mgr
 	errors_msg = errors_msg:new(interface_mgr)
