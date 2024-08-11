@@ -287,6 +287,7 @@ function CMD.start(config)
     g_config = config
     --加载pb协议
     pb_netpack.load('../../commonlualib/gamecommon/proto')
+    pb_netpack.load('../../commonlualib/common/proto')
 	pb_netpack.load('../../world/hallserver/proto')
     game:init()
     return true
