@@ -53,14 +53,14 @@ function M:on_connect(player_id, table_id, token, send_msg)
         token = token,
         player_id = player_id,
     }
-    send_msg('.game_login.LoginReq', login_req)
+    send_msg('.login.LoginReq', login_req)
 end
 
 --消息处理
 function M:on_handle(packname, packbody)
     local HANDLE_FUNC = {}
      --游戏服登录成功
-     HANDLE_FUNC['.game_login.LoginRes'] = function(body)
+     HANDLE_FUNC['.login.LoginRes'] = function(body)
         --发送心跳包
         if self.m_heart_timer then
             self.m_heart_timer:cancel()
