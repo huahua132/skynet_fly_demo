@@ -88,8 +88,10 @@ function M.on_login(player_id)
     elseif time_util.is_cross_day(player_info.last_logout_time) then
         skynet.fork(event_mgr.publish, EVENT_ID.CROSS_DAY, player_id)                         --跨天事件
     end
-    player_info.last_login_time = time_util.time()                      --更新最后一次登录的时间
-    g_player_entity:change_save_one_entry(player_info)
+    player_info.last_login_time = time_util.time()                                            --更新最后一次登录的时间
+
+    --保存数据
+    g_player_entity:change_save_one_entry({player_id = player_id, last_login_time = player_info.last_login_time})
 end
 
 --登出
@@ -108,6 +110,8 @@ function M.on_loginout(player_id)
             break
         end
     end
+
+    g_player_entity:change_save_one_entry({player_id = player_id, last_logout_time = player_info.last_logout_time})
 end
 
 --重连
