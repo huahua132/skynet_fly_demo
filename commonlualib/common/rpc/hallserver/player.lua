@@ -7,8 +7,6 @@ local env_util = require "skynet-fly.utils.env_util"
 local table_util = require "skynet-fly.utils.table_util"
 local log = require "skynet-fly.log"
 
-contriner_client:register("room_game_hall_m")
-
 local tonumber = tonumber
 local table = table
 local pairs = pairs
