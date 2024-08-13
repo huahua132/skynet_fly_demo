@@ -12,6 +12,7 @@ local table = table
 local pairs = pairs
 
 local g_svr_id = env_util.get_svr_id()
+local g_svr_name = env_util.get_svr_name()
 
 local M = {}
 
@@ -83,7 +84,7 @@ function M.get_players_info(player_list, field_map)
     local res = {}
     for svr_id, list in pairs(svr_map) do
         --本服
-        if svr_id == g_svr_id then
+        if g_svr_name == "hallserver" and svr_id == g_svr_id then
             local ret_map = contriner_client:instance("room_game_hall_m"):balance_call("player_get_players_info", list, field_map)
             table_util.merge(res, ret_map)
         else
