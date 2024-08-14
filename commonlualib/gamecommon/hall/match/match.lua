@@ -1,6 +1,7 @@
 
 local match_logic = hotfix_require "gamecommon.hall.match.match_logic"
 
+local PACK = require "common.pack_helper".PACK
 
 local M = {}
 
@@ -10,7 +11,7 @@ end
 
 M.handle = {
     --匹配
-    ['.game_hall.JoinReq'] = function(player_id, packname, pack_body)
+    [PACK.game_hall.JoinReq] = function(player_id, pack_id, pack_body)
        return match_logic.do_join(player_id, pack_body)
     end,
 }

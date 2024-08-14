@@ -1,5 +1,7 @@
 local setmetatable = setmetatable
 
+local PACK = require "common.pack_helper".PACK
+
 local M = {}
 local meta = {__index = M}
 
@@ -12,23 +14,23 @@ function M:new(interface_mgr)
 end
 
 function M:match_game_res(player_id, res)
-	self.interface_mgr:send_msg(player_id, '.hallserver_match.MatchGameRes', res)
+	self.interface_mgr:send_msg(player_id, PACK.hallserver_match.MatchGameRes, res)
 end
 
 function M:cancel_match_game_res(player_id, res)
-	self.interface_mgr:send_msg(player_id, '.hallserver_match.CancelMatchGameRes', res)
+	self.interface_mgr:send_msg(player_id, PACK.hallserver_match.CancelMatchGameRes, res)
 end
 
 function M:match_game_notice(player_id, res)
-	self.interface_mgr:send_msg(player_id, '.hallserver_match.MatchGameNotice', res)
+	self.interface_mgr:send_msg(player_id, PACK.hallserver_match.MatchGameNotice, res)
 end
 
 function M:accept_match_res(player_id, res)
-	self.interface_mgr:send_msg(player_id, '.hallserver_match.AcceptMatchRes', res)
+	self.interface_mgr:send_msg(player_id, PACK.hallserver_match.AcceptMatchRes, res)
 end
 
 function M:join_game_notice(player_id, res)
-    self.interface_mgr:send_msg(player_id, '.hallserver_match.JoinGameNotice', res)
+    self.interface_mgr:send_msg(player_id, PACK.hallserver_match.JoinGameNotice, res)
 end
 
 return M

@@ -1,8 +1,24 @@
 local skynet = require "skynet"
 local pb_netpack = require "skynet-fly.netpack.pb_netpack"
-local ws_pbnet_util = require "skynet-fly.utils.net.ws_pbnet_util"
+local ws_pbnet_byid = require "skynet-fly.utils.net.ws_pbnet_byid"
 local log = require "skynet-fly.log"
 local module_cfg = require "skynet-fly.etc.module_info".get_cfg()
+local pack_helper = require "common.pack_helper"
+
+do
+	pb_netpack.load('../../commonlualib/gamecommon/proto')
+	pb_netpack.load('../../commonlualib/common/proto')
+	pb_netpack.load('./proto')
+
+	pack_helper.set_pack_id_names({
+		'../../commonlualib/gamecommon/enum/',
+		'../../commonlualib/common/enum/',
+		'./enum/',
+	})
+end
+
+local PACK = pack_helper.PACK
+
 local errors_msg = require "common.msg.errors_msg"
 local table_logic = hotfix_require "table.table_logic"
 
@@ -23,13 +39,11 @@ local g_interface_mgr = nil
 function M.init(interface_mgr)
 	g_interface_mgr = interface_mgr
 	assert(module_cfg.table_conf.player_num,"not player_num")
-	pb_netpack.load('../../commonlualib/gamecommon/proto')
-	pb_netpack.load('../../commonlualib/common/proto')
-	pb_netpack.load('./proto')
+	
 end
 
-M.ws_send = ws_pbnet_util.send
-M.ws_broadcast = ws_pbnet_util.broadcast
+M.ws_send = ws_pbnet_byid.send
+M.ws_broadcast = ws_pbnet_byid.broadcast
 
 --游戏桌子创建者
 function M.table_creator(table_id)
@@ -57,18 +71,18 @@ function M.table_creator(table_id)
 		--消息分发处理
 		handle = {
 			--玩家请求游戏状态数据
-			['.chinese_chess_game.gameStateReq'] = function(player_id, packname, pack_body)
-				return m_logic:game_state_req(player_id, packname, pack_body)
+			[PACK.chinese_chess_game.gameStateReq] = function(player_id, pack_id, pack_body)
+				return m_logic:game_state_req(player_id, pack_id, pack_body)
 			end,
-			['.chinese_chess_game.moveReq'] = function (player_id, packname, pack_body)
-				return m_logic:move_req(player_id, packname, pack_body)
+			[PACK.chinese_chess_game.moveReq] = function (player_id, pack_id, pack_body)
+				return m_logic:move_req(player_id, pack_id, pack_body)
 			end
 		},
 
-		handle_end = function(player_id, packname, pack_body, ret, errcode, errmsg)
-			--log.info("handle_end >>> ", player_id, packname, ret, errcode, errmsg)
+		handle_end = function(player_id, pack_id, pack_body, ret, errcode, errmsg)
+			--log.info("handle_end >>> ", player_id, pack_id, ret, errcode, errmsg)
 			if not ret then
-				m_errors_msg:errors(player_id, errcode, errmsg, packname)
+				m_errors_msg:errors(player_id, errcode, errmsg, pack_id)
 			end
 		end,
     }

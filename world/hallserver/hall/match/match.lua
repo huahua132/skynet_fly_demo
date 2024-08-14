@@ -1,6 +1,7 @@
 
 local match_logic = hotfix_require "hall.match.match_logic"
 
+local PACK = require "common.pack_helper".PACK
 
 local M = {}
 
@@ -26,15 +27,15 @@ end
 
 M.handle = {
     --匹配
-    ['.hallserver_match.MatchGameReq'] = function(player_id, packname, pack_body)
+    [PACK.hallserver_match.MatchGameReq] = function(player_id, pack_id, pack_body)
        return match_logic.do_match_game(player_id, pack_body)
     end,
     --取消匹配
-    ['.hallserver_match.CancelMatchGameReq'] = function(player_id, packname, pack_body)
+    [PACK.hallserver_match.CancelMatchGameReq] = function(player_id, pack_id, pack_body)
         return match_logic.do_cancel_match_game(player_id, pack_body)
     end,
     --接受对局
-    ['.hallserver_match.AcceptMatchReq'] = function(player_id, packname, pack_body)
+    [PACK.hallserver_match.AcceptMatchReq] = function(player_id, pack_id, pack_body)
         return match_logic.do_accept_match(player_id, pack_body)
     end,
 }

@@ -3,6 +3,24 @@ local log = require "skynet-fly.log"
 local pb_netpack = require "skynet-fly.netpack.pb_netpack"
 local timer = require "skynet-fly.timer"
 local time_util = require "skynet-fly.utils.time_util"
+local pack_helper = require "common.pack_helper"
+
+
+local game_pack = pb_netpack.instance("game")
+local game_helper = pack_helper.instance("game", game_pack)
+do
+    game_pack.load('../../commonlualib/common/proto')
+    game_pack.load('../../commonlualib/gamecommon/proto')
+    game_pack.load('../../games/digitalbomb/proto')
+     --协议码 协议消息名建立映射关系
+     game_helper.set_pack_id_names {
+        "../../commonlualib/common/enum/",
+        "../../commonlualib/gamecommon/enum/",
+        "../../games/digitalbomb/enum/",
+    }
+end
+
+local PACK = game_helper.PACK
 
 local setmetatable = setmetatable
 local math = math
@@ -12,7 +30,6 @@ local mt = {__index = M}
 
 --初始化
 function M:init()
-    pb_netpack.load('../../games/digitalbomb/proto')
 end
 
 --新建
@@ -53,14 +70,14 @@ function M:on_connect(player_id, table_id, token, send_msg)
         token = token,
         player_id = player_id,
     }
-    send_msg('.login.LoginReq', login_req)
+    send_msg(PACK.login.LoginReq, login_req)
 end
 
 --消息处理
-function M:on_handle(packname, packbody)
+function M:on_handle(pack_id, packbody)
     local HANDLE_FUNC = {}
      --游戏服登录成功
-     HANDLE_FUNC['.login.LoginRes'] = function(body)
+     HANDLE_FUNC[PACK.login.LoginRes] = function(body)
         --发送心跳包
         if self.m_heart_timer then
             self.m_heart_timer:cancel()
@@ -71,38 +88,38 @@ function M:on_handle(packname, packbody)
         }
         self.m_heart_timer = timer:new(timer.second * 5, 0, function()
             heart_req.time = time_util.time()
-            self.m_send_msg('.game_hall.HeartReq', heart_req)
+            self.m_send_msg(PACK.game_hall.HeartReq, heart_req)
         end)
 
         if body.isreconnect == 1 then   --如果是重连
             --请求游戏状态
-            self.m_send_msg('.digitalbomb_game.GameStatusReq', {
+            self.m_send_msg(PACK.digitalbomb_game.GameStatusReq, {
                 player_id = self.m_player_id
             })
         else                            --首次进入
             --请求进入桌子
-            self.m_send_msg('.game_hall.JoinReq', {
+            self.m_send_msg(PACK.game_hall.JoinReq, {
                 table_id = self.m_table_id
             })
         end
     end
 
     --进入桌子成功
-    HANDLE_FUNC['.game_hall.JoinRes'] = function()
+    HANDLE_FUNC[PACK.game_hall.JoinRes] = function()
         --请求游戏状态
-        self.m_send_msg('.digitalbomb_game.GameStatusReq', {
+        self.m_send_msg(PACK.digitalbomb_game.GameStatusReq, {
             player_id = self.m_player_id
         })
     end
 
     --游戏状态数据
-    HANDLE_FUNC['.digitalbomb_game.GameStatusRes'] = function(body)
+    HANDLE_FUNC[PACK.digitalbomb_game.GameStatusRes] = function(body)
         self.m_game_data = body
         self:check_doing()
     end
 
     --通知操作
-    HANDLE_FUNC['.digitalbomb_game.NextDoingCast'] = function(body)
+    HANDLE_FUNC[PACK.digitalbomb_game.NextDoingCast] = function(body)
         if not self.m_game_data then
             return
         end
@@ -110,9 +127,9 @@ function M:on_handle(packname, packbody)
         self:check_doing()
     end
 
-    local handle = HANDLE_FUNC[packname]
+    local handle = HANDLE_FUNC[pack_id]
     if not handle then
-        --log.error("drop game packname = ", packname)
+        --log.error("drop game pack_id = ", pack_id)
     else
         handle(packbody)
     end
@@ -129,7 +146,7 @@ function M:doing()
     local opt_num = math.random(min_num, max_num)
 
     --log.info("doing:", one_can_move, pos_index, row, col)
-    self.m_send_msg('.digitalbomb_game.DoingReq', {
+    self.m_send_msg(PACK.digitalbomb_game.DoingReq, {
         opt_num = opt_num
     })
 end

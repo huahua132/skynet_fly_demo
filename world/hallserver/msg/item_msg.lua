@@ -1,5 +1,7 @@
 local setmetatable = setmetatable
 
+local PACK = require "common.pack_helper".PACK
+
 local M = {}
 local meta = {__index = M}
 
@@ -13,7 +15,7 @@ end
 
 function M:item_list_notice(player_id, res)
 	if self.interface_mgr:is_online(player_id) then
-    	self.interface_mgr:send_msg(player_id, '.hallserver_item.ItemListNotice', res)
+    	self.interface_mgr:send_msg(player_id, PACK.hallserver_item.ItemListNotice, res)
 	end
 end
 

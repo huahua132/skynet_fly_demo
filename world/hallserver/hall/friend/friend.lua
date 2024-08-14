@@ -1,6 +1,8 @@
 
 local friend_logic = hotfix_require "hall.friend.friend_logic"
 
+local PACK = require "common.pack_helper".PACK
+
 --[[
     好友系统
     提供功能：
@@ -32,7 +34,7 @@ function M.on_disconnect(player_id)
 end
 
 M.handle = {
-    ['hallserver_friend.FriendListReq'] = function(player_id, packname, pack_body)
+    [PACK.hallserver_friend.FriendListReq] = function(player_id, pack_id, pack_body)
         return friend_logic.friend_list_req(player_id, pack_body)
     end
 }
