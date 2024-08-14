@@ -7,13 +7,34 @@ local CHANNEL = require "common.enum.CHANNEL"
 local CODE = require "common.enum.CODE"
 local websocket = require "http.websocket"
 local socket = require "skynet.socket"
-local ws_pbnet_util = require "skynet-fly.utils.net.ws_pbnet_util"
+local ws_pbnet_byid = require "skynet-fly.utils.net.ws_pbnet_byid"
 local pb_netpack = require "skynet-fly.netpack.pb_netpack"
 local time_util = require "skynet-fly.utils.time_util"
 local GAME_ID_ENUM = require "common.enum.GAME_ID_ENUM"
 local errorcode = require "common.enum.errorcode"
+local pack_helper = require "common.pack_helper"
+
+local hall_pack = pb_netpack.instance("hall")
+local game_pack = pb_netpack.instance("game")
+local hall_helper = pack_helper.instance("hall", hall_pack)
+do
+    --加载pb协议
+    hall_pack.load('../../commonlualib/common/proto')
+    hall_pack.load('../../world/hallserver/proto')
+
+    --协议码 协议消息名建立映射关系
+    hall_helper.set_pack_id_names {
+        "../../commonlualib/common/enum/",
+        "../../world/hallserver/enum/",
+    }
+end
+
+local hall_net = ws_pbnet_byid.new("hall", hall_pack)
+local game_net = ws_pbnet_byid.new("game", game_pack)
 
 local game = require "scene.game"
+
+local PACK = hall_helper.PACK
 
 local g_config = nil
 
@@ -70,18 +91,18 @@ local function create_one_robot_logic(idx)
     local m_game_scene = game:new()
 
     --给游戏服发送消息
-    local function send_game_msg(packname, packbody)
+    local function send_game_msg(pack_id, packbody)
         if m_game_fd then
-            ws_pbnet_util.send(nil, m_game_fd, packname, packbody)
+            game_net.send(nil, m_game_fd, pack_id, packbody)
         else
             --.warn("给游戏服发送消息 连接不存在 ", idx, m_player_id)
         end
     end
 
     --给大厅服发送消息
-    local function send_hall_msg(packname, packbody)
+    local function send_hall_msg(pack_id, packbody)
         if m_hall_fd then
-            ws_pbnet_util.send(nil, m_hall_fd, packname, packbody)
+            hall_net.send(nil, m_hall_fd, pack_id, packbody)
         else
             --log.warn("给大厅服发送消息 连接不存在 ", idx, m_player_id)
         end
@@ -89,7 +110,7 @@ local function create_one_robot_logic(idx)
 
     local m_HALL_SERVER_HANDLE = {}
     --登录大厅成功
-    m_HALL_SERVER_HANDLE['.login.LoginRes'] = function(body)
+    m_HALL_SERVER_HANDLE[PACK.login.LoginRes] = function(body)
         m_hall_matching = false
         --登录大厅成功
         m_state = STATE_ENUM.ONLINE_HALL
@@ -103,23 +124,23 @@ local function create_one_robot_logic(idx)
         }
         m_hall_heart_timer = timer:new(timer.second * 5, 0, function()
             heart_req.time = time_util.time()
-            send_hall_msg('.hallserver_player.HeartReq', heart_req)
+            send_hall_msg(PACK.hallserver_player.HeartReq, heart_req)
         end)
     end
 
     --请求匹配成功
-    m_HALL_SERVER_HANDLE['.hallserver_match.MatchGameRes'] = function(body)
+    m_HALL_SERVER_HANDLE[PACK.hallserver_match.MatchGameRes] = function(body)
         m_hall_matching = true
     end
 
     --通知匹配成功
-    m_HALL_SERVER_HANDLE['.hallserver_match.MatchGameNotice'] = function(body)
+    m_HALL_SERVER_HANDLE[PACK.hallserver_match.MatchGameNotice] = function(body)
         --请求接受匹配
-        timer:new(math.random(1, 10) * timer.second, 1, send_hall_msg, '.hallserver_match.AcceptMatchReq', body)
+        timer:new(math.random(1, 10) * timer.second, 1, send_hall_msg, PACK.hallserver_match.AcceptMatchReq, body)
     end
     
     --通知进入游戏
-    m_HALL_SERVER_HANDLE['.hallserver_match.JoinGameNotice'] = function(body)
+    m_HALL_SERVER_HANDLE[PACK.hallserver_match.JoinGameNotice] = function(body)
         local host = body.gamehost
         local token = body.gametoken
 
@@ -134,8 +155,8 @@ local function create_one_robot_logic(idx)
 
             m_game_scene:on_connect(m_player_id, m_game_table_id, token, send_game_msg)
             --监听游戏服消息
-            ws_pbnet_util.recv(m_game_fd, function(_,packname,packbody)
-                m_game_scene:on_handle(packname, packbody)
+            game_net.recv(m_game_fd, function(_,pack_id,packbody)
+                m_game_scene:on_handle(pack_id, packbody)
             end)
 
             m_state = STATE_ENUM.GAMEING
@@ -145,21 +166,21 @@ local function create_one_robot_logic(idx)
     end
 
     --错误消息处理
-    m_HALL_SERVER_HANDLE['.errors.Error'] = function(body)
+    m_HALL_SERVER_HANDLE[PACK.errors.Error] = function(body)
         local code = body.code
         local _ = body.msg
-        local _ = body.packname
+        local _ = body.pack_id
         if code == errorcode.MATCHING then
             m_hall_matching = true
         end
     end
 
-    local function hallserver_handle(_,packname,packbody)
+    local function hallserver_handle(_,pack_id,packbody)
         --大厅服消息处理
-        --log.info("hallserver_handle >>> ", packname, packbody)
-        local handle = m_HALL_SERVER_HANDLE[packname]
+        --log.info("hallserver_handle >>> ", pack_id, packbody)
+        local handle = m_HALL_SERVER_HANDLE[pack_id]
         if not handle then
-            --log.error("drop hallserver_handle packname = ", packname)
+            --log.error("drop hallserver_handle pack_id = ", pack_id)
         else
             handle(packbody)
         end
@@ -200,13 +221,13 @@ local function create_one_robot_logic(idx)
                 end)
 
                 --监听大厅服消息
-                ws_pbnet_util.recv(m_hall_fd, hallserver_handle)
+                hall_net.recv(m_hall_fd, hallserver_handle)
                 --请求登录
                 local login_req = {
                     token = token,
                     player_id = m_player_id,
                 }
-                send_hall_msg('.login.LoginReq', login_req)
+                send_hall_msg(PACK.login.LoginReq, login_req)
             else
                 log.error("连接大厅失败 ", host)
                 skynet.sleep(math.random(timer.second * 5, timer.second * 15))
@@ -253,7 +274,7 @@ local function create_one_robot_logic(idx)
         end
         --匹配游戏
         if not m_hall_matching then
-            send_hall_msg('.hallserver_match.MatchGameReq', {game_id = GAME_ID_ENUM[g_config.game_name]})
+            send_hall_msg(PACK.hallserver_match.MatchGameReq, {game_id = GAME_ID_ENUM[g_config.game_name]})
         end
     end
 
@@ -285,10 +306,6 @@ end
 
 function CMD.start(config)
     g_config = config
-    --加载pb协议
-    pb_netpack.load('../../commonlualib/gamecommon/proto')
-    pb_netpack.load('../../commonlualib/common/proto')
-	pb_netpack.load('../../world/hallserver/proto')
     game:init()
     return true
 end

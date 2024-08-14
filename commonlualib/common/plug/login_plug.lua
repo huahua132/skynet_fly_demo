@@ -1,48 +1,56 @@
 local log = require "skynet-fly.log"
-local ws_pbnet_util = require "skynet-fly.utils.net.ws_pbnet_util"
+local ws_pbnet_byid = require "skynet-fly.utils.net.ws_pbnet_byid"
 local pb_netpack = require "skynet-fly.netpack.pb_netpack"
-local errors_msg = require "common.msg.errors_msg"
-local login_msg = require "common.msg.login_msg"
 local errorcode = require "common.enum.errorcode"
 local timer = require "skynet-fly.timer"
 local contriner_client = require "skynet-fly.client.contriner_client"
+local pack_helper = require "common.pack_helper"
+local module_info = require "skynet-fly.etc.module_info"
 
 contriner_client:register("token_m")
 
+do
+	--加载pb文件
+	pb_netpack.load('../../commonlualib/common/proto')
+
+	--协议码 协议消息名建立映射关系
+	pack_helper.set_pack_id_names {
+		"../../commonlualib/common/enum/",
+	}
+end
+
 local assert = assert
 
-local g_login_req_pack_name = assert(login_msg.login_req_pack_name, "not exists login_req_pack_name")
+local errors_msg = require "common.msg.errors_msg"
+local login_msg = require "common.msg.login_msg"
+local g_login_req_pack_id = assert(login_msg.login_req_pack_id, "not exists g_login_req_pack_id")
 
 local M = {}
 
 --登录检测的超时时间
 M.time_out = timer.second * 5
 --解包函数
-M.ws_unpack = ws_pbnet_util.unpack
+M.ws_unpack = ws_pbnet_byid.unpack
 --发包函数
-M.ws_send = ws_pbnet_util.send
+M.ws_send = ws_pbnet_byid.send
 --广播函数
-M.ws_broadcast = ws_pbnet_util.broadcast
+M.ws_broadcast = ws_pbnet_byid.broadcast
 
 function M.init(interface_mgr)
-	--加载pb文件
-	pb_netpack.load('../../commonlualib/gamecommon/proto')
-	pb_netpack.load('../../commonlualib/common/proto')
-	pb_netpack.load('./proto')
 	login_msg = login_msg:new(interface_mgr)
 	errors_msg = errors_msg:new(interface_mgr)
 end
 
---登录检测函数 packname,pack_body是解包函数返回的
+--登录检测函数 pack_id,pack_body是解包函数返回的
 --登入成功后返回玩家id
-function M.check(packname,pack_body)
-	if not packname then
-		log.error("unpack err ",packname,pack_body)
+function M.check(pack_id,pack_body)
+	if not pack_id then
+		log.error("unpack err ",pack_id,pack_body)
 		return false,errorcode.PROTOCOL_ERR,"PROTOCOL_ERR"
 	end
 	--检测是不是登录请求
-	if packname ~= g_login_req_pack_name then
-		log.error("login_check msg err ",packname)
+	if pack_id ~= g_login_req_pack_id then
+		log.error("login_check msg err ",pack_id)
 		return false,errorcode.NOT_LOGIN,"not login"
 	end
 
@@ -64,7 +72,7 @@ end
 
 --登录失败
 function M.login_failed(player_id, errcode, errmsg)
-	errors_msg:errors(player_id, errcode, errmsg, g_login_req_pack_name)
+	errors_msg:errors(player_id, errcode, errmsg, g_login_req_pack_id)
 end
 
 --登录成功

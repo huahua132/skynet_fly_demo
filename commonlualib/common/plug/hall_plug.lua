@@ -1,10 +1,32 @@
 
 local log = require "skynet-fly.log"
-local ws_pbnet_util = require "skynet-fly.utils.net.ws_pbnet_util"
+local ws_pbnet_byid = require "skynet-fly.utils.net.ws_pbnet_byid"
 local pb_netpack = require "skynet-fly.netpack.pb_netpack"
 local timer = require "skynet-fly.timer"
-local errors_msg = require "common.msg.errors_msg"
 local skynet = require "skynet"
+local module_info = require "skynet-fly.etc.module_info"
+local pack_helper = require "common.pack_helper"
+do
+	--加载协议
+	local cfg = module_info.get_cfg()
+	if cfg.is_game then
+		pb_netpack.load('../../commonlualib/gamecommon/proto')
+		pack_helper.set_pack_id_names {
+			"../../commonlualib/gamecommon/enum/",
+		}
+	end
+
+	pb_netpack.load('../../commonlualib/common/proto')
+	pb_netpack.load('./proto')
+
+	--协议码 协议消息名建立映射关系
+	pack_helper.set_pack_id_names {
+		"../../commonlualib/common/enum/",
+		"./enum/",
+	}
+end
+
+local errors_msg = require "common.msg.errors_msg"
 local g_modules_list = require "hall.hall"
 
 local assert = assert
@@ -16,25 +38,21 @@ local g_interface_mgr = nil
 local M = {}
 
 --指定解包函数
-M.ws_unpack = ws_pbnet_util.unpack
-M.ws_send = ws_pbnet_util.send
-M.ws_broadcast = ws_pbnet_util.broadcast
+M.ws_unpack = ws_pbnet_byid.unpack
+M.ws_send = ws_pbnet_byid.send
+M.ws_broadcast = ws_pbnet_byid.broadcast
 M.disconn_time_out = timer.minute                   --掉线一分钟就清理
 
 --初始化
 function M.init(interface_mgr)
-	--加载协议
-	pb_netpack.load('../../commonlualib/gamecommon/proto')
-	pb_netpack.load('../../commonlualib/common/proto')
-	pb_netpack.load('./proto')
 	g_interface_mgr = interface_mgr
 	errors_msg = errors_msg:new(interface_mgr)
 
 	--注册handle
 	for _, m in ipairs(g_modules_list) do
 		local handle = m.handle
-		for packname,func in pairs(handle) do
-			g_interface_mgr:handle(packname, func)
+		for pack_id,func in pairs(handle) do
+			g_interface_mgr:handle(pack_id, func)
 		end
 	end
 
@@ -95,20 +113,22 @@ end
 
 M.register_cmd = {}
 
---设置CMD命令
-for _, m in ipairs(g_modules_list) do
-	local register_cmd = m.register_cmd
-	for cmdname,func in pairs(register_cmd) do
-		assert(not M.register_cmd[cmdname], "exists cmdname: " .. cmdname)
-		M.register_cmd[cmdname] = func
+do
+	--设置CMD命令
+	for _, m in ipairs(g_modules_list) do
+		local register_cmd = m.register_cmd
+		for cmdname,func in pairs(register_cmd) do
+			assert(not M.register_cmd[cmdname], "exists cmdname: " .. cmdname)
+			M.register_cmd[cmdname] = func
+		end
 	end
 end
 
 -- 客户端消息处理结束
-function M.handle_end(player_id, packname, pack_body, ret, errcode, errmsg)
+function M.handle_end(player_id, pack_id, pack_body, ret, errcode, errmsg)
 	if not ret then
-		log.info("handle_end err >>> ", packname, ret, errcode, errmsg)
-		errors_msg:errors(player_id, errcode, errmsg, packname)
+		log.info("handle_end err >>> ", pack_id, ret, errcode, errmsg)
+		errors_msg:errors(player_id, errcode, errmsg, pack_id)
 	end
 end
 

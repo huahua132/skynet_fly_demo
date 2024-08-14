@@ -1,10 +1,27 @@
 local skynet = require "skynet"
 local pb_netpack = require "skynet-fly.netpack.pb_netpack"
 local module_cfg = require "skynet-fly.etc.module_info".get_cfg()
+local log = require "skynet-fly.log"
+local ws_pbnet_byid = require "skynet-fly.utils.net.ws_pbnet_byid"
+
+local pack_helper = require "common.pack_helper"
+
+do
+	pb_netpack.load('../../commonlualib/gamecommon/proto')
+	pb_netpack.load('../../commonlualib/common/proto')
+	pb_netpack.load('./proto')
+
+	pack_helper.set_pack_id_names({
+		'../../commonlualib/gamecommon/enum/',
+		'../../commonlualib/common/enum/',
+		'./enum/',
+	})
+end
+
+local PACK = pack_helper.PACK
+
 local table_logic = require "table.table_logic"
 local errors_msg = require "common.msg.errors_msg"
-local log = require "skynet-fly.log"
-local ws_pbnet_util = require "skynet-fly.utils.net.ws_pbnet_util"
 
 local assert = assert
 
@@ -18,18 +35,15 @@ local MINE_MAX = 100
 
 local M = {}
 
-M.ws_send = ws_pbnet_util.send
+M.ws_send = ws_pbnet_byid.send
 --广播函数
-M.ws_broadcast = ws_pbnet_util.broadcast
+M.ws_broadcast = ws_pbnet_byid.broadcast
 
 function M.init(interface_mgr)
 	g_interface_mgr = interface_mgr
     g_table_conf.mine_min = MINE_MIN
     g_table_conf.mine_max = MINE_MAX
 	assert(g_table_conf.player_num,"not player_num")
-	pb_netpack.load('../../commonlualib/gamecommon/proto')
-	pb_netpack.load('../../commonlualib/common/proto')
-	pb_netpack.load('./proto')
 end
 
 function M.table_creator(table_id)
@@ -55,18 +69,18 @@ function M.table_creator(table_id)
 		end,
         
 		handle = {
-			['.digitalbomb_game.DoingReq'] = function(player_id,packname,pack_body)
-                m_logic:doing_req(player_id,packname,pack_body)
+			[PACK.digitalbomb_game.DoingReq] = function(player_id,pack_id,pack_body)
+                m_logic:doing_req(player_id,pack_id,pack_body)
 			end,
 
-			['.digitalbomb_game.GameStatusReq'] = function(player_id,packname,pack_body)
-				m_logic:game_status_req(player_id,packname,pack_body)
+			[PACK.digitalbomb_game.GameStatusReq] = function(player_id,pack_id,pack_body)
+				m_logic:game_status_req(player_id,pack_id,pack_body)
 			end
 		},
-		handle_end = function(player_id, packname, pack_body, ret, errcode, errmsg)
-			--log.info("handle_end >>> ", player_id, packname, ret, errcode, errmsg)
+		handle_end = function(player_id, pack_id, pack_body, ret, errcode, errmsg)
+			--log.info("handle_end >>> ", player_id, pack_id, ret, errcode, errmsg)
 			if not ret then
-				m_errors_msg:errors(player_id, errcode, errmsg, packname)
+				m_errors_msg:errors(player_id, errcode, errmsg, pack_id)
 			end
 		end,
 		------------------------------------服务退出回调-------------------------------------

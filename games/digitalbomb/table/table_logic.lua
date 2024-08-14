@@ -193,7 +193,7 @@ end
 -----------------------------------------------------------------------
 --client req
 -----------------------------------------------------------------------
-function M:doing_req(player_id, packname, pack_body)
+function M:doing_req(player_id, pack_id, pack_body)
     if self.m_game_state ~= GAME_STATE_ENUM.playing then
         log.info("游戏还没有开始！！！")
         return
@@ -242,7 +242,7 @@ function M:doing_req(player_id, packname, pack_body)
     return true
 end
 
-function M:game_status_req(player_id, packname, pack_body)
+function M:game_status_req(player_id, pack_id, pack_body)
     local seat_id = self.m_player_seat_map[player_id]
     if not seat_id then
         log.error("not in table ",player_id)

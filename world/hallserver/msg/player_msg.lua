@@ -1,5 +1,7 @@
 local setmetatable = setmetatable
 
+local PACK = require "common.pack_helper".PACK
+
 local M = {}
 local meta = {__index = M}
 
@@ -12,7 +14,7 @@ function M:new(interface_mgr)
 end
 
 function M:player_info_notice(player_id, res)
-    self.interface_mgr:send_msg(player_id, '.hallserver_player.PlayerInfoNotice', res)
+    self.interface_mgr:send_msg(player_id, PACK.hallserver_player.PlayerInfoNotice, res)
 end
 
 return M

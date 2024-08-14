@@ -358,8 +358,8 @@ end
 --client req
 -----------------------------------------------------------------------
 --玩家请求游戏状态数据
-function M:game_state_req(player_id, packname, pack_body)
-    --log.info("handle >>>> ", packname)
+function M:game_state_req(player_id, pack_id, pack_body)
+    --log.info("handle >>>> ", pack_id)
     local seat_id = self.m_player_seat_map[player_id]
     if not seat_id then
         log.error("player not seat_down ",player_id)
@@ -371,8 +371,8 @@ function M:game_state_req(player_id, packname, pack_body)
 end
 
 --移动棋子
-function M:move_req(player_id,packname,pack_body)
-    --log.info("move_req >>>> ", player_id,packname,pack_body)
+function M:move_req(player_id,pack_id,pack_body)
+    --log.info("move_req >>>> ", player_id,pack_id,pack_body)
     if self.m_game_state ~= GAME_STATE.playing then
         log.error("not is playing state ", self.m_game_state)
         return

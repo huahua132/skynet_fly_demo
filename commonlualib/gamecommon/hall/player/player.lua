@@ -2,6 +2,7 @@
 local player_logic = hotfix_require "gamecommon.hall.player.player_logic"
 local skynet = require "skynet"
 
+local PACK = require "common.pack_helper".PACK
 
 local M = {}
 
@@ -25,7 +26,7 @@ end
 
 M.handle = {
     --心跳
-    ['.game_hall.HeartReq'] = function(player_id, packname, pack_body)
+    [PACK.game_hall.HeartReq] = function(player_id, pack_id, pack_body)
        return player_logic.do_heart(player_id, pack_body)
     end,
 }
