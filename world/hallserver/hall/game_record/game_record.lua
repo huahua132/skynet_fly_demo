@@ -9,6 +9,11 @@ function M.init(interface_mgr)
     game_record_logic.init(interface_mgr)
 end
 
+function M.on_login(player_id)
+    game_record_logic.on_login(player_id)
+end
+
+
 M.handle = {
     [PACK.hallserver_game_record.RecordListReq] = function(player_id, pack_id, pack_body)
         return game_record_logic.do_record_list_req(player_id, pack_body)
