@@ -10,7 +10,7 @@ local g_game_record_cli = orm_table_client:new("game_record")
 
 local g_local_info = state_data.alloc_table("g_local_info")
 
-local MAX_PAGE_COUNT = 10
+local MAX_PAGE_COUNT = 100
 
 local M = {}
 
@@ -21,7 +21,11 @@ function M.init(interface_mgr)
     g_local_info.game_record_msg = game_record_msg:new(interface_mgr)
 end
 
-
+function M.on_login(player_id)
+    -- for i = 1, 100 do
+    --     g_game_record_cli:add_record(player_id, os.time() + i, "23:" .. i, 1, 1, 1, i)
+    -- end
+end
 ---------------------------客户端消息处理-------------------------------
 function M.do_record_list_req(player_id, pack_body)
     local pageage_num = pack_body.pageage_num or 0
