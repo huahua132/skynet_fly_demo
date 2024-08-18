@@ -48,7 +48,7 @@ function M.on_loginout(player_id)
 end
 
 ---------------------------客户端消息处理-------------------------------
-function M.friend_list_req(player_id, pack_body)
+function M.do_friend_list_req(player_id, pack_body)
     local pageage_num = pack_body.pageage_num or 0
     local pageage_count = pack_body.pageage_count or 0
     if pageage_num <= 0 then

@@ -24,7 +24,7 @@ function M.init()
     local adapter = ormadapter_mysql:new("hall_" .. svr_id)
     g_ormobj = ormtable:new("new_game_record")
     :int64("player_id")         --玩家id
-    :int64("create_time")       --日期
+    :int64("create_time")       --创建时间
     :string64("table_id")       --对局ID
     :int8("is_win")             --是否赢
     :uint16("game_id")          --游戏ID

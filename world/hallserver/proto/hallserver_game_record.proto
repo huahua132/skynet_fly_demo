@@ -1,0 +1,24 @@
+package hallserver_game_record;
+
+message OneRecord {
+    optional int64 create_time = 1;           //创建时间
+    optional string table_id   = 2;           //桌子ID
+    optional int32 game_id     = 3;           //游戏ID
+    optional int32 score       = 4;           //改变分数
+}
+
+//请求记录列表
+message RecordListReq {
+    optional uint32 pageage_num   = 1;      //第几页
+    optional uint32 pageage_count = 2;      //多少数量
+    optional uint32 cursor        = 3;      //游标
+}
+
+//回复记录列表
+message RecordListRes {
+    optional uint32 pageage_num = 1;        //第几页
+    optional uint32 pageage_count = 2;      //多少数量
+    optional uint32 total_count = 3;        //总数量
+    repeated OneRecord record_list = 4;     //记录列表
+    optional uint32 next_cursor = 5;        //下一个游标
+}

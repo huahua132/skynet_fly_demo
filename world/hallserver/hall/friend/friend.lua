@@ -35,7 +35,7 @@ end
 
 M.handle = {
     [PACK.hallserver_friend.FriendListReq] = function(player_id, pack_id, pack_body)
-        return friend_logic.friend_list_req(player_id, pack_body)
+        return friend_logic.do_friend_list_req(player_id, pack_body)
     end
 }
 
