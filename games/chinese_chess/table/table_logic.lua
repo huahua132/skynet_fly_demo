@@ -233,9 +233,9 @@ function M:game_over(win_seat_id)
  
     --结算积分
     --赢了加10分
-    seat_player:add_score(10)
+    local addnum = seat_player:add_score(10)
     --输了减10分
-    lose_seat_player:reduce_score(10)
+    local reducenum = lose_seat_player:reduce_score(10)
 
     local lose_player_id = lose_seat_player:get_player().player_id
 
@@ -248,9 +248,9 @@ function M:game_over(win_seat_id)
             team_type = seat_player:get_team_type(),
         }
         if info.player_id == self.m_win_player_id then
-            info.add_score = 10
+            info.add_score = addnum
         else
-            info.add_score = -10
+            info.add_score = reducenum
         end
 
         table.insert(self.m_record_info.player_info_list, info)
@@ -263,17 +263,14 @@ function M:game_over(win_seat_id)
     local record_info = self.m_record_info
     local win_player_id = self.m_win_player_id
     skynet.fork(function()
-        local date = tonumber(os.date("%Y%m%d", cur_time))
-        local id = table_id .. ':' .. cur_time
         local record = {
-            date = date,
-            id = id,
             create_time = cur_time,
+            table_id = table_id,
             details = json.encode(record_info),
         }
         if g_record_cli:create_one_entry(record) then
-            player_rpc.add_game_record(win_player_id, date, id, 1, GAME_ID_ENUM.chinese_chess, g_svr_id)
-            player_rpc.add_game_record(lose_player_id, date, id, -1, GAME_ID_ENUM.chinese_chess, g_svr_id)
+            player_rpc.add_game_record(win_player_id, cur_time, table_id, 1, GAME_ID_ENUM.chinese_chess, g_svr_id, addnum)
+            player_rpc.add_game_record(lose_player_id, cur_time, table_id, -1, GAME_ID_ENUM.chinese_chess, g_svr_id, reducenum)
         end
     end)
 

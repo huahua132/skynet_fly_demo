@@ -90,12 +90,14 @@ function M:add_score(num)
 	if num <= 0 then return end
 	local player_id = self.player.player_id
 	self.score = item.add_item(player_id, ITEM.score, num)
+
+	return num
 end
 
 --减少积分
 function M:reduce_score(num)
 	if num <= 0 then return end
-	if self.score <= 0 then return end
+	if self.score <= 0 then return 0 end
 
 	if num > self.score then
 		num = self.score
@@ -104,6 +106,8 @@ function M:reduce_score(num)
 	local player_id = self.player.player_id
 	local _
 	_,self.score = item.reduce_item(player_id, ITEM.score, num)
+
+	return num
 end
 
 --设置操作,总时长,单次时长
