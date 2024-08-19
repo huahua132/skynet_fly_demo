@@ -34,12 +34,21 @@ function M.on_disconnect(player_id)
 end
 
 M.handle = {
+    --好友列表
     [PACK.hallserver_friend.FriendListReq] = function(player_id, pack_id, pack_body)
         return friend_logic.do_friend_list_req(player_id, pack_body)
+    end,
+    --请求添加好友
+    [PACK.hallserver_friend.AddFriendReq] = function(player_id, pack_id, pack_body)
+        return friend_logic.do_add_friend_req(player_id, pack_body)
     end
 }
 
 local CMD = {}
+
+function CMD.friend_add_req(player_id, add_player_id)
+    return friend_logic.cmd_add_req(player_id, add_player_id)
+end
 
 M.register_cmd = CMD
 
