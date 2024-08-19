@@ -6,6 +6,9 @@ local tti = require "skynet-fly.cache.tti"
 local friend_msg = require "msg.friend_msg"
 local player_interface = require "hall.player.interface"
 local player_rpc = require "common.rpc.hallserver.player"
+local player_util = require "common.utils.player"
+local env_util = require "skynet-fly.utils.env_util"
+local friend_rpc = require "common.hallserver.friend"
 
 local tinsert = table.insert
 local pairs = pairs
@@ -13,9 +16,11 @@ local pairs = pairs
 local MAX_PAGE_COUNT = 20
 local CACHE_TIME = 60 * 10
 
+local g_svr_id = env_util.get_svr_id()
 local g_get_field_map = {['nickname'] = true, ['last_logout_time'] = true}
 
-local g_friend_cli = orm_table_client:instance("friend")
+local g_friend_cli = orm_table_client:instance("friend")                    --好友
+local g_friend_req_cli = orm_table_client:instance("friend_req")            --添加好友请求
 
 local g_local_info = state_data.alloc_table("g_local_info")
 
@@ -108,6 +113,57 @@ function M.do_friend_list_req(player_id, pack_body)
 
     g_local_info.friend_msg:friend_list_res(player_id, res_list)
     
+    return true
+end
+
+--请求添加好友
+function M.do_add_friend_req(player_id, pack_body)
+    local add_player_id = pack_body.player_id or 0
+    local add_svr_id = player_util.get_svr_id_by_player_id(player_id)
+    if add_svr_id <= 0 then
+        return nil, errorcode.REQ_PARAM_ERR, "invaild player_id:" .. add_player_id
+    end
+
+    if g_friend_cli:get_one_entry(player_id, add_player_id) then
+        --已经是好友了
+        return nil, errorcode.UNKOWN_ERR, "repeat add friend"
+    end
+
+    --本服
+    if g_svr_id == add_svr_id then
+        if g_friend_req_cli:get_one_entry(add_player_id, player_id) then
+            --已经发起请求了
+            return nil, errorcode.UNKOWN_ERR, "repeat add req"    
+        end
+
+        if not g_friend_req_cli:create_one_entry({req_player_id = player_id, player_id = add_player_id}) then
+            return nil, errorcode.UNKOWN_ERR, "server err"
+        end
+    else
+    --其他服
+        local ret, errno, errmsg = friend_rpc.req_add_firend(player_id, add_player_id)
+        if not ret then
+            return ret,errno, errmsg
+        end
+    end
+
+    g_local_info.friend_msg:add_friend_res(player_id, {
+        player_id = add_player_id
+    })
+    
+    return true
+end
+
+--------------------------------------CMD-----------------------------------
+function M.cmd_add_req(player_id, add_player_id)
+    if g_friend_req_cli:get_one_entry(add_player_id, player_id) then
+        --已经发起请求了
+        return nil, errorcode.UNKOWN_ERR, "repeat add req"    
+    end
+
+    if not g_friend_req_cli:create_one_entry({req_player_id = player_id, player_id = add_player_id}) then
+        return nil, errorcode.UNKOWN_ERR, "server err"
+    end
     return true
 end
 
