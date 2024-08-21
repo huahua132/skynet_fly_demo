@@ -41,13 +41,31 @@ M.handle = {
     --请求添加好友
     [PACK.hallserver_friend.AddFriendReq] = function(player_id, pack_id, pack_body)
         return friend_logic.do_add_friend_req(player_id, pack_body)
+    end,
+    --同意添加好友
+    [PACK.hallserver_friend.AgreeAddFriendReq] = function(player_id, pack_id, pack_body)
+        return friend_logic.do_agree_add_friend_req(player_id, pack_body)
+    end,
+    --拒绝添加好友
+    [PACK.hallserver_friend.RefuseAddFriendReq] = function(player_id, pack_id, pack_body)
+        return friend_logic.do_refuse_add_friend_req(player_id, pack_body)
+    end,
+    --删除好友
+    [PACK.hallserver_friend.DelFriendReq] = function(player_id, pack_id, pack_body)
+        return friend_logic.do_del_friend_req(player_id, pack_body)
     end
 }
 
 local CMD = {}
 
+--请求加好友
 function CMD.friend_add_req(player_id, add_player_id)
     return friend_logic.cmd_add_req(player_id, add_player_id)
+end
+
+--同意加好友
+function CMD.friend_agree_req(player_id, add_player_id)
+    return friend_logic.cmd_agree_req(player_id, add_player_id)
 end
 
 M.register_cmd = CMD

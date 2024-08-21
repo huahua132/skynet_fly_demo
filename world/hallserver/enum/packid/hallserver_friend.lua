@@ -6,8 +6,10 @@ local enum = {
     AddFriendRes       = 4,       --回复添加好友
     AgreeAddFriendReq  = 5,       --同意添加好友请求
     AgreeAddFriendRes  = 6,       --同意添加好友回复
-    DelFriendReq       = 7,       --删除好友请求
-    DelFriendRes       = 8,       --删除好友回复
+    RefuseAddFriendReq = 7,       --拒绝添加好友请求
+    RefuseAddFriendRes = 8,       --拒绝添加好友回复
+    DelFriendReq       = 9,       --删除好友请求
+    DelFriendRes       = 10,      --删除好友回复
 
     AddReqListNotice   = 80,      --通知请求添加好友列表
 }

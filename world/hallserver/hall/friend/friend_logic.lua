@@ -8,7 +8,7 @@ local player_interface = require "hall.player.interface"
 local player_rpc = require "common.rpc.hallserver.player"
 local player_util = require "common.utils.player"
 local env_util = require "skynet-fly.utils.env_util"
-local friend_rpc = require "common.hallserver.friend"
+local friend_rpc = require "common.rpc.hallserver.friend"
 
 local tinsert = table.insert
 local pairs = pairs
@@ -154,6 +154,87 @@ function M.do_add_friend_req(player_id, pack_body)
     return true
 end
 
+--同意添加好友
+function M.do_agree_add_friend_req(player_id, pack_body)
+    local add_player_id = pack_body.player_id or 0
+    local add_svr_id = player_util.get_svr_id_by_player_id(player_id)
+    if add_svr_id <= 0 then
+        return nil, errorcode.REQ_PARAM_ERR, "invaild player_id:" .. add_player_id
+    end
+
+    if g_friend_req_cli:get_one_entry(player_id, add_player_id) then
+        --没有发起过请求
+        return nil, errorcode.UNKOWN_ERR, "not add req"
+    end
+
+    if not g_friend_req_cli:delete_one_entry(player_id, add_player_id) then
+        return nil, errorcode.UNKOWN_ERR, "server err"
+    end
+
+    --添加为好友
+    if not g_friend_cli:create_one_entry(player_id, add_player_id) then
+        return nil, errorcode.UNKOWN_ERR, "server err"
+    end
+
+    --对方也把你加入好友列表
+    if g_svr_id == add_svr_id then
+        --同服
+        if not g_friend_cli:get_one_entry(add_player_id, player_id) then
+            if not g_friend_cli:create_one_entry(add_player_id, player_id) then
+                g_friend_cli:delete_one_entry(player_id, add_player_id)
+                return nil, errorcode.UNKOWN_ERR, "server err"
+            end
+        end
+    else
+        --不同服
+        local ret, errno, errmsg = friend_rpc.req_agree_firend(player_id, add_player_id)
+        if not ret then
+            return ret,errno, errmsg
+        end
+    end
+
+    g_local_info.friend_msg:agree_friend_res(player_id, {
+        player_id = add_player_id
+    })
+    
+    return true
+end
+
+--拒绝添加好友
+function M.do_refuse_add_friend_req(player_id, pack_body)
+    local add_player_id = pack_body.player_id or 0
+    local add_svr_id = player_util.get_svr_id_by_player_id(player_id)
+    if add_svr_id <= 0 then
+        return nil, errorcode.REQ_PARAM_ERR, "invaild player_id:" .. add_player_id
+    end
+
+    if g_friend_req_cli:get_one_entry(player_id, add_player_id) then
+        --没有发起过请求
+        return nil, errorcode.UNKOWN_ERR, "not add req"
+    end
+
+    if not g_friend_req_cli:delete_one_entry(player_id, add_player_id) then
+        return nil, errorcode.UNKOWN_ERR, "server err"
+    end
+
+    g_local_info.friend_msg:refuse_friend_res(player_id, {
+        player_id = add_player_id
+    })
+    
+    return true
+end
+
+--删除好友
+function M.do_del_friend_req(player_id, pack_body)
+    local add_player_id = pack_body.player_id or 0
+    local add_svr_id = player_util.get_svr_id_by_player_id(player_id)
+    if add_svr_id <= 0 then
+        return nil, errorcode.REQ_PARAM_ERR, "invaild player_id:" .. add_player_id
+    end
+
+    
+end
+
 --------------------------------------CMD-----------------------------------
 function M.cmd_add_req(player_id, add_player_id)
     if g_friend_req_cli:get_one_entry(add_player_id, player_id) then
@@ -164,6 +245,18 @@ function M.cmd_add_req(player_id, add_player_id)
     if not g_friend_req_cli:create_one_entry({req_player_id = player_id, player_id = add_player_id}) then
         return nil, errorcode.UNKOWN_ERR, "server err"
     end
+    return true
+end
+
+function M.cmd_agree_req(player_id, add_player_id)
+    if g_friend_cli:get_one_entry(add_player_id, player_id) then
+        return true
+    end
+
+    if not g_friend_cli:create_one_entry(add_player_id, player_id) then
+        return nil, errorcode.UNKOWN_ERR, "server err"
+    end
+
     return true
 end
 
