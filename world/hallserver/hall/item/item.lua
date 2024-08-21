@@ -1,7 +1,7 @@
 
 local item_logic = hotfix_require "hall.item.item_logic"
 
-local PACK = require "common.pack_helper".PACK
+local _ = require "common.pack_helper".PACK
 
 local M = {}
 

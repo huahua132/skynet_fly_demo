@@ -16,4 +16,15 @@ function M.req_add_firend(player_id, add_player_id)
     return table.unpack(ret.result)
 end
 
+--同意加好友
+function M.req_agree_firend(player_id, add_player_id)
+    local cli = base.hallserver_room_game_hall_m(add_player_id)
+    local ret = cli:byid_mod_call("friend_agree_req", player_id, add_player_id)
+    if not ret then
+        return nil
+    end
+
+    return table.unpack(ret.result)
+end
+
 return M
