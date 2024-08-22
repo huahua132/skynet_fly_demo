@@ -16,7 +16,7 @@
 `git submodule update --init`
 拉取skynet仓库
 ```shell
-cd skynet_sly
+cd skynet_fly
 git submodule update --init
 ```
 拉取jemalloc仓库
