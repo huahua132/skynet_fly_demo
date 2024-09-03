@@ -13,5 +13,5 @@ echo make_cmd = $make_cmd
 #此处可以 examples 的其他例子
 cd skynet_fly/examples/webapp
 bash ${make_cmd}
-bash script/restart.sh load_mods.lua
+bash make/script/restart.sh load_mods.lua
 cd ../../
