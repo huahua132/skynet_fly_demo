@@ -30,4 +30,12 @@ function M.hallserver_token_m(player_id)
     return cli
 end
 
+--大厅服的room_game_login
+function M.hallserver_room_game_login(player_id)
+    local svr_id = player_util.get_svr_id_by_player_id(player_id)
+    local cli = frpc_client:instance("hallserver", ".room_game_login")
+    cli:set_svr_id(svr_id)
+    return cli
+end
+
 return M

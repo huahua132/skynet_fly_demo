@@ -5,13 +5,13 @@ local timer = require "skynet-fly.timer"
 local redis = require "skynet-fly.db.redisf"
 local string_util = require "skynet-fly.utils.string_util"
 local time_util = require "skynet-fly.utils.time_util"
-local player_util = require "common.utils.player"
 local ENUM = require "common.enum.ENUM"
 local GAME_ID_ENUM = require "common.enum.GAME_ID_ENUM"
 local module_info = require "skynet-fly.etc.module_info"
 local watch_syn_client = require "skynet-fly.rpc.watch_syn_client"
 local SYN_CHANNEL_NAME = require "common.enum.SYN_CHANNEL_NAME"
 local errorcode = require "common.enum.errorcode"
+local player_rpc = require "common.rpc.hallserver.player"
 
 local tonumber = tonumber
 local ipairs = ipairs
@@ -131,12 +131,8 @@ local function match_loop()
                 if ret[#ret].out == 1 then
                     --通知大厅服，匹配成功了
                     for j,player_id in ipairs(match_list) do
-                        local svr_id = player_util.get_svr_id_by_player_id(player_id)
                         --log.info("get_svr_id_by_player_id >>> ",player_id, svr_id)
-                        local hallcli = frpc_client:instance("hallserver", "room_game_hall_m")
-                        hallcli:set_svr_id(svr_id)              --指定服
-                        hallcli:set_mod_num(player_id)          --指定mod_num 
-                        hallcli:byid_mod_send("match_succ", player_id, session_id, GAME_ID_ENUM[module_info.get_cfg().instance_name], ENUM.MATCH_ACCEPT_TIME_OUT)
+                        player_rpc.send_player_hall(player_id, "match_succ", player_id, session_id, GAME_ID_ENUM[module_info.get_cfg().instance_name], ENUM.MATCH_ACCEPT_TIME_OUT)
                     end
                 end
             else
@@ -265,12 +261,8 @@ function CMD.accept_session(player_id, session_id)
 
             for l_player_id,info in pairs(game_info_map) do
                 --通知加入对局
-                local svr_id = player_util.get_svr_id_by_player_id(l_player_id)
                 --log.info("get_svr_id_by_player_id >>> ",l_player_id, svr_id)
-                local hallcli = frpc_client:instance("hallserver", "room_game_hall_m")
-                hallcli:set_svr_id(svr_id)                --指定服
-                hallcli:set_mod_num(l_player_id)          --指定mod_num 
-                hallcli:byid_mod_send("match_join_game", l_player_id, info.token, host, table_id)
+                player_rpc.send_player_hall(l_player_id, "match_join_game", l_player_id, info.token, host, table_id)
             end
         end)
         return true

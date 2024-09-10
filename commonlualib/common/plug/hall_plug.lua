@@ -62,17 +62,17 @@ function M.init(interface_mgr)
 	end
 end
 
-local function on_login(player_id)
+local function on_login(player_id, is_jump_join)
 	for _, m in ipairs(g_modules_list) do
 		if m.on_login then
-			m.on_login(player_id)
+			m.on_login(player_id, is_jump_join)
 		end
 	end
 end
 
 --连接成功
-function M.connect(player_id)
-	skynet.fork(on_login, player_id)
+function M.connect(player_id, is_jump_join)
+	skynet.fork(on_login, player_id, is_jump_join)
 	return {
 		isreconnect = 0,
 	}
@@ -103,10 +103,10 @@ function M.reconnect(player_id)
 end
 
 --登出
-function M.goout(player_id)
+function M.goout(player_id, is_jump_exit)
 	for _, m in ipairs(g_modules_list) do
 		if m.on_loginout then
-			m.on_loginout(player_id)
+			m.on_loginout(player_id, is_jump_exit)
 		end
 	end
 end
