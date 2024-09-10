@@ -55,7 +55,9 @@ end
 
 ---------------------------客户端事件----------------------------------
 --玩家登录
-function M.on_login(player_id)
+function M.on_login(player_id, is_jump_join)
+    --log.info("on_login >>> ", player_id, is_jump_join)
+    if is_jump_join then return end
     check_join_room_game(player_id)
 end
 
@@ -70,7 +72,9 @@ function M.on_disconnect(player_id)
 end
 
 --玩家登出
-function M.on_loginout(player_id)
+function M.on_loginout(player_id, is_jump_exit)
+    --log.info("on_loginout >>> ", player_id, is_jump_exit)
+    if is_jump_exit then return end
     check_cancel_matching(player_id)
 end
 

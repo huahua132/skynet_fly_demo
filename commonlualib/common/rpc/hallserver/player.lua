@@ -101,4 +101,10 @@ function M.get_players_info(player_list, field_map)
     return res
 end
 
+--发送到玩家所在room_game_hall
+function M.send_player_hall(player_id, ...)
+    local cli = base.hallserver_room_game_login(player_id)
+    cli:byid_send_by_name("send_player_hall", player_id, ...)
+end
+
 return M
