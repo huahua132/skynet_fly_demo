@@ -35,6 +35,8 @@ M.ws_unpack = ws_pbnet_byid.unpack
 M.ws_send = ws_pbnet_byid.send
 --广播函数
 M.ws_broadcast = ws_pbnet_byid.broadcast
+--跳转新到大厅
+M.is_jump_new = true
 
 function M.init(interface_mgr)
 	login_msg = login_msg:new(interface_mgr)
