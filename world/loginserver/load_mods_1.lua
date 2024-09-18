@@ -50,7 +50,7 @@ return {
             max_age = 7,               --最大保留天数
             max_backups = 7,           --最大保留文件数
             sys_cmd = [[
-                /usr/bin/pkill -HUP -f skynet.loginserver_config.lua.load_mods_1.lua\n
+                /usr/bin/pkill -HUP -f skynet.make/loginserver_config.lua.load_mods_1.lua\n
             ]],              --系统命令
         }
     },

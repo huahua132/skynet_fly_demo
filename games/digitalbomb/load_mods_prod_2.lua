@@ -13,7 +13,7 @@ cfg.share_config_m.default_arg.room_game_login.wsgateconf = gate_cfg.games.digit
 
 cfg.logrotate_m.default_arg.file_path = './logs_2/'
 cfg.logrotate_m.default_arg.sys_cmd = [[
-	/usr/bin/pkill -HUP -f skynet.digitalbomb_config.lua.load_mods_prod_2.lua\n
+	/usr/bin/pkill -HUP -f skynet.make/digitalbomb_config.lua.load_mods_prod_2.lua\n
 ]]
 
 return cfg

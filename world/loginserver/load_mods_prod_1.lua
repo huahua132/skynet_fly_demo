@@ -12,7 +12,7 @@ cfg.share_config_m.default_arg.server_cfg = server_cfg.world.loginserver_1
 
 cfg.logrotate_m.default_arg.file_path = './logs_1/'
 cfg.logrotate_m.default_arg.sys_cmd = [[
-	/usr/bin/pkill -HUP -f skynet.loginserver_config.lua.load_mods_prod_1.lua\n
+	/usr/bin/pkill -HUP -f skynet.make/loginserver_config.lua.load_mods_prod_1.lua\n
 ]]
 
 cfg.web_agent_m.default_arg = http_cfg.world.loginserver_1.agent

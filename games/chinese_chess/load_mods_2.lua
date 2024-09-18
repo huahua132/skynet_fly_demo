@@ -10,7 +10,7 @@ cfg.share_config_m.default_arg.room_game_login.wsgateconf = gate_cfg.games.chine
 
 cfg.logrotate_m.default_arg.file_path = './logs_2/'
 cfg.logrotate_m.default_arg.sys_cmd = [[
-	/usr/bin/pkill -HUP -f skynet.chinese_chess_config.lua.load_mods_2.lua\n
+	/usr/bin/pkill -HUP -f skynet.make/chinese_chess_config.lua.load_mods_2.lua\n
 ]]
 
 cfg.mysql_m.default_arg.instance_name = mysql_cfg.games.chinese_chess_2.database

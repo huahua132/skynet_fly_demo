@@ -38,7 +38,7 @@ return {
             max_age = 7,               --最大保留天数
             max_backups = 7,           --最大保留文件数
             sys_cmd = [[
-                /usr/bin/pkill -HUP -f skynet.matchserver_config.lua\n
+                /usr/bin/pkill -HUP -f skynet.make/matchserver_config.lua\n
             ]],              --系统命令
         }
     },
