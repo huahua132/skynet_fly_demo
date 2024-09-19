@@ -4,11 +4,12 @@ local ws_pbnet_util = require "skynet-fly.utils.net.ws_pbnet_util"
 local log = require "skynet-fly.log"
 local player = require "common.rpc.hallserver.player"
 local item = require "common.rpc.hallserver.item"
-local ITEM = require "common.enum.ITEM"
 local timer = require "skynet-fly.timer"
+local schema = require "common.enum.schema"
 
 local setmetatable = setmetatable
 local assert = assert
+local ITEM_ID = schema.enums.item_ID
 
 local M = {}
 
@@ -28,7 +29,7 @@ end
 --坐下
 function M:enter(player_id, seat_id)
 	self.player = player.get_player_info(player_id)
-	self.score = item.get_item(player_id, ITEM.score)
+	self.score = item.get_item(player_id, ITEM_ID.PROP_SCORE)
 	self.seat_id = seat_id
 	
 	if not self.player or not self.score then
@@ -89,7 +90,7 @@ end
 function M:add_score(num)
 	if num <= 0 then return end
 	local player_id = self.player.player_id
-	self.score = item.add_item(player_id, ITEM.score, num)
+	self.score = item.add_item(player_id, ITEM_ID.PROP_SCORE, num)
 
 	return num
 end
@@ -105,7 +106,7 @@ function M:reduce_score(num)
 
 	local player_id = self.player.player_id
 	local _
-	_,self.score = item.reduce_item(player_id, ITEM.score, num)
+	_,self.score = item.reduce_item(player_id, ITEM_ID.PROP_SCORE, num)
 
 	return num
 end

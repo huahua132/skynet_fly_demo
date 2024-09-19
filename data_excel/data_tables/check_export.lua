@@ -18,21 +18,29 @@ local EXPORT_TARGET_DIR = {
 
 local export_list = {}
 local export_file_map = {}
+local files_map = {}
 for name, target in pairs(EXPORT_TARGET) do
     export_list[target] = {}
     export_file_map[target] = {}
 end
 
---检查
+--加载
 for filename in lfs.dir("./check") do
     if filename ~= '.' and filename ~= '..' then
-        local export_map = loadfile("check/" .. filename)()
-        for filename, target in pairs(export_map) do
-            assert(export_list[target], "target not exists :" .. target)
-            tinsert(export_list[target], filename)
-            export_file_map[target][filename .. '.lua'] = true
-        end
+        files_map[filename] = loadfile("check/" .. filename)()
     end
+end
+
+--检查
+for _, tab in pairs(files_map) do
+    local export = tab.export
+    for fn, target in pairs(export) do
+        assert(export_list[target], "target not exists :" .. target)
+        tinsert(export_list[target], fn)
+        export_file_map[target][fn .. '.lua'] = true
+    end
+
+    tab.check_func()
 end
 
 --导出
