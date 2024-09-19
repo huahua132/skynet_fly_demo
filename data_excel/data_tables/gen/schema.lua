@@ -10,9 +10,33 @@
 
 local enums =
 {
+    ---@class item_ID @道具ID
+     ---@field public PROP_SCORE integer @排位赛积分
+     ---@field public PROP_LEVEL integer @排位赛段位
+     ---@field public PROP_SILVER integer @普通货币
+     ---@field public PROP_GOLD integer @高级货币
+     ---@field public PROP_EXP integer @玩家经验值
+    ['item_ID'] = {   PROP_SCORE=10000001,  PROP_LEVEL=10000002,  PROP_SILVER=10000003,  PROP_GOLD=10000004,  PROP_EXP=10000005,  };
+    ---@class item_main_type @道具类型
+     ---@field public PROP integer @没有特殊类型的道具
+    ['item_main_type'] = {   PROP=1,  };
+    ---@class item_sub_type
+    ['item_sub_type'] = {   };
 }
 
 local beans = {}
+    do
+    ---@class item.item 
+     ---@field public item_id integer @道具ID
+     ---@field public main_type integer @道具类型
+     ---@field public sub_type integer @子类型
+        local class = {
+            { name='item_id', type='integer'},
+            { name='main_type', type='integer'},
+            { name='sub_type', type='integer'},
+        }
+        beans['item.item'] = class
+    end
     do
     ---@class player.player 
      ---@field public level integer @等级
@@ -27,6 +51,7 @@ local beans = {}
 local tables =
 {
     { name='level', file='player_level', mode='map', index='level', value_type='player.player' },
+    { name='info', file='item_info', mode='map', index='item_id', value_type='item.item' },
 }
 
 return { enums = enums, beans = beans, tables = tables }

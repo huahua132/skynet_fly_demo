@@ -10,6 +10,7 @@ local EVENT_ID = require "enum.EVENT_ID"
 local state_data = require "skynet-fly.hotfix.state_data"
 local contriner_client = require "skynet-fly.client.contriner_client"
 local table_util = require "skynet-fly.utils.table_util"
+local player_conf = hotfix_require "hall.player.player_conf"
 
 contriner_client:register("room_game_hall_m")
 
