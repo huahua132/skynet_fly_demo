@@ -3,6 +3,9 @@ local time_util = require "skynet-fly.utils.time_util"
 local item_msg = require "msg.item_msg"
 local orm_table_client = require "skynet-fly.client.orm_table_client"
 local state_data = require "skynet-fly.hotfix.state_data"
+local event_mgr = require "common.event_mgr"
+local EVENT_ID = require "enum.EVENT_ID"
+local interface = require "hall.item.interface"
 
 local assert = assert
 local pairs = pairs
@@ -59,6 +62,7 @@ function M.cmd_add_item(player_id, id, num)
         item_list = {{id = id, count = count}}
     })
 
+    event_mgr.publish(EVENT_ID.ITEM_CHANGE, player_id, id, num, count)
     return count
 end
 
@@ -74,7 +78,24 @@ function M.cmd_reduce_item(player_id, id, num)
         item_list = {{id = id, count = count}}
     })
 
+    event_mgr.publish(EVENT_ID.ITEM_CHANGE, player_id, id, -num, count)
     return ret,count
+end
+
+-----------------------------interface------------------------------------
+--查询道具
+function interface.get_item(player_id, id)
+    return M.cmd_get_item(player_id, id)
+end
+
+--增加道具
+function interface.add_item(player_id, id, num)
+    return M.cmd_add_item(player_id, id, num)
+end
+
+--减少道具
+function interface.reduce_item(player_id, id, num)
+    return M.cmd_reduce_item(player_id, id, num)
 end
 
 return M

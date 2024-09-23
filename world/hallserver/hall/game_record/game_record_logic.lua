@@ -14,10 +14,11 @@ local MAX_PAGE_COUNT = 100
 
 local M = {}
 
+event_mgr.monitor(EVENT_ID.CROSS_DAY, function(player_id)
+    g_game_record_cli:check_delete(player_id)
+end)
+
 function M.init(interface_mgr)
-    event_mgr.monitor(EVENT_ID.CROSS_DAY, function(player_id)
-        g_game_record_cli:check_delete(player_id)
-    end)
     g_local_info.game_record_msg = game_record_msg:new(interface_mgr)
 end
 

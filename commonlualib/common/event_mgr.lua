@@ -3,6 +3,8 @@
 local tinsert = table.insert
 local assert = assert
 local type = type
+local debug_getinfo = debug.getinfo
+local pairs = pairs
 
 local M = {}
 
@@ -12,11 +14,14 @@ local g_event_cbs_map = {}
 function M.monitor(event_id, callback)
     assert(event_id, "not event_id")
     assert(type(callback) == 'function')
+
+    local info = debug_getinfo(2,"S")
+    local name = info.short_src
     if not g_event_cbs_map[event_id] then
         g_event_cbs_map[event_id] = {}
     end
 
-    tinsert(g_event_cbs_map[event_id], callback)
+    g_event_cbs_map[event_id][name] = callback
 end
 
 --触发事件
@@ -26,10 +31,8 @@ function M.publish(event_id, ...)
         return
     end
 
-    local len = #cbs
-    for i = 1, len do
-        local cb = cbs[i]
-        cb(...)
+    for name, callback in pairs(cbs) do
+        callback(...)
     end
 end
 
