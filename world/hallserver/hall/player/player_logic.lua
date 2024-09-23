@@ -10,6 +10,10 @@ local EVENT_ID = require "enum.EVENT_ID"
 local state_data = require "skynet-fly.hotfix.state_data"
 local contriner_client = require "skynet-fly.client.contriner_client"
 local table_util = require "skynet-fly.utils.table_util"
+local mod_queue = require "skynet-fly.mod_queue"
+local item_interface = require "hall.item.interface"
+
+local schema = hotfix_require "common.enum.schema"
 local player_conf = hotfix_require "hall.player.player_conf"
 
 contriner_client:register("room_game_hall_m")
@@ -41,6 +45,7 @@ local M = {}
 function M.init(interface_mgr)
     g_local_info.hall_interface = interface_mgr
     g_local_info.player_msg = player_msg:new(interface_mgr)
+    g_local_info.mod_queue = mod_queue:new(1024)
     timer_point:new(timer_point.EVERY_DAY):builder(function()
         --跨天
         for i = 1, #g_player_list do
@@ -48,6 +53,44 @@ function M.init(interface_mgr)
         end
     end)
 end
+
+--检查升级
+local function check_up_level(player_id, item_id, change_num, total_count)
+    local player_info = interface.get_info(player_id)
+    local level = player_info.level
+    if level <= 0 then
+        level = 1
+    end
+    local next_level, need_exp = player_conf.get_curexp_uplevel(level, total_count)        --升级所需经验
+    if next_level == level then
+        return
+    end
+
+    --尝试扣除经验值升级
+    local ret = item_interface.reduce_item(player_id, item_id, need_exp)
+    if not ret then --扣除失败，经验值不足
+        return
+    end
+
+    if g_p_info_map[player_id] then
+        player_info = g_p_info_map[player_id]
+    end
+    player_info.level = next_level
+
+    --保存数据
+    g_player_entity:change_save_one_entry({player_id = player_id, level = next_level})
+    event_mgr.publish(EVENT_ID.PLAYER_UP_LEVEL, player_id, level, player_info.level)
+end
+
+--监听道具改变
+event_mgr.monitor(EVENT_ID.ITEM_CHANGE, function(player_id, item_id, change_num, total_count)
+    if change_num <= 0 then return end
+    if item_id ~= schema.enums.item_ID.PROP_EXP then
+        return
+    end
+
+    g_local_info.mod_queue:exec(player_id, check_up_level, player_id, item_id, change_num, total_count)
+end)
 ---------------------------其他逻辑------------------------------------
 --检测心跳
 function M.check_heart()
@@ -187,7 +230,7 @@ end
 
 --获取玩家信息
 function interface.get_info(player_id)
-    return M.cmd_get_info
+    return M.cmd_get_info(player_id)
 end
 
 --批量获取玩家信息
