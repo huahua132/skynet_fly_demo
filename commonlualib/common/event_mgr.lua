@@ -1,10 +1,12 @@
 --事件管理员
+local log = require "skynet-fly.log"
 
 local tinsert = table.insert
 local assert = assert
 local type = type
 local debug_getinfo = debug.getinfo
 local pairs = pairs
+local x_pcall = x_pcall
 
 local M = {}
 
@@ -32,7 +34,10 @@ function M.publish(event_id, ...)
     end
 
     for name, callback in pairs(cbs) do
-        callback(...)
+        local isok,err = x_pcall(callback, ...)
+        if not isok then
+            log.error_fmt("publish excute err event_id[%s] name[%s] err[%s]", event_id, name, err)
+        end
     end
 end
 

@@ -22,6 +22,7 @@ local assert = assert
 local pairs = pairs
 local tinsert = table.insert
 local tremote = table.remove
+local os = os
 
 local g_player_entity = orm_table_client:instance("player")
 
@@ -49,7 +50,7 @@ function M.init(interface_mgr)
     timer_point:new(timer_point.EVERY_DAY):builder(function()
         --跨天
         for i = 1, #g_player_list do
-            skynet.fork(event_mgr.publish, EVENT_ID.CROSS_DAY, g_player_list[i])        --跨天
+            event_mgr.publish(EVENT_ID.CROSS_DAY, g_player_list[i])        --跨天
         end
     end)
 end
@@ -61,6 +62,8 @@ local function check_up_level(player_id, item_id, change_num, total_count)
     if level <= 0 then
         level = 1
     end
+    --获取最新的经验值
+    local total_count = item_interface.get_item(player_id, schema.enums.item_ID.PROP_EXP)
     local next_level, need_exp = player_conf.get_curexp_uplevel(level, total_count)        --升级所需经验
     if next_level == level then
         return
@@ -95,7 +98,7 @@ end)
 --检测心跳
 function M.check_heart()
     --log.info("check_heart >>>> ")
-    local cur_time = time_util.time()
+    local cur_time = os.time()      --心跳用系统时间，避免加速时间导致测试号被踢下线
     for player_id,heart_time in pairs(g_p_heart_map) do
         if cur_time - heart_time > 60 then  --心跳超时
             skynet.fork(g_local_info.hall_interface.goout, g_local_info.hall_interface, player_id) --踢出
@@ -121,16 +124,16 @@ function M.on_login(player_id)
     end
     --log.info("on_login >>> ", player_id)
     assert(not g_p_heart_map[player_id], "is exists " .. player_id)
-    g_p_heart_map[player_id] = time_util.time()
+    g_p_heart_map[player_id] = os.time()
     g_p_info_map[player_id] = player_info
 
     tinsert(g_player_list, player_id)
     player_info_notice(player_id)
 
     if player_info.last_login_time == 0 then
-        skynet.fork(event_mgr.publish, EVENT_ID.FIRST_LOGIN, player_id)                       --首次登录事件
+        event_mgr.publish(EVENT_ID.FIRST_LOGIN, player_id)                                    --首次登录事件
     elseif time_util.is_cross_day(player_info.last_logout_time) then
-        skynet.fork(event_mgr.publish, EVENT_ID.CROSS_DAY, player_id)                         --跨天事件
+        event_mgr.publish(EVENT_ID.CROSS_DAY, player_id)                                      --跨天事件
     end
     player_info.last_login_time = time_util.time()                                            --更新最后一次登录的时间
 
