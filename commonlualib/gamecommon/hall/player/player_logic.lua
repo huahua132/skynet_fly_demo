@@ -7,6 +7,7 @@ local assert = assert
 local pairs = pairs
 local tinsert = table.insert
 local tremote = table.remove
+local os = os
 
 local g_logic_info = state_data.alloc_table("g_logic_info")
 local g_player_map = state_data.alloc_table("g_player_map")
@@ -19,7 +20,7 @@ end
 ---------------------------其他逻辑------------------------------------
 --检测心跳
 function M.check_heart()
-    local cur_time = time_util.time()
+    local cur_time = os.time()                     --心跳用系统时间，避免加速时间导致测试号被踢下线
     for player_id,player in pairs(g_player_map) do
         if cur_time - player.heart_time > 60 then  --心跳超时
             skynet.fork(g_logic_info.hall_interface.goout, g_logic_info.hall_interface, player_id, "heart timeout") --踢出
@@ -33,7 +34,7 @@ function M.on_login(player_id)
     --log.info("on_login >>> ", player_id)
     assert(not g_player_map[player_id], "is exists " .. player_id)
     g_player_map[player_id] = {
-        heart_time = time_util.time()
+        heart_time = os.time()
     }
     tinsert(g_player_list, player_id)
 end
