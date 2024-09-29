@@ -46,3 +46,6 @@ quit
 
 # 客户端
 [中国象棋](https://github.com/huahua132/chinesechess)
+
+# 注意
+本项目使用了ubuntu最新版本已编译的`skynet_fly`，实际项目部署开发，请自行编译。
