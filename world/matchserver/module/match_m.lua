@@ -12,6 +12,7 @@ local watch_syn_client = require "skynet-fly.rpc.watch_syn_client"
 local SYN_CHANNEL_NAME = require "common.enum.SYN_CHANNEL_NAME"
 local errorcode = require "common.enum.errorcode"
 local player_rpc = require "common.rpc.hallserver.player"
+local match_conf = hotfix_require "common.conf.match_conf"
 
 local tonumber = tonumber
 local ipairs = ipairs
@@ -21,9 +22,9 @@ local next = next
 local pairs = pairs
 
 --匹配集合
-local function match_key()
+local function match_key(play_type)
     local cfg = module_info.get_cfg()
-    return cfg.instance_name .. ":match"
+    return cfg.instance_name .. ":match:" .. play_type
 end
 
 --匹配成功的结果信息
@@ -71,14 +72,15 @@ local function get_game_node()
     return nil
 end
 
-local function match_loop()
+local function match_one(play_type)
     local game_node_info = get_game_node()
     if not game_node_info then
         return
     end
+    
     local cur_time = time_util.time()
     local redis_cli = redis.instance("global")
-    local member_list = redis_cli:zrevrange(match_key(), 0, 999)
+    local member_list = redis_cli:zrevrange(match_key(play_type), 0, 999)
     for i = 1,#member_list, 2 do
         local match_list = {tonumber(member_list[i]), tonumber(member_list[i + 1])}
         if #match_list ~= 2 then
@@ -87,7 +89,7 @@ local function match_loop()
 
         --匹配成功，请求游戏服创建房间
         g_game_cli:set_svr_id(game_node_info.svr_id)
-        local ret = g_game_cli:byid_mod_call("createtable", match_list, cur_time) --创建桌子
+        local ret = g_game_cli:byid_mod_call("createtable", match_list, cur_time, play_type) --创建桌子
         --log.info("match_loop >>> ", ret)
         if ret and #ret.result > 0 then
             local table_id = ret.result[1]
@@ -110,7 +112,7 @@ local function match_loop()
                 return 1
             ]]
 
-            local ret = redis_cli:script_run(script_str, 1, match_key(), table.unpack(match_list))
+            local ret = redis_cli:script_run(script_str, 1, match_key(play_type), table.unpack(match_list))
             --log.info("ret >>>> ", ret)
             if ret == 1 then
                 local session_id = string.format("%s-%s-%s-%s", game_node_info.svr_name, game_node_info.svr_id, table_id, time_util.time())
@@ -145,10 +147,19 @@ local function match_loop()
     end
 end
 
+local function match_loop()
+    local play_type_list = match_conf.get_play_type_list(GAME_ID_ENUM[module_info.get_cfg().instance_name])
+    
+    for i = 1, #play_type_list do
+        local play_type = play_type_list[i]
+        match_one(play_type)
+    end
+end
+
 local CMD = {}
 
 --匹配
-function CMD.match(player_id)
+function CMD.match(player_id, play_type)
     --log.info("match1 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>", player_id)
     local script_str = [[
         local player_id = KEYS[1]
@@ -169,7 +180,7 @@ function CMD.match(player_id)
         return 1
     ]]
 
-    local ret = redis.instance("global"):script_run(script_str, 3, player_id, match_key(), match_succ_lock_key(player_id), 0)
+    local ret = redis.instance("global"):script_run(script_str, 3, player_id, match_key(play_type), match_succ_lock_key(player_id), 0)
     --log.info("match2>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>", ret)
     if ret ~= 1 then
         return nil, errorcode.MATCHING, "matching"
@@ -179,9 +190,9 @@ function CMD.match(player_id)
 end
 
 --取消匹配
-function CMD.cancel_match(player_id)
+function CMD.cancel_match(player_id, play_type)
     --log.info("cancel_match >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>", player_id)
-    if redis.instance("global"):zrem(match_key(), player_id) == 1 then
+    if redis.instance("global"):zrem(match_key(play_type), player_id) == 1 then
         return true
     end
 

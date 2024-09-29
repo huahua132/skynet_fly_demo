@@ -59,8 +59,8 @@ function CMD.exists(table_id, create_time)
 end
 
 --创建桌子
-function CMD.createtable(player_list, create_time)
-	local table_id = g_alloc_interface.create_table("default")
+function CMD.createtable(player_list, create_time, play_type)
+	local table_id = g_alloc_interface.create_table("default", play_type)
 	if not table_id then
 		return nil
 	end

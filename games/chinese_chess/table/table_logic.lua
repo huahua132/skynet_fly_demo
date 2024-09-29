@@ -15,6 +15,7 @@ local chess_rule = hotfix_require "table.chess_rule"
 local module_cfg = require "skynet-fly.etc.module_info".get_cfg()
 local seater = hotfix_require "table.seater"
 local TEAM_TYPE = require "enum.TEAM_TYPE"
+local table_conf = hotfix_require "table.table_conf"
 
 local assert = assert
 local setmetatable = setmetatable
@@ -33,7 +34,10 @@ local g_svr_id = env_util.get_svr_id()
 local M = {}
 local mata = {__index = M}
 
-function M:new(table_id, interface)
+function M:new(table_id, interface, play_type)
+    if table_id == 1 then  -- 1是测试创建的房间
+        return
+    end
     local m_interface_mgr = interface:new(table_id)
     local t = {
         m_table_id = table_id,
@@ -48,6 +52,7 @@ function M:new(table_id, interface)
         m_game_seat_id_list = {},               	 --游戏参与座位号列表
         m_next_doing = {seat_id = 0,player_id = 0},  --接下来谁操作
         m_win_player_id = 0,					     --赢家
+        m_play_type = play_type,                     --玩法类型
 
         --对局记录
         m_record_info = {
@@ -57,7 +62,7 @@ function M:new(table_id, interface)
             win_player_id = nil,   --赢家
         },
         
-        m_join_time_out = nil,
+        m_join_time_out = timer:new(timer.minute, 1, m_interface_mgr.kick_out_all, m_interface_mgr, "join time out"),
 
         --棋子数据
         m_chess_list = {},                     --棋子数据
@@ -66,14 +71,16 @@ function M:new(table_id, interface)
         m_can_move_map = {},
     }
 
-	if table_id ~= 1 then  -- 1是测试创建的房间
-		t.m_join_time_out = timer:new(timer.minute, 1, m_interface_mgr.kick_out_all, m_interface_mgr, "join time out")
-	end
 
+    local play_cfg = table_conf.get_type_cfg(play_type)
+    if not play_cfg then
+        log.error("can`t get play_cfg ", play_type)
+    end
+    
     --座位初始化
     for i = 1,module_cfg.table_conf.player_num do
         t.m_seat_list[i] = seater:new()
-		t.m_seat_list[i]:set_doing_time(60 * 20 * 100, 60 * 100)   --操作总时长20分钟, 单次1分钟
+		t.m_seat_list[i]:set_doing_time(play_cfg.total_time or 600, play_cfg.doing_time or 60)
     end
 
     setmetatable(t, mata)
@@ -213,7 +220,7 @@ function M:game_start()
 end
 --游戏结束
 function M:game_over(win_seat_id)
-    --log.info("游戏结束:",win_seat_id, m_table_id)
+    --log.info("游戏结束:",win_seat_id, self.m_table_id)
     self.m_game_state = GAME_STATE.over
     --踢出所有玩家
     for _,seat_player in ipairs(self.m_seat_list) do

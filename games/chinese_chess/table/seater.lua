@@ -113,8 +113,8 @@ end
 
 --设置操作,总时长,单次时长
 function M:set_doing_time(total_time, one_time)
-	self.remain_total_time = total_time
-	self.once_time = one_time
+	self.remain_total_time = total_time * timer.second
+	self.once_time = one_time * timer.second
 end
 
 --开始操作

@@ -10,6 +10,10 @@
 
 local enums =
 {
+    ---@class game_type @游戏类型
+     ---@field public CHINESE_CHESS integer @中国象棋游戏
+     ---@field public DIGITALBOMB integer @数字炸弹游戏
+    ['game_type'] = {   CHINESE_CHESS=1,  DIGITALBOMB=2,  };
     ---@class item_ID @道具ID
      ---@field public PROP_SCORE integer @排位赛积分
      ---@field public PROP_LEVEL integer @排位赛段位
@@ -20,11 +24,34 @@ local enums =
     ---@class item_main_type @道具类型
      ---@field public PROP integer @没有特殊类型的道具
     ['item_main_type'] = {   PROP=1,  };
-    ---@class item_sub_type
+    ---@class item_sub_type @道具子类型
     ['item_sub_type'] = {   };
+    ---@class play_type @玩法类型
+     ---@field public CC_RANKING integer @排位赛玩法
+     ---@field public CC_FIVE_MINUTE integer @5分钟场
+     ---@field public CC_TEN_MINUTE integer @10分钟场
+     ---@field public DB_RANGE_100 integer @范围100玩法
+     ---@field public DB_RANGE_10000 integer @范围10000玩法
+    ['play_type'] = {   CC_RANKING=10001,  CC_FIVE_MINUTE=10002,  CC_TEN_MINUTE=10003,  DB_RANGE_100=20001,  DB_RANGE_10000=20002,  };
 }
 
 local beans = {}
+    do
+    ---@class chess.chess 
+     ---@field public play_type integer @玩法类型
+     ---@field public total_time integer @总局时(秒)
+     ---@field public doing_time integer @操作时长(秒)
+     ---@field public win_rewards table<integer,integer> @获胜奖励
+     ---@field public fail_rewards table<integer,integer> @失败奖励
+        local class = {
+            { name='play_type', type='integer'},
+            { name='total_time', type='integer'},
+            { name='doing_time', type='integer'},
+            { name='win_rewards', type='table<integer,integer>'},
+            { name='fail_rewards', type='table<integer,integer>'},
+        }
+        beans['chess.chess'] = class
+    end
     do
     ---@class item.item 
      ---@field public item_id integer @道具ID
@@ -36,6 +63,16 @@ local beans = {}
             { name='sub_type', type='integer'},
         }
         beans['item.item'] = class
+    end
+    do
+    ---@class match.match 
+     ---@field public game_type integer @游戏类型
+     ---@field public play_type integer @玩法类型
+        local class = {
+            { name='game_type', type='integer'},
+            { name='play_type', type='integer'},
+        }
+        beans['match.match'] = class
     end
     do
     ---@class player.player 
@@ -52,6 +89,8 @@ local tables =
 {
     { name='level', file='player_level', mode='map', index='level', value_type='player.player' },
     { name='info', file='item_info', mode='map', index='item_id', value_type='item.item' },
+    { name='type', file='chess_type', mode='map', index='play_type', value_type='chess.chess' },
+    { name='game', file='match_game', mode='list', index='', value_type='match.match' },
 }
 
 return { enums = enums, beans = beans, tables = tables }

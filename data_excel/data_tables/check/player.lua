@@ -2,7 +2,7 @@ local player_level = require "lua.player_level"
 
 return {
     export = {
-        ["player_level"] = EXPORT_TARGET.hall_server,
+        ["player_level"] = {EXPORT_TARGET.hallserver},
     },
     check_func = function()
         for i, cfg in pairs(player_level) do
