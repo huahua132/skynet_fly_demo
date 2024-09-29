@@ -1,11 +1,12 @@
 local log = require "skynet-fly.log"
-local GAME_ID_ENUM = require "common.enum.GAME_ID_ENUM"
-local errorcode = require "common.enum.errorcode"
-local game_redis = require "common.redis.game"
+local GAME_ID_ENUM = hotfix_require "common.enum.GAME_ID_ENUM"
+local errorcode = hotfix_require "common.enum.errorcode"
+local game_redis = hotfix_require "common.redis.game"
 local match_msg = require "msg.match_msg"
 local rpc_matchserver_match = require "common.rpc.matchserver.match"
 local frpc_client = require "skynet-fly.client.frpc_client"
 local state_data = require "skynet-fly.hotfix.state_data"
+local match_conf = hotfix_require "common.conf.match_conf"
 
 local next = next
 local tonumber = tonumber
@@ -44,9 +45,12 @@ local function check_cancel_matching(player_id)
     if not g_matching_map[player_id] then
         return
     end
-    local game_server = g_matching_map[player_id]
+    local match_info = g_matching_map[player_id]
+    local game_type = match_info.game_type
+    local play_type = match_info.play_type
+    local game_server = GAME_ID_ENUM[game_type]
     --log.info("check_cancel_matching >>> ", player_id)
-    local ret, errcode, errmsg = rpc_matchserver_match.cancel_match(game_server, player_id)
+    local ret, errcode, errmsg = rpc_matchserver_match.cancel_match(game_server, player_id, play_type)
     if not ret then
         log.warn("check_cancel_matching err ", errcode, errmsg)
     end
@@ -83,11 +87,18 @@ end
 --请求匹配
 function M.do_match_game(player_id, pack_body)
     --log.info("do_match_game >>> ",player_id, pack_body)
-    local game_id = pack_body.game_id
+    local game_id = pack_body.game_id or 0
+    local play_type = pack_body.play_type or 0
     local game_server = GAME_ID_ENUM[game_id]
     if not game_server then
-        log.error("do_match_game not exists gameid ", game_id)
+        log.warn("do_match_game not exists gameid ", game_id)
         return nil, errorcode.GAME_NOT_EXISTS, "GAME_NOT_EXISTS"
+    end
+
+    local cfg = match_conf.get_cfg(game_id, play_type)
+    if not cfg then
+        log.warn("do_match_game not exists playtype ", game_id, play_type)
+        return nil, errorcode.GAME_NOT_EXISTS, "PLAY_TYPE NOT EXISTS"
     end
 
     local game_room_info = game_redis.get_game_room_info(player_id)
@@ -102,7 +113,7 @@ function M.do_match_game(player_id, pack_body)
         return nil, errorcode.MATCHING, "MATCHING"
     end
     --log.info("do_match_game2 >>> ",player_id, pack_body)
-    local ret, errcode, errmsg = rpc_matchserver_match.match(game_server, player_id)
+    local ret, errcode, errmsg = rpc_matchserver_match.match(game_server, player_id, play_type)
     if not ret then
         log.warn("do_match_game err ", errcode, errmsg)
         return ret, errcode, errmsg
@@ -111,7 +122,10 @@ function M.do_match_game(player_id, pack_body)
     --回复匹配
     g_local_info.match_msg:match_game_res(player_id, {game_id = game_id})
 
-    g_matching_map[player_id] = game_server
+    g_matching_map[player_id] = {
+        game_type = game_id,
+        play_type = play_type,
+    }
     return true
 end
 
@@ -129,8 +143,8 @@ function M.do_cancel_match_game(player_id, pack_body)
         log.warn("do_cancel_match_game not matching ", player_id)
         return nil, errorcode.NOT_MATCHING, "NOT_MATCHING"
     end
-
-    local ret, errcode, errmsg = rpc_matchserver_match.cancel_match(game_server, player_id)
+    local play_type = g_matching_map[player_id].play_type
+    local ret, errcode, errmsg = rpc_matchserver_match.cancel_match(game_server, player_id, play_type)
     if not ret then
         log.warn("do_cancel_match_game err ", errcode, errmsg)
         return ret, errcode, errmsg

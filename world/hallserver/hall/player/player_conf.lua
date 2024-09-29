@@ -1,9 +1,9 @@
-local share_data = require "skynet-fly.sharedata"
+local sharedata = require "skynet-fly.sharedata"
 local log = require "skynet-fly.log"
 
 local assert = assert
 
-local g_player_level = share_data:new("./data_tables/player_level.lua", share_data.enum.sharedata)
+local g_player_level = sharedata:new("./data_tables/player_level.lua", sharedata.enum.sharedata)
                        :set_map("level_idx", "level")
                        :builder()
 

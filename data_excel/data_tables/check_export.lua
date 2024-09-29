@@ -4,16 +4,23 @@ local utils = require "utils"
 local tinsert = table.insert
 local EMPTY = {}
 
+INTERFACE = {}                  --检查接口
+
 EXPORT_TARGET = {
     common = 1,
-    game_common = 2,
-    hall_server = 3,
+    gamecommon = 2,
+    matchserver = 3,
+    hallserver = 4,
+    chinese_chess = 5,
 }
 
 local EXPORT_TARGET_DIR = {
     common = "..\\..\\commonlualib\\common\\data_tables",             --公共
-    game_common = "..\\..\\commonlualib\\gamecommon\\data_tables",    --游戏服公共
-    hall_server = "..\\..\\world\\hallserver\\data_tables",           --大厅服
+    gamecommon = "..\\..\\commonlualib\\gamecommon\\data_tables",     --游戏服公共
+    hallserver = "..\\..\\world\\hallserver\\data_tables",            --大厅服
+    matchserver = "..\\..\\world\\matchserver\\data_tables",          --匹配服
+
+    chinese_chess = "..\\..\\games\\chinese_chess\\data_tables",      --象棋游戏服
 }
 
 local export_list = {}
@@ -34,10 +41,12 @@ end
 --检查
 for _, tab in pairs(files_map) do
     local export = tab.export
-    for fn, target in pairs(export) do
-        assert(export_list[target], "target not exists :" .. target)
-        tinsert(export_list[target], fn)
-        export_file_map[target][fn .. '.lua'] = true
+    for fn, target_list in pairs(export) do
+        for _,target in ipairs(target_list) do
+            assert(export_list[target], "target not exists :" .. target)
+            tinsert(export_list[target], fn)
+            export_file_map[target][fn .. '.lua'] = true
+        end
     end
 
     tab.check_func()

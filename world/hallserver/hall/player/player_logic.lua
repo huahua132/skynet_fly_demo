@@ -12,7 +12,6 @@ local contriner_client = require "skynet-fly.client.contriner_client"
 local table_util = require "skynet-fly.utils.table_util"
 local mod_queue = require "skynet-fly.mod_queue"
 local item_interface = require "hall.item.interface"
-
 local schema = hotfix_require "common.enum.schema"
 local player_conf = hotfix_require "hall.player.player_conf"
 

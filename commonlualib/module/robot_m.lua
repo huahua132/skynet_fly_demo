@@ -13,6 +13,8 @@ local time_util = require "skynet-fly.utils.time_util"
 local GAME_ID_ENUM = require "common.enum.GAME_ID_ENUM"
 local errorcode = require "common.enum.errorcode"
 local pack_helper = require "common.pack_helper"
+local schema = hotfix_require "common.enum.schema"
+
 
 local hall_pack = pb_netpack.instance("hall")
 local game_pack = pb_netpack.instance("game")
@@ -274,7 +276,13 @@ local function create_one_robot_logic(idx)
         end
         --匹配游戏
         if not m_hall_matching then
-            send_hall_msg(PACK.hallserver_match.MatchGameReq, {game_id = GAME_ID_ENUM[g_config.game_name]})
+            local play_type = nil
+            if g_config.game_name == "chinese_chess" then
+                play_type = schema.enums.play_type.CC_RANKING
+            elseif g_config.game_name == "digitalbomb" then
+                play_type = schema.enums.play_type.DB_RANGE_100
+            end
+            send_hall_msg(PACK.hallserver_match.MatchGameReq, {game_id = GAME_ID_ENUM[g_config.game_name], play_type = play_type})
         end
     end
 

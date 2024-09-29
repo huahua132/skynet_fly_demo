@@ -31,6 +31,7 @@ package hallserver_match;
 //请求匹配游戏
 message MatchGameReq {
     optional int32 game_id = 1;
+    optional int32 play_type = 2;   //玩法类型
 }
 
 //回应匹配游戏

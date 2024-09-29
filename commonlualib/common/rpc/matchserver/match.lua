@@ -5,16 +5,16 @@ local table = table
 local M = {}
 
 --匹配
-function M.match(game_server, player_id)
-    local ret = frpc_client:instance("matchserver", "match_m", game_server):one_balance_call_by_name("match", player_id)
+function M.match(game_server, player_id, play_type)
+    local ret = frpc_client:instance("matchserver", "match_m", game_server):one_balance_call_by_name("match", player_id, play_type)
     if not ret then return end
     
     return table.unpack(ret.result)
 end
 
 --取消匹配
-function M.cancel_match(game_server, player_id)
-    local ret = frpc_client:instance("matchserver", "match_m", game_server):one_balance_call_by_name("cancel_match", player_id)
+function M.cancel_match(game_server, player_id, play_type)
+    local ret = frpc_client:instance("matchserver", "match_m", game_server):one_balance_call_by_name("cancel_match", player_id, play_type)
     if not ret then return end
     
     return table.unpack(ret.result)

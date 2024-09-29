@@ -46,9 +46,9 @@ M.ws_send = ws_pbnet_byid.send
 M.ws_broadcast = ws_pbnet_byid.broadcast
 
 --游戏桌子创建者
-function M.table_creator(table_id)
+function M.table_creator(table_id, table_name, play_type)
 	local m_errors_msg = errors_msg:new(g_interface_mgr)
-	local m_logic = table_logic:new(table_id, g_interface_mgr)
+	local m_logic = table_logic:new(table_id, g_interface_mgr, play_type)
     return {
 		--玩家进入桌子
         enter = function(player_id)
