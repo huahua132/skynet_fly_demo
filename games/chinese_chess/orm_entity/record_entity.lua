@@ -29,7 +29,7 @@ function M.init()
     :string64("table_id")       --桌子ID
     :text("details")            --详情信息
     :set_keys("create_time", "table_id")
-    :set_cache(60 * 60 * 100, 500, 10000)    --缓存10分钟，5秒同步一次更改，最大缓存1万条数据
+    :set_cache(10 * 60 * 100, 500, 10000)    --缓存10分钟，5秒同步一次更改，最大缓存1万条数据
     :builder(adapter)
 
     assert(g_ormobj, "builder err")
