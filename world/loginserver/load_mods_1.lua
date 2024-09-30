@@ -44,7 +44,7 @@ return {
         launch_seq = 5000,
         launch_num = 1,
         default_arg = {
-            file_path = './logs_1/',          --文件路径
+            file_path = server_cfg.world.loginserver_1.logpath,          --文件路径
             filename = 'server.log',   --文件名
             limit_size = 0,            --最小分割大小
             max_age = 7,               --最大保留天数
