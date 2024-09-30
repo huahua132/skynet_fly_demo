@@ -75,6 +75,8 @@ function M:new(table_id, interface, play_type)
     local play_cfg = table_conf.get_type_cfg(play_type)
     if not play_cfg then
         log.error("can`t get play_cfg ", play_type)
+    else
+        t.m_play_cfg = table_util.deep_copy(play_cfg)
     end
     
     --座位初始化
@@ -237,7 +239,7 @@ function M:game_over(win_seat_id)
             break
         end
     end
- 
+    local play_cfg = self.m_play_cfg
     --结算积分
     --赢了加10分
     local addnum = seat_player:add_score(10)
@@ -247,6 +249,11 @@ function M:game_over(win_seat_id)
     local lose_player_id = lose_seat_player:get_player().player_id
 
     self:send_game_state()
+
+    --获胜奖励
+    seat_player:add_item_map(play_cfg.win_rewards)
+    --失败奖励
+    lose_seat_player:add_item_map(play_cfg.fail_rewards)
 
     self.m_record_info.player_info_list = {}
     for seat_id, seat_player in pairs(self.m_seat_list) do
