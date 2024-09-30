@@ -29,7 +29,6 @@ function sharedata.query(name)
 	if cache[name] then
 		return cache[name]
 	end
-
 	local obj = skynet.call(service, "lua", "query", name)
 	if cache[name] and cache[name].__obj == obj then
 		skynet.send(service, "lua", "confirm" , obj)
