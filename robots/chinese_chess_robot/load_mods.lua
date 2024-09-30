@@ -27,7 +27,7 @@ return {
         launch_seq = 2,
         launch_num = 1,
         default_arg = {
-            file_path = './logs/',          --文件路径
+            file_path = server_cfg.robots.chinese_chess_robot.logpath,          --文件路径
             filename = 'server.log',   --文件名
             limit_size = 0,            --最小分割大小
             max_age = 2,               --最大保留天数
@@ -49,7 +49,7 @@ return {
 		launch_seq = 5,
 		launch_num = 1,
 		default_arg = {
-			robot_num = 2501,    --启动机器人数量
+			robot_num = 0,    --启动机器人数量
 		}
 	},
 

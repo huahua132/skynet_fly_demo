@@ -12,7 +12,7 @@ cfg.share_config_m.default_arg.frpc_server = frpc_server_cfg.world.hallserver_2
 cfg.share_config_m.default_arg.server_cfg = server_cfg.world.hallserver_2
 cfg.share_config_m.default_arg.room_game_login.wsgateconf = gate_cfg.world.hallserver_2
 
-cfg.logrotate_m.default_arg.file_path = './logs_2/'
+cfg.logrotate_m.default_arg.file_path = server_cfg.world.hallserver_2.logpath
 cfg.logrotate_m.default_arg.sys_cmd = [[
 	/usr/bin/pkill -HUP -f skynet.make/hallserver_config.lua.load_mods_prod_1.lua\n
 ]]
