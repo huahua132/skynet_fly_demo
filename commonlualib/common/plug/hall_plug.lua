@@ -139,8 +139,8 @@ end
 
 --登出
 function M.goout(player_id, is_jump_exit)
-	for i = 1, #g_login_funcs do
-		local func = g_login_funcs[i]
+	for i = 1, #g_loginout_funcs do
+		local func = g_loginout_funcs[i]
 		local isok, err = x_pcall(func, player_id, is_jump_exit)
 		if not isok then
 			log.error("reconnect err ", player_id, is_jump_exit, err)

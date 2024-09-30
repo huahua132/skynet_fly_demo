@@ -109,7 +109,6 @@ function M.do_match_game(player_id, pack_body)
 
     --匹配中
     if g_matching_map[player_id] then
-        log.warn("do_match_game ", player_id)
         return nil, errorcode.MATCHING, "MATCHING"
     end
     --log.info("do_match_game2 >>> ",player_id, pack_body)
