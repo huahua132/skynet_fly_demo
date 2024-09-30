@@ -93,7 +93,7 @@ function handle.get_item(player_id, id)
 end
 
 --批量查询道具
-function handle.get_item_list(player_id, id_list)
+function handle.get_item_map(player_id, id_list)
     assert(player_id > 0, "err player_id " .. tostring(player_id))
     local entry_list = g_ormobj:get_entry_by_in(id_list, player_id)
     local ret_map = {}
@@ -125,7 +125,7 @@ function handle.get_item_list(player_id, id_list)
 end
 
 --批量增加道具
-function handle.add_item_list(player_id, item_map)
+function handle.add_item_map(player_id, item_map)
     assert(player_id > 0, "err player_id " .. tostring(player_id))
     local id_list = {}
     for id, num in pairs(item_map) do

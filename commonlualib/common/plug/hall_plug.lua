@@ -32,8 +32,14 @@ local g_modules_list = require "hall.hall"
 local assert = assert
 local ipairs = ipairs
 local pairs = pairs
+local x_pcall = x_pcall
+local tinsert = table.insert
 
 local g_interface_mgr = nil
+local g_login_funcs = {}
+local g_disconnect_funcs = {}
+local g_reconnect_funcs = {}
+local g_loginout_funcs = {}
 
 local M = {}
 
@@ -58,21 +64,41 @@ function M.init(interface_mgr)
 
 	--初始化
 	for _, m in ipairs(g_modules_list) do
-		m.init(interface_mgr)
-	end
-end
-
-local function on_login(player_id, is_jump_join)
-	for _, m in ipairs(g_modules_list) do
+		if m.init then
+			m.init(interface_mgr)
+		end
 		if m.on_login then
-			m.on_login(player_id, is_jump_join)
+			tinsert(g_login_funcs, m.on_login)
+		end
+		if m.on_disconnect then
+			tinsert(g_disconnect_funcs, m.on_disconnect)
+		end
+		if m.on_reconnect then
+			tinsert(g_reconnect_funcs, m.on_reconnect)
+		end
+		if m.on_loginout then
+			tinsert(g_loginout_funcs, m.on_loginout)
 		end
 	end
 end
 
+local function on_login(player_id, is_jump_join)
+	for i = 1, #g_login_funcs do
+		local func = g_login_funcs[i]
+		local isok, err = x_pcall(func, player_id, is_jump_join)
+		if not isok then
+			log.error("login err ", player_id, is_jump_join, err)
+		end
+	end
+end
+
+local function queue_on_login(player_id, is_jump_join)
+	g_interface_mgr:queue(player_id, on_login, player_id, is_jump_join)
+end
+
 --连接成功
 function M.connect(player_id, is_jump_join)
-	skynet.fork(on_login, player_id, is_jump_join)
+	skynet.fork(queue_on_login, player_id, is_jump_join)
 	return {
 		isreconnect = 0,
 	}
@@ -80,23 +106,32 @@ end
 
 --掉线
 function M.disconnect(player_id)
-	for _, m in ipairs(g_modules_list) do
-		if m.on_disconnect then
-			m.on_disconnect(player_id)
+	for i = 1, #g_disconnect_funcs do
+		local func = g_disconnect_funcs[i]
+		local isok, err = x_pcall(func, player_id)
+		if not isok then
+			log.error("disconnect err ", player_id, err)
 		end
 	end
 end
 
 local function on_reconnect(player_id)
-	for _, m in ipairs(g_modules_list) do
-		if m.on_reconnect then
-			m.on_reconnect(player_id)
+	for i = 1, #g_reconnect_funcs do
+		local func = g_reconnect_funcs[i]
+		local isok, err = x_pcall(func, player_id)
+		if not isok then
+			log.error("reconnect err ", player_id, err)
 		end
 	end
 end
+
+local function queue_on_reconnect(player_id)
+	g_interface_mgr:queue(player_id, on_reconnect, player_id)
+end
+
 --重连
 function M.reconnect(player_id)
-	skynet.fork(on_reconnect, player_id)
+	skynet.fork(queue_on_reconnect, player_id)
 	return {
 		isreconnect = 1,
 	}
@@ -104,9 +139,11 @@ end
 
 --登出
 function M.goout(player_id, is_jump_exit)
-	for _, m in ipairs(g_modules_list) do
-		if m.on_loginout then
-			m.on_loginout(player_id, is_jump_exit)
+	for i = 1, #g_login_funcs do
+		local func = g_login_funcs[i]
+		local isok, err = x_pcall(func, player_id, is_jump_exit)
+		if not isok then
+			log.error("reconnect err ", player_id, is_jump_exit, err)
 		end
 	end
 end
@@ -127,7 +164,7 @@ end
 -- 客户端消息处理结束
 function M.handle_end(player_id, pack_id, pack_body, ret, errcode, errmsg)
 	if not ret then
-		log.info("handle_end err >>> ", pack_id, ret, errcode, errmsg)
+		log.info("handle_end err >>> ", player_id, pack_id, ret, errcode, errmsg)
 		errors_msg:errors(player_id, errcode, errmsg, pack_id)
 	end
 end

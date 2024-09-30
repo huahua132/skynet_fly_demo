@@ -35,4 +35,14 @@ function M.reduce_item(player_id, id, count)
     return table.unpack(ret.result)
 end
 
+function M.add_item_map(player_id, item_map)
+    local cli = base.hallserver_room_game_hall_m(player_id)
+    local ret = cli:byid_mod_call("item_add_item_map", player_id, item_map)
+    if not ret then
+        log.error("add_item_map err ", player_id, item_map)
+        return nil
+    end
+    return table.unpack(ret.result)
+end
+
 return M

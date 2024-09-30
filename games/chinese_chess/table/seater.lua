@@ -111,6 +111,12 @@ function M:reduce_score(num)
 	return num
 end
 
+--获得奖励
+function M:add_item_map(item_map)
+	local player_id = self.player.player_id
+	return item.add_item_map(player_id, item_map)
+end
+
 --设置操作,总时长,单次时长
 function M:set_doing_time(total_time, one_time)
 	self.remain_total_time = total_time * timer.second

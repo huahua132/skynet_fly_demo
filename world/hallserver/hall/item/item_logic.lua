@@ -84,13 +84,13 @@ function M.cmd_reduce_item(player_id, id, num)
 end
 
 --批量查询道具
-function M.cmd_get_item_list(player_id, id_list)
-    return g_item_entity:get_item_list(player_id, id_list)
+function M.cmd_get_item_map(player_id, id_list)
+    return g_item_entity:get_item_map(player_id, id_list)
 end
 
 --批量增加道具
-function M.cmd_add_item_list(player_id, item_map)
-    local ret_map = g_item_entity:add_item_list(player_id, item_map)
+function M.cmd_add_item_map(player_id, item_map)
+    local ret_map = g_item_entity:add_item_map(player_id, item_map)
 
     local item_list = {}
     for id, count in pairs(ret_map) do
