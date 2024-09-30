@@ -6,6 +6,7 @@ local player = require "common.rpc.hallserver.player"
 local item = require "common.rpc.hallserver.item"
 local timer = require "skynet-fly.timer"
 local schema = hotfix_require "common.enum.schema"
+local table_conf = hotfix_require "table.table_conf"
 
 local setmetatable = setmetatable
 local assert = assert
@@ -35,6 +36,7 @@ function M:enter(player_id, seat_id)
 		return false
 	end
 
+	self.rank_level = table_conf.get_rank_level(self.score)
 	self.state = SEAT_STATE.waitting
 	return true
 end
@@ -83,6 +85,11 @@ end
 --获取分数
 function M:get_score()
 	return self.score
+end
+
+--获取段位等级
+function M:get_rank_level()
+	return self.rank_level
 end
 
 --增加积分

@@ -36,6 +36,24 @@ local enums =
 
 local beans = {}
     do
+    ---@class chess.chess_param 
+     ---@field public init_score integer @初始分数
+     ---@field public low_level_cond integer @低等级条件
+     ---@field public win_add_score integer @赢加分
+     ---@field public lose_reduce_score integer @输减分
+     ---@field public low_win_add_score integer @低等级赢加分
+     ---@field public low_lose_reduce_score integer @低等级输减分
+        local class = {
+            { name='init_score', type='integer'},
+            { name='low_level_cond', type='integer'},
+            { name='win_add_score', type='integer'},
+            { name='lose_reduce_score', type='integer'},
+            { name='low_win_add_score', type='integer'},
+            { name='low_lose_reduce_score', type='integer'},
+        }
+        beans['chess.chess_param'] = class
+    end
+    do
     ---@class chess.chess_rank 
      ---@field public rank_id integer @段位ID
      ---@field public level integer @段位等级
@@ -103,6 +121,7 @@ local tables =
     { name='level', file='player_level', mode='map', index='level', value_type='player.player_level' },
     { name='info', file='item_info', mode='map', index='item_id', value_type='item.item_info' },
     { name='type', file='chess_type', mode='map', index='play_type', value_type='chess.chess_type' },
+    { name='param', file='chess_param', mode='one', value_type='chess.chess_param'},
     { name='rank', file='chess_rank', mode='map', index='rank_id', value_type='chess.chess_rank' },
     { name='game', file='match_game', mode='list', index='', value_type='match.match_game' },
 }

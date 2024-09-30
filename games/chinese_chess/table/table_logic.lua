@@ -16,6 +16,7 @@ local module_cfg = require "skynet-fly.etc.module_info".get_cfg()
 local seater = hotfix_require "table.seater"
 local TEAM_TYPE = require "enum.TEAM_TYPE"
 local table_conf = hotfix_require "table.table_conf"
+local schema = hotfix_require "common.enum.schema"
 
 local assert = assert
 local setmetatable = setmetatable
@@ -240,11 +241,28 @@ function M:game_over(win_seat_id)
         end
     end
     local play_cfg = self.m_play_cfg
+    local param = table_conf.get_params()
+
     --结算积分
-    --赢了加10分
-    local addnum = seat_player:add_score(10)
-    --输了减10分
-    local reducenum = lose_seat_player:reduce_score(10)
+    local addnum = 0
+    local reducenum = 0
+
+    if self.m_play_type == schema.enums.play_type.CC_RANKING then                           --排位赛玩法才加减分
+        local win_rank_level = seat_player:get_rank_level()
+        local lose_rank_level = seat_player:get_rank_level()
+        if math.abs(win_rank_level - lose_rank_level) >= param.low_level_cond then          --有段位差
+            if win_rank_level < lose_rank_level then                                        --赢家段位小，赢家多赢分
+                addnum = seat_player:add_score(param.low_win_add_score)
+                reducenum = lose_seat_player:reduce_score(param.lose_reduce_score)
+            else                                                                            --输家段位小，输家少输分
+                addnum = seat_player:add_score(param.win_add_score)
+                reducenum = lose_seat_player:reduce_score(param.low_lose_reduce_score)
+            end
+        else
+            addnum = seat_player:add_score(param.win_add_score)
+            reducenum = lose_seat_player:reduce_score(param.lose_reduce_score)
+        end
+    end
 
     local lose_player_id = lose_seat_player:get_player().player_id
 
