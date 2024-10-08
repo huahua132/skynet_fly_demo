@@ -6,7 +6,7 @@ local player = require "common.rpc.hallserver.player"
 local item = require "common.rpc.hallserver.item"
 local timer = require "skynet-fly.timer"
 local schema = hotfix_require "common.enum.schema"
-local table_conf = hotfix_require "table.table_conf"
+local chess_conf = hotfix_require "common.conf.chess_conf"
 
 local setmetatable = setmetatable
 local assert = assert
@@ -29,14 +29,14 @@ end
 --坐下
 function M:enter(player_id, seat_id)
 	self.player = player.get_player_info(player_id)
-	self.score = item.get_item(player_id, schema.enums.item_ID.PROP_SCORE)
+	self.score = self.player.rank_score
 	self.seat_id = seat_id
 	
 	if not self.player or not self.score then
 		return false
 	end
 
-	self.rank_level = table_conf.get_rank_level(self.score)
+	self.rank_level = chess_conf.get_rank_level(self.score)
 	self.state = SEAT_STATE.waitting
 	return true
 end
@@ -94,26 +94,18 @@ end
 
 --增加积分
 function M:add_score(num)
-	if num <= 0 then return end
+	if num <= 0 then return 0 end
 	local player_id = self.player.player_id
-	self.score = item.add_item(player_id, schema.enums.item_ID.PROP_SCORE, num)
-	item.add_item(player_id, schema.enums.item_ID.PROP_EXP, 1000) 				--增加经验
+	self.score = player.change_rank_score(player_id, num)
 	
 	return num
 end
 
 --减少积分
 function M:reduce_score(num)
-	if num <= 0 then return end
-	if self.score <= 0 then return 0 end
-
-	if num > self.score then
-		num = self.score
-	end
-
+	if num <= 0 then return 0 end
 	local player_id = self.player.player_id
-	local _
-	_,self.score = item.reduce_item(player_id, schema.enums.item_ID.PROP_SCORE, num)
+	self.score = player.change_rank_score(player_id, -num)
 
 	return num
 end

@@ -14,6 +14,7 @@ local mod_queue = require "skynet-fly.mod_queue"
 local item_interface = require "hall.item.interface"
 local schema = hotfix_require "common.enum.schema"
 local player_conf = hotfix_require "hall.player.player_conf"
+local chess_conf = hotfix_require "common.conf.chess_conf"
 
 contriner_client:register("room_game_hall_m")
 
@@ -127,17 +128,22 @@ function M.on_login(player_id)
     g_p_info_map[player_id] = player_info
 
     tinsert(g_player_list, player_id)
-    player_info_notice(player_id)
 
+    local change_info = {}
     if player_info.last_login_time == 0 then
+        local param_cfg = chess_conf.get_params()
+        player_info.rank_score = param_cfg.init_score
+        change_info['rank_score'] = player_info.rank_score
         event_mgr.publish(EVENT_ID.FIRST_LOGIN, player_id)                                    --首次登录事件
     elseif time_util.is_cross_day(player_info.last_logout_time) then
         event_mgr.publish(EVENT_ID.CROSS_DAY, player_id)                                      --跨天事件
     end
     player_info.last_login_time = time_util.time()                                            --更新最后一次登录的时间
-
+    change_info['player_id'] = player_id
+    change_info['last_login_time'] = player_info.last_login_time
+    player_info_notice(player_id)
     --保存数据
-    g_player_entity:change_save_one_entry({player_id = player_id, last_login_time = player_info.last_login_time})
+    g_player_entity:change_save_one_entry(change_info)
 end
 
 --登出
@@ -222,6 +228,16 @@ end
 
 function M.cmd_get_players_info_by_local(player_list, field_list)
     return interface.get_players_info(player_list, field_list)
+end
+
+function M.cmd_change_rank_score(player_id, score)
+    local now_score = g_player_entity:change_rank_score(player_id, score)
+    local player_info = g_p_info_map[player_id]
+    if player_info then
+        player_info.rank_score = now_score
+    end
+
+    return now_score
 end
 
 -----------------------------interface------------------------------------

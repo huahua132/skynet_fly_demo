@@ -15,11 +15,10 @@ local enums =
      ---@field public DIGITALBOMB integer @数字炸弹游戏
     ['game_type'] = {   CHINESE_CHESS=1,  DIGITALBOMB=2,  };
     ---@class item_ID @道具ID
-     ---@field public PROP_SCORE integer @排位赛积分
      ---@field public PROP_SILVER integer @普通货币
      ---@field public PROP_GOLD integer @高级货币
      ---@field public PROP_EXP integer @玩家经验值
-    ['item_ID'] = {   PROP_SCORE=10000001,  PROP_SILVER=10000003,  PROP_GOLD=10000004,  PROP_EXP=10000005,  };
+    ['item_ID'] = {   PROP_SILVER=10000001,  PROP_GOLD=10000002,  PROP_EXP=10000003,  };
     ---@class item_main_type @道具类型
      ---@field public PROP integer @没有特殊类型的道具
     ['item_main_type'] = {   PROP=1,  };
