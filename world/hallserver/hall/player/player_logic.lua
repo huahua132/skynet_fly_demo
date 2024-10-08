@@ -235,6 +235,10 @@ function M.cmd_change_rank_score(player_id, score)
     local player_info = g_p_info_map[player_id]
     if player_info then
         player_info.rank_score = now_score
+
+        g_local_info.player_msg:player_info_syn_notice(player_id, {
+            synList = {{field_name = 'rank_score', is_str = 0, value = now_score}} 
+        })
     end
 
     return now_score

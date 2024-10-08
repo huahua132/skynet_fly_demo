@@ -7,5 +7,18 @@ message HeartReq {
 
 //玩家信息通知
 message PlayerInfoNotice {
-    optional string nickname = 1;
+    optional string nickname = 1;       //昵称
+    optional int32 rank_score = 2;      //段位积分
+}
+
+message oneSynInfo {
+    optional string field_name = 1;     //字段名
+    optional int32 is_str      = 2;     //是否字符串
+    optional string value_str  = 3;     //string值
+    optional int64 value       = 4;     //number值
+}
+
+//玩家信息字段同步通知
+message PlayerInfoSynNotice {
+    repeated oneSynInfo synList = 1;
 }
