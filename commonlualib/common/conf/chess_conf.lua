@@ -1,16 +1,26 @@
+local skynet = require "skynet"
 local sharedata = require "skynet-fly.sharedata"
 local log = require "skynet-fly.log"
 
-local g_chess_type = sharedata:new("./data_tables/chess_type.lua", sharedata.enum.sharedata)
-:set_map("type_idx", "play_type")
-:builder()
+local g_chess_type
 
-local g_chess_rank = sharedata:new("./data_tables/chess_rank.lua", sharedata.enum.sharedata)
-:set_map("idx", "rank_id")
-:builder()
+local g_chess_rank
 
-local g_chess_param = sharedata:new("./data_tables/chess_param.lua", sharedata.enum.sharedata):builder()
+local g_chess_param
 
+local function init()
+    g_chess_type = sharedata:new("./data_tables/chess_type.lua", sharedata.enum.sharedata)
+    :set_map("type_idx", "play_type")
+    :builder()
+    
+    g_chess_rank = sharedata:new("./data_tables/chess_rank.lua", sharedata.enum.sharedata)
+    :set_map("idx", "rank_id")
+    :builder()
+    
+    g_chess_param = sharedata:new("./data_tables/chess_param.lua", sharedata.enum.sharedata):builder()
+end
+
+skynet.init(init)
 
 local M = {}
 

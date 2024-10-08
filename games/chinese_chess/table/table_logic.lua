@@ -15,7 +15,7 @@ local chess_rule = hotfix_require "table.chess_rule"
 local module_cfg = require "skynet-fly.etc.module_info".get_cfg()
 local seater = hotfix_require "table.seater"
 local TEAM_TYPE = require "enum.TEAM_TYPE"
-local table_conf = hotfix_require "table.table_conf"
+local chess_conf = hotfix_require "common.conf.chess_conf"
 local schema = hotfix_require "common.enum.schema"
 
 local assert = assert
@@ -73,7 +73,7 @@ function M:new(table_id, interface, play_type)
     }
 
 
-    local play_cfg = table_conf.get_type_cfg(play_type)
+    local play_cfg = chess_conf.get_type_cfg(play_type)
     if not play_cfg then
         log.error("can`t get play_cfg ", play_type)
     else
@@ -241,7 +241,7 @@ function M:game_over(win_seat_id)
         end
     end
     local play_cfg = self.m_play_cfg
-    local param = table_conf.get_params()
+    local param = chess_conf.get_params()
 
     --结算积分
     local addnum = 0

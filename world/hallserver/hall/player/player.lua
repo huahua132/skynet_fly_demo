@@ -57,6 +57,11 @@ function CMD.player_get_players_info_by_local(player_list, field_list)
     return player_logic.cmd_get_players_info_by_local(player_list, field_list)
 end
 
+--改变玩家段位积分
+function CMD.player_change_rank_score(player_id, score)
+    return player_logic.cmd_change_rank_score(player_id, score)
+end
+
 M.register_cmd = CMD
 
 return M

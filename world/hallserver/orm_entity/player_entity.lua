@@ -28,6 +28,7 @@ function M.init()
     :int64("create_time")       --创建时间
     :int64("last_login_time")   --最后登录时间
     :int64("last_logout_time")  --最后登出时间
+    :int32("rank_score")        --段位积分
     :set_keys("player_id")
     :set_cache(60 * 60 * 100, 500, 100000)    --缓存1个小时，5秒同步一次更改，最大缓存10万条数据
     :builder(adapter)
@@ -39,17 +40,30 @@ function handle.get_players_info(player_list, field_map)
     for i = 1, #player_list do
         local player_id = player_list[i]
         local entry = g_ormobj:get_one_entry(player_id)
-        local entry_data = entry:get_entry_data()
+        if entry then
+            local entry_data = entry:get_entry_data()
 
-        local info = {}
-        for field in pairs(field_map) do
-            assert(entry_data[field], "get_players_info field not exists :" .. field)
-            info[field] = entry_data[field]
+            local info = {}
+            for field in pairs(field_map) do
+                assert(entry_data[field], "get_players_info field not exists :" .. field)
+                info[field] = entry_data[field]
+            end
+            ret_map[player_id] = info
         end
-        ret_map[player_id] = info
     end
 
     return ret_map
+end
+
+function handle.change_rank_score(player_id, score)
+    local entry = g_ormobj:get_one_entry(player_id)
+    assert(entry, "change_rank_score not exists" .. player_id)
+
+    local rank_score = entry:get('rank_score')
+    rank_score = rank_score + score
+    entry:set('rank_score', rank_score)
+
+    return rank_score
 end
 
 M.handle = handle
