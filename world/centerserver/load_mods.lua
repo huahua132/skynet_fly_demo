@@ -14,22 +14,16 @@ return {
 				rpc = redis_cfg.rpc
 			},
 
+            mysql = {
+                [mysql_cfg.world.centerserver.database] = mysql_cfg.world.centerserver
+            },
+
 			--cluster_server用的配置
 			frpc_server = frpc_server_cfg.world.centerserver,
 
 			server_cfg = server_cfg.world.centerserver
 		}
 	},
-    --mysql连接
-    mysql_m = {
-        launch_seq = 2000,
-        launch_num = 6, --启动6个
-        default_arg = {
-            instance_name = mysql_cfg.world.centerserver.database,
-            db_conf = mysql_cfg.world.centerserver,
-            is_create = true,				--数据库不存在就创建
-        }
-    },
     --debug入口
 	debug_console_m = {
 		launch_seq = 3000,

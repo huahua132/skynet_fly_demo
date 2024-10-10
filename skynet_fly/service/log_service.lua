@@ -120,3 +120,4 @@ skynet.start(function()
     open_file()
     skynet_util.lua_dispatch(CMD)
 end)
+

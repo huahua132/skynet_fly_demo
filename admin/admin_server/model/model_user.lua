@@ -1,6 +1,5 @@
 local token_auth_mid = require "middleware.token_auth_mid"
 local model_role = require "model.model_role"
-local mysqlf = require "skynet-fly.db.mysqlf"
 local log = require "skynet-fly.log"
 local CODE = require "common.enum.CODE"
 local json = require "cjson"

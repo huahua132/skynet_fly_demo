@@ -1,8 +1,11 @@
 local skynet = require "skynet"
 local contriner_client = require "skynet-fly.client.contriner_client"
+local mysql = require "skynet.db.mysql"
 
 local assert = assert
 local setmetatable = setmetatable
+local pcall = pcall
+local next = next
 
 contriner_client:register("mysql_m")
 
