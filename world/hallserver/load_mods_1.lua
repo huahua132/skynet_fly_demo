@@ -18,6 +18,9 @@ return {
 				global = redis_cfg.global,
 			},
 
+			mysql = {
+				[mysql_cfg.world.hallserver_1.database] = mysql_cfg.world.hallserver_1,
+			},
 			--cluster_server用的配置
 			frpc_server = frpc_server_cfg.world.hallserver_1,
 
@@ -50,17 +53,6 @@ return {
             sys_cmd = [[
                 /usr/bin/pkill -HUP -f skynet.make/hallserver_config.lua.load_mods_1.lua\n
             ]],              --系统命令
-        }
-    },
-
-    --mysql连接
-    mysql_m = {
-        launch_seq = 4000,
-        launch_num = 6, --启动6个
-        default_arg = {
-			instance_name = mysql_cfg.world.hallserver_1.database,
-            db_conf = mysql_cfg.world.hallserver_1,
-            is_create = true,				--数据库不存在就创建
         }
     },
 

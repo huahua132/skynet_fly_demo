@@ -24,22 +24,15 @@ return {
 				global = redis_cfg.global,
 			},
 
+			mysql = {
+				[mysql_cfg.games.chinese_chess_1.database] = mysql_cfg.games.chinese_chess_1,
+			},
+
 			--cluster_server用的配置
 			frpc_server = frpc_server_cfg.games.chinese_chess_1,
 
 			server_cfg = server_cfg.games.chinese_chess_1,
 		}
-	},
-
-	--mysql
-	mysql_m = {
-		launch_seq = 1500,
-		launch_num = 6, --启动6个
-        default_arg = {
-			instance_name = mysql_cfg.games.chinese_chess_1.database,
-            db_conf = mysql_cfg.games.chinese_chess_1,
-            is_create = true,				--数据库不存在就创建
-        }
 	},
 
 	--大厅服

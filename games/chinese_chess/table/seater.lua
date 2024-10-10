@@ -5,7 +5,6 @@ local log = require "skynet-fly.log"
 local player = require "common.rpc.hallserver.player"
 local item = require "common.rpc.hallserver.item"
 local timer = require "skynet-fly.timer"
-local schema = hotfix_require "common.enum.schema"
 local chess_conf = hotfix_require "common.conf.chess_conf"
 
 local setmetatable = setmetatable

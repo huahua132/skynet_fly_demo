@@ -17,6 +17,9 @@ return {
 				global = redis_cfg.global,
 			},
 
+			mysql = {
+				[mysql_cfg.admin.database] = mysql_cfg.admin,
+			},
 			--cluster_server用的配置
 			frpc_server = frpc_server_cfg.admin.admin_server,
 
@@ -57,17 +60,6 @@ return {
             ]],              --系统命令
         }
     },
-    --mysql连接
-    mysql_m = {
-		launch_seq = 5000,
-		launch_num = 6, --启动6个
-        default_arg = {
-			instance_name = mysql_cfg.admin.database,
-            db_conf = mysql_cfg.admin,
-			is_create = true,				--数据库不存在就创建
-        }
-	},
-
 	-- orm
 	orm_table_m = {
 		launch_seq = 5500,
