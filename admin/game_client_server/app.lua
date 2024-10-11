@@ -4,7 +4,7 @@ local cors_mid = require "skynet-fly.web.middleware.cors_mid"
 
 local M = {}
 
---初始化一个纯净版
+--带log中间件
 local app = engine_web:default()
 --请求处理
 M.dispatch = engine_web.dispatch(app)
