@@ -1,31 +1,8 @@
 
 local log = require "skynet-fly.log"
 local ws_pbnet_byid = require "skynet-fly.utils.net.ws_pbnet_byid"
-local pb_netpack = require "skynet-fly.netpack.pb_netpack"
 local timer = require "skynet-fly.timer"
 local skynet = require "skynet"
-local module_info = require "skynet-fly.etc.module_info"
-local pack_helper = require "common.pack_helper"
-do
-	--加载协议
-	local cfg = module_info.get_cfg()
-	if cfg.is_game then
-		pb_netpack.load('../../commonlualib/gamecommon/proto')
-		pack_helper.set_pack_id_names {
-			"../../commonlualib/gamecommon/enum/",
-		}
-	end
-
-	pb_netpack.load('../../commonlualib/common/proto')
-	pb_netpack.load('./proto')
-
-	--协议码 协议消息名建立映射关系
-	pack_helper.set_pack_id_names {
-		"../../commonlualib/common/enum/",
-		"./enum/",
-	}
-end
-
 local errors_msg = require "common.msg.errors_msg"
 local g_modules_list = require "hall.hall"
 

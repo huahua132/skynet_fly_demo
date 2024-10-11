@@ -1,5 +1,5 @@
 package hallserver_item;
-import "../../commonlualib/common/proto/common.proto";
+import "../../commonlualib/protos/common/common.proto";
 
 message ItemListNotice {
     repeated common.Item item_list = 1;

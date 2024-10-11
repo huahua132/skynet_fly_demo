@@ -11,11 +11,11 @@ contriner_client:register("token_m")
 
 do
 	--加载pb文件
-	pb_netpack.load('../../commonlualib/common/proto')
+	pb_netpack.load('../../commonlualib/protos/common')
 
 	--协议码 协议消息名建立映射关系
 	pack_helper.set_pack_id_names {
-		"../../commonlualib/common/enum/",
+		"../../commonlualib/packids/common/",
 	}
 end
 

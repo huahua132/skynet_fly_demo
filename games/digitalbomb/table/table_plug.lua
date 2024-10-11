@@ -7,15 +7,16 @@ local ws_pbnet_byid = require "skynet-fly.utils.net.ws_pbnet_byid"
 local pack_helper = require "common.pack_helper"
 
 do
-	pb_netpack.load('../../commonlualib/gamecommon/proto')
-	pb_netpack.load('../../commonlualib/common/proto')
-	pb_netpack.load('./proto')
+	pb_netpack.load('../../commonlualib/protos/gamecommon')
+	pb_netpack.load('../../commonlualib/protos/common')
+	pb_netpack.load('../../commonlualib/protos/chinese_chess')
 
-	pack_helper.set_pack_id_names({
-		'../../commonlualib/gamecommon/enum/',
-		'../../commonlualib/common/enum/',
-		'./enum/',
-	})
+	--协议码 协议消息名建立映射关系
+	pack_helper.set_pack_id_names {
+		"../../commonlualib/packids/gamecommon/",
+		"../../commonlualib/packids/common/",
+		"../../commonlualib/packids/chinese_chess/",
+	}
 end
 
 local PACK = pack_helper.PACK
