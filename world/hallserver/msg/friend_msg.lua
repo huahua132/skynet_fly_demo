@@ -33,4 +33,9 @@ function M:refuse_friend_res(player_id, res)
 	self.interface_mgr:send_msg(player_id, PACK.hallserver_friend.RefuseAddFriendRes, res)
 end
 
+--删除好友
+function M:del_friend_res(player_id, res)
+	self.interface_mgr:send_msg(player_id, PACK.hallserver_friend.DelFriendReq, res)
+end
+
 return M
