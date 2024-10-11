@@ -41,7 +41,6 @@ return {
 		launch_num = 6, --启动6个
 		default_arg = {
 			hall_plug = "common.plug.hall_plug",         --大厅加载的插件lua模块文件名
-			is_game = true,
 		}
 	},
 

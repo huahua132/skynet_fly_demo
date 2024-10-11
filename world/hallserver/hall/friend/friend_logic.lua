@@ -119,7 +119,7 @@ end
 --请求添加好友
 function M.do_add_friend_req(player_id, pack_body)
     local add_player_id = pack_body.player_id or 0
-    local add_svr_id = player_util.get_svr_id_by_player_id(player_id)
+    local add_svr_id = player_util.get_svr_id_by_player_id(add_player_id)
     if add_svr_id <= 0 then
         return nil, errorcode.REQ_PARAM_ERR, "invaild player_id:" .. add_player_id
     end
@@ -143,7 +143,7 @@ function M.do_add_friend_req(player_id, pack_body)
     --其他服
         local ret, errno, errmsg = friend_rpc.req_add_firend(player_id, add_player_id)
         if not ret then
-            return ret,errno, errmsg
+            return ret, errno, errmsg
         end
     end
 
@@ -157,7 +157,7 @@ end
 --同意添加好友
 function M.do_agree_add_friend_req(player_id, pack_body)
     local add_player_id = pack_body.player_id or 0
-    local add_svr_id = player_util.get_svr_id_by_player_id(player_id)
+    local add_svr_id = player_util.get_svr_id_by_player_id(add_player_id)
     if add_svr_id <= 0 then
         return nil, errorcode.REQ_PARAM_ERR, "invaild player_id:" .. add_player_id
     end
@@ -203,7 +203,7 @@ end
 --拒绝添加好友
 function M.do_refuse_add_friend_req(player_id, pack_body)
     local add_player_id = pack_body.player_id or 0
-    local add_svr_id = player_util.get_svr_id_by_player_id(player_id)
+    local add_svr_id = player_util.get_svr_id_by_player_id(add_player_id)
     if add_svr_id <= 0 then
         return nil, errorcode.REQ_PARAM_ERR, "invaild player_id:" .. add_player_id
     end
@@ -226,13 +226,34 @@ end
 
 --删除好友
 function M.do_del_friend_req(player_id, pack_body)
-    local add_player_id = pack_body.player_id or 0
-    local add_svr_id = player_util.get_svr_id_by_player_id(player_id)
-    if add_svr_id <= 0 then
-        return nil, errorcode.REQ_PARAM_ERR, "invaild player_id:" .. add_player_id
+    local del_player_id = pack_body.player_id or 0
+    local del_svr_id = player_util.get_svr_id_by_player_id(del_player_id)
+    if del_svr_id <= 0 then
+        return nil, errorcode.REQ_PARAM_ERR, "invaild player_id:" .. del_player_id
     end
 
-    
+    if not g_friend_cli:get_one_entry(player_id, del_player_id) then
+        return nil, errorcode.UNKOWN_ERR, "not friend"
+    end
+
+    if not g_friend_cli:delete_one_entry(player_id, del_player_id) then
+        return nil, errorcode.UNKOWN_ERR, "server err"
+    end
+
+    --是同服的好友
+    if g_svr_id == del_svr_id then
+        if g_friend_cli:get_one_entry(del_player_id, player_id) then
+            g_friend_cli:delete_one_entry(del_player_id, player_id)
+        end
+    else
+        friend_rpc.req_del_firend(player_id, del_player_id)
+    end
+
+    g_local_info.friend_msg:del_friend_res(player_id, {
+        player_id = del_player_id,
+    })
+
+    return true
 end
 
 --------------------------------------CMD-----------------------------------
@@ -255,6 +276,14 @@ function M.cmd_agree_req(player_id, add_player_id)
 
     if not g_friend_cli:create_one_entry(add_player_id, player_id) then
         return nil, errorcode.UNKOWN_ERR, "server err"
+    end
+
+    return true
+end
+
+function M.cmd_del_req(player_id, del_player_id)
+    if g_friend_cli:get_one_entry(del_player_id, player_id) then
+        g_friend_cli:delete_one_entry(del_player_id, player_id)
     end
 
     return true
