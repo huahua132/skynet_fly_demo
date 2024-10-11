@@ -8,15 +8,16 @@ local pack_helper = require "common.pack_helper"
 local game_pack = pb_netpack.instance("game")
 local game_helper = pack_helper.instance("game", game_pack)
 do
-    game_pack.load('../../commonlualib/common/proto')
-    game_pack.load('../../commonlualib/gamecommon/proto')
-    game_pack.load('../../games/chinese_chess/proto')
-     --协议码 协议消息名建立映射关系
-     game_helper.set_pack_id_names {
-        "../../commonlualib/common/enum/",
-        "../../commonlualib/gamecommon/enum/",
-        "../../games/chinese_chess/enum/",
-    }
+    game_pack.load('../../commonlualib/protos/gamecommon')
+	game_pack.load('../../commonlualib/protos/common')
+	game_pack.load('../../commonlualib/protos/chinese_chess')
+
+	--协议码 协议消息名建立映射关系
+	game_helper.set_pack_id_names {
+		"../../commonlualib/packids/gamecommon/",
+		"../../commonlualib/packids/common/",
+		"../../commonlualib/packids/chinese_chess/",
+	}
 end
 
 local PACK = game_helper.PACK

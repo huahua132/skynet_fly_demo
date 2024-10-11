@@ -21,13 +21,13 @@ local game_pack = pb_netpack.instance("game")
 local hall_helper = pack_helper.instance("hall", hall_pack)
 do
     --加载pb协议
-    hall_pack.load('../../commonlualib/common/proto')
-    hall_pack.load('../../world/hallserver/proto')
+    hall_pack.load('../../commonlualib/protos/common')
+    hall_pack.load('../../commonlualib/protos/hallserver')
 
     --协议码 协议消息名建立映射关系
     hall_helper.set_pack_id_names {
-        "../../commonlualib/common/enum/",
-        "../../world/hallserver/enum/",
+        "../../commonlualib/packids/common/",
+        "../../commonlualib/packids/hallserver/",
     }
 end
 
