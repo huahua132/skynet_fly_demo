@@ -35,6 +35,21 @@ return {
 		}
 	},
 
+	--token
+	token_m = {
+		launch_seq = 1500,
+		launch_num = 1,
+	},
+
+	-- orm
+	orm_table_m = {
+		launch_seq = 1600,
+		launch_num = 1,
+		mod_args = {
+			{instance_name = "record", orm_plug = "orm_entity.record_entity"},
+		}
+	},
+
 	--大厅服
 	room_game_hall_m = {
 		launch_seq = 2000, --第二个启动
@@ -99,21 +114,6 @@ return {
 				['hallserver'] = true,
 			},
 			watch = 'redis',  --监听redis的方式做服务发现
-		}
-	},
-
-	--token
-	token_m = {
-		launch_seq = 8000,
-		launch_num = 1,
-	},
-
-	-- orm
-	orm_table_m = {
-		launch_seq = 9000,
-		launch_num = 1,
-		mod_args = {
-			{instance_name = "record", orm_plug = "orm_entity.record_entity"},
 		}
 	},
 }

@@ -38,7 +38,7 @@ local function new_join_table(agent, table_name, join_cmd)
 	local player_id = agent.player_id
 	local hall_server_id = agent.hall_server_id
 
-	local table_server_id,table_id,errmsg = alloc_client:mod_call(join_cmd, player_id, gate, fd, agent.is_ws, hall_server_id, table_name)
+	local table_server_id,table_id,errmsg = alloc_client:mod_call(join_cmd, player_id, gate, fd, agent.is_ws, agent.addr, hall_server_id, table_name)
 	if not table_server_id then
 		return false,table_id,errmsg
 	end
@@ -76,7 +76,7 @@ local function join_table(agent, player_id, table_name, table_id)
 	local gate = agent.gate
 	local fd = agent.fd
 	local hall_server_id = agent.hall_server_id
-	local table_server_id,table_id,errmsg = xx_pcall(skynet.call, alloc_server_id, 'lua', "join", player_id, gate, fd, agent.is_ws, hall_server_id, table_name, table_id)
+	local table_server_id,table_id,errmsg = xx_pcall(skynet.call, alloc_server_id, 'lua', "join", player_id, gate, fd, agent.is_ws, agent.addr, hall_server_id, table_name, table_id)
 	if not table_server_id then
 		return false,table_id,errmsg
 	end
@@ -134,6 +134,13 @@ local function handle_msg(agent, header, body)
 			skynet.send(table_server_id, 'lua', 'request', table_id, agent.player_id, header, body)
 		end
 	else
+		
+		if hall_plug.handle_before then
+			if not hall_plug.handle_before(agent.player_id, header, body) then
+				return
+			end
+		end
+
 		if hall_plug.handle_end then
 			hall_plug.handle_end(agent.player_id, header, body, func(agent.player_id,header,body))
 		else
@@ -177,7 +184,7 @@ local function connect(agent, is_reconnect, is_jump_join)
 		local table_server_id = agent.table_server_id
 		local table_id = agent.table_id
 		if table_server_id then
-			skynet.send(table_server_id, 'lua', 'reconnect', gate, fd, agent.is_ws, table_id, player_id)
+			skynet.send(table_server_id, 'lua', 'reconnect', gate, fd, agent.is_ws, agent.addr, table_id, player_id)
 		end
 	end
 
@@ -459,10 +466,20 @@ function interface:queue(player_id, func, ...)
 	end
 	return agent.queue(func, ...)
 end
+
+--获取客户端连接IP:PORT
+function interface:get_addr(player_id)
+	local agent = g_player_map[player_id]
+	if not agent then
+		return ""
+	end
+
+	return agent.addr
+end
 ----------------------------------------------------------------------------------
 --CMD
 ----------------------------------------------------------------------------------
-local function connect_new(gate, fd, is_ws, player_id, watchdog, is_jump_join)
+local function connect_new(gate, fd, is_ws, addr, player_id, watchdog, is_jump_join)
 	--先设置转发，成功后再建立连接管理映射，不然存在建立连接，客户端立马断开的情况，掉线无法通知到此服务
 	if fd > 0 and not skynet.call(gate, 'lua', 'forward', fd) then
 		return nil, -1, "forward err"
@@ -479,6 +496,7 @@ local function connect_new(gate, fd, is_ws, player_id, watchdog, is_jump_join)
 			hall_server_id = SELF_ADDRESS,
 			dis_conn_time = 0,         --掉线时间
 			is_ws = is_ws,			   --是否websocket连接
+			addr = addr,
 		}
 		g_player_map[player_id] = agent
 	else
@@ -491,6 +509,7 @@ local function connect_new(gate, fd, is_ws, player_id, watchdog, is_jump_join)
 		agent.gate = gate
 		agent.watchdog = watchdog
 		agent.is_ws = is_ws
+		agent.addr = addr
 		is_reconnect = true
 	end
 
@@ -498,8 +517,8 @@ local function connect_new(gate, fd, is_ws, player_id, watchdog, is_jump_join)
 	return agent.queue(connect, agent, is_reconnect, is_jump_join)
 end
 
-function CMD.connect(gate, fd, is_ws, player_id, watchdog)
-	return connect_new(gate, fd, is_ws, player_id, watchdog)
+function CMD.connect(gate, fd, is_ws, addr, player_id, watchdog)
+	return connect_new(gate, fd, is_ws, addr, player_id, watchdog)
 end
 --掉线
 function CMD.disconnect(gate,fd,player_id)
@@ -568,8 +587,8 @@ function CMD.jump_exit(player_id)
 end
 
 --跳入新服务
-function CMD.jump_join(gate, fd, is_ws, player_id, watchdog)
-	return connect_new(gate, fd, is_ws, player_id, watchdog, true)
+function CMD.jump_join(gate, fd, is_ws, addr, player_id, watchdog)
+	return connect_new(gate, fd, is_ws, addr, player_id, watchdog, true)
 end
 
 function CMD.start(config)
@@ -686,5 +705,21 @@ function CMD.exit()
 		return true
 	end
 end
+
+--安全关服处理
+skynet_util.reg_shutdown_func(function()
+	log.warn("-------------shutdown save begin---------------")
+	for _,agent in pairs(g_player_map) do
+		if agent then
+			local isok,errorcode,errormsg = interface:goout(agent.player_id, "shutdown")
+			if not isok then
+				log.warn("shutdown goout err ",errorcode,errormsg)
+			else
+				log.warn("shutdown goout succ ", agent.player_id)
+			end
+		end
+	end
+	log.warn("-------------shutdown save begin---------------")
+end)
 
 return CMD
