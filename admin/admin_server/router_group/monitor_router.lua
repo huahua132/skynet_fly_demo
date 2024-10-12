@@ -129,16 +129,14 @@ return function(group)
         local ret = instance:byid_mod_call('run_time')
         
         local server_ret = instance:byid_mod_call('call','info',address)
+        if not server_ret then
+            log.error("byid_mod_call err ", address)
+            return
+        end
         log.error("server_id:>>>>>>>>>>>>>>>>",split_str,address)
         log.error("server_ret:>>",server_ret)
 
-        if server_ret.result[1] and server_ret.result[1].hot_container and server_ret.result[1].hot_container.source_map then
-            local source_map = server_ret.result[1].hot_container.source_map
-            for source,name in pairs(source_map) do
-                source_map['' .. source] = name
-                source_map[source] = nil
-            end
-        end
+        server_ret.result[1] = cjson_safe.decode(server_ret.result[1])
 
         rsp_body.set_rsp(c,{
             run_time = ret.result[1],

@@ -64,16 +64,16 @@ function M.do_friend_list_req(player_id, pack_body)
         return nil, errorcode.REQ_PARAM_ERR, "pageage_count err " .. pageage_count
     end
 
-    local firend_list = g_local_info.friend_list_cache:get_cache(player_id)
-    if not firend_list then
-        firend_list = g_friend_cli:get_entry(player_id)
-        g_local_info.friend_list_cache:set_cache(player_id, firend_list)
+    local friend_list = g_local_info.friend_list_cache:get_cache(player_id)
+    if not friend_list then
+        friend_list = g_friend_cli:get_entry(player_id)
+        g_local_info.friend_list_cache:set_cache(player_id, friend_list)
     end
 
     local start_index = (pageage_num - 1) * pageage_count + 1
     local end_index = start_index + pageage_count - 1
 
-    local len = #firend_list
+    local len = #friend_list
 
     local res_list = {
         pageage_num = pageage_num,
@@ -86,7 +86,7 @@ function M.do_friend_list_req(player_id, pack_body)
     local friend_index_map = {}
     for i = start_index, end_index do
         if i > len then break end
-        local info = firend_list[i]
+        local info = friend_list[i]
         tinsert(player_list, info.friend_id)
         friend_index_map[info.friend_id] = i
     end
@@ -94,7 +94,7 @@ function M.do_friend_list_req(player_id, pack_body)
     local info_map = player_rpc.get_players_info(player_list, g_get_field_map)
     for pid, info in pairs(info_map) do
         local index = friend_index_map[pid]
-        local friend_info = firend_list[index]
+        local friend_info = friend_list[index]
         for field in pairs(g_get_field_map) do
             friend_info[field] = info[field]
         end
@@ -102,7 +102,7 @@ function M.do_friend_list_req(player_id, pack_body)
 
     for i = start_index, end_index do
         if i > len then break end
-        local info = firend_list[i]
+        local info = friend_list[i]
         tinsert(res_list.friend_list, {
             player_id = info.friend_id,
             nickname = info.nickname,
@@ -141,7 +141,7 @@ function M.do_add_friend_req(player_id, pack_body)
         end
     else
     --其他服
-        local ret, errno, errmsg = friend_rpc.req_add_firend(player_id, add_player_id)
+        local ret, errno, errmsg = friend_rpc.req_add_friend(player_id, add_player_id)
         if not ret then
             return ret, errno, errmsg
         end
@@ -187,7 +187,7 @@ function M.do_agree_add_friend_req(player_id, pack_body)
         end
     else
         --不同服
-        local ret, errno, errmsg = friend_rpc.req_agree_firend(player_id, add_player_id)
+        local ret, errno, errmsg = friend_rpc.req_agree_friend(player_id, add_player_id)
         if not ret then
             return ret,errno, errmsg
         end
@@ -246,7 +246,7 @@ function M.do_del_friend_req(player_id, pack_body)
             g_friend_cli:delete_one_entry(del_player_id, player_id)
         end
     else
-        friend_rpc.req_del_firend(player_id, del_player_id)
+        friend_rpc.req_del_friend(player_id, del_player_id)
     end
 
     g_local_info.friend_msg:del_friend_res(player_id, {

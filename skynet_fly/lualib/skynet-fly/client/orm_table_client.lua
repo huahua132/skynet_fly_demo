@@ -1,5 +1,6 @@
 local contriner_client = require "skynet-fly.client.contriner_client"
 local skynet = require "skynet"
+local table_util = require "skynet-fly.utils.table_util"
 local setmetatable = setmetatable
 local select = select
 local tunpack = table.unpack
@@ -25,7 +26,7 @@ local mt = {__index = function(t,k)
             end
             skynet.yield()
         end
-        error("call err ",k, ...)
+        error("call err " .. k .. ' ' .. table_util.dump({...}))
     end
     return t[k]
 end}

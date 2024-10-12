@@ -77,6 +77,24 @@ return {
 		launch_num = 1,
 	},
 
+	  -- orm
+	  orm_table_m = {
+		launch_seq = 5600,
+		launch_num = 5,
+		mod_args = {
+            {instance_name = "player", orm_plug = "orm_entity.player_entity"},
+			{instance_name = "item", orm_plug = "orm_entity.item_entity"},
+			{instance_name = "game_record", orm_plug = "orm_entity.game_record_entity"},
+			{instance_name = "friend", orm_plug = "orm_entity.friend_entity"},
+			{instance_name = "friend_req", orm_plug = "orm_entity.friend_req_entity"}
+		}
+	},
+
+    player_m = {
+        launch_seq = 5700,
+        launch_num = 6,
+    },
+
     --大厅服
 	room_game_hall_m = {
 		launch_seq = 6000,
@@ -106,22 +124,4 @@ return {
 			table_conf = {}
 		}
 	},
-
-    -- orm
-	orm_table_m = {
-		launch_seq = 7000,
-		launch_num = 5,
-		mod_args = {
-            {instance_name = "player", orm_plug = "orm_entity.player_entity"},
-			{instance_name = "item", orm_plug = "orm_entity.item_entity"},
-			{instance_name = "game_record", orm_plug = "orm_entity.game_record_entity"},
-			{instance_name = "friend", orm_plug = "orm_entity.friend_entity"},
-			{instance_name = "friend_req", orm_plug = "orm_entity.friend_req_entity"}
-		}
-	},
-
-    player_m = {
-        launch_seq = 8000,
-        launch_num = 6,
-    },
 }

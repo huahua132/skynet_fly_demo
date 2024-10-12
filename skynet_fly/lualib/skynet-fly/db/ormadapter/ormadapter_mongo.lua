@@ -113,8 +113,8 @@ function M:builder(tab_name, field_list, field_map, key_list)
 
     --insert_one 创建一条数据
     self._insert_one = function(entry_data)
-        local ok, isok, err = pcall(collect_db.raw_safe_insert, collect_db, entry_data)
-        if not ok or not isok then
+        local isok, err = collect_db:safe_insert(entry_data)
+        if not isok then
             log.error("_insert_one doc err ", self._tab_name, err, entry_data)
             error("_insert_one err ")
         end
@@ -300,11 +300,13 @@ function M:builder(tab_name, field_list, field_map, key_list)
         for k,_ in pairs(change_map) do
             update[k] = entry_data[k]
         end
-        local ok,isok,err = pcall(collect_db.safe_update, collect_db, query, {['$set'] = update})
-        if not ok or not isok then
-            log.error("_update_one doc err ",self._tab_name, err)
+        
+        local isok,err = collect_db:safe_update(query, {['$set'] = update})
+        if not isok then
+            log.error("_update_one doc err ",self._tab_name, err, update)
             error("_update_one doc err")
         end
+
         return true
     end
 
