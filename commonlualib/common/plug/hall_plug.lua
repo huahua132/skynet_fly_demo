@@ -5,6 +5,7 @@ local timer = require "skynet-fly.timer"
 local skynet = require "skynet"
 local errors_msg = require "common.msg.errors_msg"
 local g_modules_list = require "hall.hall"
+local pack_helper = require "common.pack_helper"
 
 local assert = assert
 local ipairs = ipairs
@@ -17,6 +18,9 @@ local g_login_funcs = {}
 local g_disconnect_funcs = {}
 local g_reconnect_funcs = {}
 local g_loginout_funcs = {}
+
+local g_before_funcs = {}
+local g_before_id_funcs = {}
 
 local M = {}
 
@@ -55,6 +59,17 @@ function M.init(interface_mgr)
 		end
 		if m.on_loginout then
 			tinsert(g_loginout_funcs, m.on_loginout)
+		end
+		if m.on_msg_before then
+			tinsert(g_before_funcs, m.on_msg_before)
+		end
+		if m.on_msg_before_id then
+			for id, func in pairs(m.on_msg_before_id) do
+				if not g_before_id_funcs[id] then
+					g_before_id_funcs[id] = {}
+				end
+				tinsert(g_before_id_funcs[id], func)
+			end
 		end
 	end
 end
@@ -136,6 +151,34 @@ do
 			M.register_cmd[cmdname] = func
 		end
 	end
+end
+
+--客户端消息前置处理
+function M.handle_before(player_id, pack_id, pack_body)
+	local ret, errcode, errmsg
+	for i = 1, #g_before_funcs do
+		local func = g_before_funcs[i]
+		ret, errcode, errmsg = func(player_id, pack_id, pack_body)
+		if not ret then
+			errors_msg:errors(player_id, errcode, errmsg, pack_id)
+			return false
+		end
+	end
+
+	local id = pack_helper.get_id_subid(pack_id)
+	local funcs = g_before_id_funcs[id]
+	if funcs then
+		for i = 1, #funcs do
+			local func = funcs[i]
+			ret, errcode, errmsg = func(player_id, pack_id, pack_body)
+			if not ret then
+				errors_msg:errors(player_id, errcode, errmsg, pack_id)
+				return false
+			end
+		end
+	end
+
+	return true
 end
 
 -- 客户端消息处理结束

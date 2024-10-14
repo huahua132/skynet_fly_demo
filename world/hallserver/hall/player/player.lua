@@ -1,8 +1,10 @@
 
 local player_logic = hotfix_require "hall.player.player_logic"
+local log = require "skynet-fly.log"
 local skynet = require "skynet"
 
 local PACK = require "common.pack_helper".PACK
+local ID = require "common.pack_helper".ID
 
 local M = {}
 
@@ -27,6 +29,20 @@ end
 function M.on_reconnect(player_id)
     player_logic.on_reconnect(player_id)
 end
+
+--消息前置处理
+function M.on_msg_before(player_id, pack_id, pack_body)
+    --log.info("on_msg_before >>> ", player_id, pack_id)
+    return true
+end
+
+--消息指定主码前置处理
+M.on_msg_before_id = {
+    [ID.hallserver_player] = function(player_id, pack_id, pack_body)
+        --log.info("on_msg_before hallserver_player >>> ", player_id, pack_id)
+        return true
+    end
+}
 
 M.handle = {
     --心跳
