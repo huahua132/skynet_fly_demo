@@ -6,6 +6,7 @@ local pairs = pairs
 local string = string
 local assert = assert
 local tostring = tostring
+local mfloor = math.floor
 
 local g_instance_map = {}
 
@@ -17,6 +18,7 @@ function M.new(name, pack_obj)
     local m_name = name
     local pack_obj = pack_obj
     local m_PACK = {}
+    local m_ID = {}
 
     local ret_M = {}
 
@@ -41,6 +43,8 @@ function M.new(name, pack_obj)
                     return
                 end
                 sub_packs = sub_packs()
+
+                m_ID[packname] = id
     
                 if not m_PACK[packname] then
                     m_PACK[packname] = {}
@@ -60,6 +64,7 @@ function M.new(name, pack_obj)
     end
 
     ret_M.PACK = m_PACK
+    ret_M.ID = m_ID
 
     return ret_M
 end
@@ -70,6 +75,13 @@ function M.instance(name, pack_obj)
         g_instance_map[name] = M.new(name, pack_obj)
     end
     return g_instance_map[name]
+end
+
+--拆分出主码，子码
+function M.get_id_subid(pack_id)
+    local id = mfloor(pack_id / 100)
+    local subid = pack_id % 100
+    return id, subid
 end
 
 local g_default = M.new('default', pb_netpack)

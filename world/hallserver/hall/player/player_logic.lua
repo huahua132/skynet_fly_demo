@@ -101,7 +101,7 @@ function M.check_heart()
     local cur_time = os.time()      --心跳用系统时间，避免加速时间导致测试号被踢下线
     for player_id,heart_time in pairs(g_p_heart_map) do
         if cur_time - heart_time > 60 then  --心跳超时
-            skynet.fork(g_local_info.hall_interface.goout, g_local_info.hall_interface, player_id) --踢出
+            skynet.fork(g_local_info.hall_interface.goout, g_local_info.hall_interface, player_id, "heart time out") --踢出
         end
     end
 end
@@ -148,7 +148,7 @@ end
 
 --登出
 function M.on_loginout(player_id)
-    --log.info("on_loginout >>> ", player_id)
+    --log.info("on_loginout start >>> ", player_id)
     assert(g_p_heart_map[player_id], "is not exists " .. player_id)
     local player_info =  g_p_info_map[player_id]
     assert(player_info, "not exists player_info " .. player_id)
