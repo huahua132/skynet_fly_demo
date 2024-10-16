@@ -34,7 +34,9 @@ end
 --加载
 for filename in lfs.dir("./check") do
     if filename ~= '.' and filename ~= '..' then
-        files_map[filename] = loadfile("check/" .. filename)()
+        local chunk,err = loadfile("check/" .. filename)
+        assert(chunk, err)
+        files_map[filename] = chunk()
     end
 end
 
