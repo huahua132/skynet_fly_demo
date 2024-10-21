@@ -64,13 +64,13 @@ function CMD.get_all_online()
 end
 
 --批量获取玩家字段信息
-function CMD.player_get_players_info(player_list, field_list)
-    return player_logic.cmd_get_players_info(player_list, field_list)
+function CMD.player_get_players_info(player_list, field_map)
+    return player_logic.cmd_get_players_info(player_list, field_map)
 end
 
 --批量获取本server下的玩家字段信息
-function CMD.player_get_players_info_by_local(player_list, field_list)
-    return player_logic.cmd_get_players_info_by_local(player_list, field_list)
+function CMD.player_get_players_info_by_local(player_list, field_map)
+    return player_logic.cmd_get_players_info_by_local(player_list, field_map)
 end
 
 --改变玩家段位积分

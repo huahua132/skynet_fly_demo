@@ -199,7 +199,7 @@ function M.cmd_get_all_online()
     return g_player_list
 end
 
-function M.cmd_get_players_info(player_list, field_list)
+function M.cmd_get_players_info(player_list, field_map)
     local cli = contriner_client:instance("room_game_hall_m")
     local self_address = skynet.self()
     local server_id_map = {}
@@ -216,18 +216,18 @@ function M.cmd_get_players_info(player_list, field_list)
     local res_map = {}
     for server_id, list in pairs(server_id_map) do
         if server_id ~= self_address then
-            local ret_map = skynet.call(server_id, 'lua', 'player_get_players_info_by_local', list, get_field_value)
+            local ret_map = skynet.call(server_id, 'lua', 'player_get_players_info_by_local', list, field_map)
             table_util.merge(res_map, ret_map)
         else
-            local ret_map = interface.get_players_info(list, get_field_value)
+            local ret_map = interface.get_players_info(list, field_map)
             table_util.merge(res_map, ret_map)
         end
     end
     return res_map
 end
 
-function M.cmd_get_players_info_by_local(player_list, field_list)
-    return interface.get_players_info(player_list, field_list)
+function M.cmd_get_players_info_by_local(player_list, field_map)
+    return interface.get_players_info(player_list, field_map)
 end
 
 function M.cmd_change_rank_score(player_id, score)
