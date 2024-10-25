@@ -3,6 +3,7 @@ local ARGV = { ... }
 local skynet_fly_path = ARGV[1]
 local load_mods_name = ARGV[2]
 local is_daemon = ARGV[3]
+local recordfile = ARGV[4]
 assert(skynet_fly_path, '缺少 skynet_fly_path')
 
 package.cpath = skynet_fly_path .. "/luaclib/?.so;"
@@ -37,6 +38,7 @@ local config = {
 	logger          = "log_service",
 	loglevel        = "info",
 	logpath         = server_path .. 'logs/',
+	recordpath      = server_path .. 'records/',
 	logfilename     = 'server.log',
 	logservice      = 'snlua',
 	log_is_launch_rename = true,
@@ -60,6 +62,8 @@ local config = {
 	lua_path        = "",
 	enablessl       = true,
 	loadmodsfile    = load_mods_name, --可热更服务启动配置
+	recordfile      = recordfile,		 --播放录像的文件名
+	recordlimit     = 1024 * 1024 * 100, --录像记录限制(字节数) 超过不再写录像
 }
 
 config.lua_path = file_util.create_luapath(skynet_fly_path)
@@ -101,9 +105,14 @@ if load_mods_f and load_mods_f.share_config_m and load_mods_f.share_config_m.def
 	if cfg.breakpoint_debug_module_index then								--断点调式的可热更模块启动下标
 		config.breakpoint_debug_module_index = cfg.breakpoint_debug_module_index
 	end
-
 	if cfg.log_is_launch_rename ~= nil then
 		config.log_is_launch_rename = cfg.log_is_launch_rename				--启动是否重命名旧日志
+	end
+	if cfg.recordpath then
+		config.recordpath = cfg.recordpath									--录像文件目录
+	end
+	if cfg.recordlimit then													--录像记录限制
+		config.recordlimit = cfg.recordlimit
 	end
 end
 

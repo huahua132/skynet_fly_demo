@@ -9,6 +9,12 @@ local pairs = pairs
 local pcall = pcall
 local table = table
 local next = next
+
+if c.command("GETENV","recordfile") ~= "" and c.addresscommand "REG" > 1 then
+	local record_pre = require "skynet.record_pre"
+	record_pre.skynet()
+end
+
 local tremove = table.remove
 local tinsert = table.insert
 local tpack = table.pack
@@ -605,6 +611,18 @@ function skynet.self()
 	return self_address
 end
 
+function skynet.recordon()
+	c.command("RECORDON", skynet.address(skynet.self()))
+end
+
+function skynet.recordoff()
+	c.command("RECORDOFF", skynet.address(skynet.self()))
+end
+
+function skynet.recordstart(str)
+	c.command("RECORDSTART", str)
+end
+
 function skynet.localname(name)
 	return c.addresscommand("QUERY", name)
 end
@@ -1187,5 +1205,45 @@ debug.init(skynet, {
 	suspend = suspend,
 	resume = coroutine_resume,
 })
+
+if skynet.getenv("recordfile") ~= "" and c.addresscommand "REG" > 1 then
+	local record_do = require "skynet.record_do"
+	record_do.skynet(skynet)
+end
+
+function skynet.start_record(ARGV)
+	--记录录像
+	if skynet.getenv("recordfile") == "" then
+		skynet.recordon()
+		skynet.recordstart(string.format("%08x", skynet.self()) .. SERVICE_NAME .. ' ' .. table.concat(ARGV, ' '))
+
+		local old_mathrandseed = math.randomseed
+		math.randomseed = function(x, y)
+			c.recordsetrandomseed(x or 0, y or 0)
+			return old_mathrandseed(x, y)
+		end
+
+		local old_ostime = os.time
+		os.time = function(date)
+			if date then
+				return old_ostime(date)
+			end
+			
+			local time = old_ostime()
+			c.recordsetostime(time)
+
+			return time
+		end
+
+		skynet.now = function()
+			local now = c.now()
+			c.recordsetnowtime(now)
+			return now
+		end
+	end
+	
+	--设置随机种子，以便录像播放时使用
+	math.randomseed(os.time(), math.random(1, 10000) + skynet.self())
+end
 
 return skynet
