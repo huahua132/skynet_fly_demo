@@ -12,9 +12,14 @@ local INDEX = tonumber(ARGV[2])
 local LAUNCH_DATE = ARGV[3]
 local LAUNCH_TIME = tonumber(ARGV[4])
 local VERSION = tonumber(ARGV[5])
+local IS_RECORD_ON = tonumber(ARGV[6])			--是否记录录像
 assert(MODULE_NAME)
 
 local new_loaded = _loaded
+
+if IS_RECORD_ON == 1 then
+	skynet.start_record(ARGV)
+end
 
 local CMD = {}
 
@@ -45,6 +50,7 @@ module_info.set_base_info {
 	launch_date = LAUNCH_DATE,
 	launch_time = LAUNCH_TIME,
 	version = VERSION,
+	is_record_on = IS_RECORD_ON,
 }
 
 local SERVER_STATE = SERVER_STATE_TYPE.loading
@@ -234,10 +240,10 @@ end
 --热更
 assert(not CMD['hotfix'], "repeat cmd hotfix")
 function CMD.hotfix(hotfixmods)
-	local isok, ret = hotfix.hotfix(hotfixmods)
+	local isok, ret = hotfix.hotfix(hotfixmods, IS_RECORD_ON)
 	if isok and INDEX == 1 then
 		local hotfix_loaded = hotfix.get_loadedmap()
-		skynet.fork(write_mod_required,"hotfix_info",MODULE_NAME,hotfix_loaded)
+		skynet.fork(write_mod_required,"make/hotfix_info",MODULE_NAME,hotfix_loaded)
 	end
 	return ret
 end
@@ -247,3 +253,9 @@ contriner_client:CMD(CMD)
 skynet.start(function()
 	skynet_util.lua_dispatch(CMD)
 end)
+
+if IS_RECORD_ON == 1 then
+	skynet_util.reg_shutdown_func(function()
+		skynet.recordoff()
+	end)
+end
