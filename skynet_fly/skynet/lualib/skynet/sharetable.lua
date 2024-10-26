@@ -221,7 +221,18 @@ local RECORD = {}
 function sharetable.query(filename)
 	local newptr = skynet.call(sharetable.address, "lua", "query", filename)
 	if newptr then
-		local t = core.clone(newptr)
+		local t = nil
+        if not skynet.is_record_handle() then
+            t = core.clone(newptr)
+        else
+            local f, err = loadfile(filename)
+            if not f then
+                skynet.error("query file err ", filename, err)
+            end
+            assert(f, "query can`t loadfile")
+            t = f()
+        end
+        
 		local map = RECORD[filename]
 		if not map then
 			map = {}
@@ -233,6 +244,9 @@ function sharetable.query(filename)
 end
 
 function sharetable.queryall(filenamelist)
+    if skynet.is_record_handle() then
+        assert(1 == 2, "record can`t use")
+    end
     local list, t, map = {}
     local ptrList = skynet.call(sharetable.address, "lua", "queryall", filenamelist)
     for filename, ptr in pairs(ptrList) do

@@ -7,7 +7,6 @@ local log = require "skynet-fly.log"
 
 local svr_id = env_util.get_svr_id()
 
-local pairs = pairs
 local ipairs = ipairs
 local table = table
 local assert = assert

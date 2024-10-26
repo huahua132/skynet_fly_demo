@@ -10,7 +10,9 @@ local pcall = pcall
 local table = table
 local next = next
 
-if c.command("GETENV","recordfile") ~= "" and c.addresscommand "REG" > 1 then
+local g_recordfile = c.command("GETENV","recordfile")
+
+if g_recordfile ~= "" and c.addresscommand "REG" > 1 then
 	local record_pre = require "skynet.record_pre"
 	record_pre.skynet()
 end
@@ -623,6 +625,26 @@ function skynet.recordstart(str)
 	c.command("RECORDSTART", str)
 end
 
+local g_record_handle
+function skynet.get_record_handle()
+	if not g_record_handle then
+		g_record_handle = c.getrecordhandle()
+	end
+	return g_record_handle
+end
+
+function skynet.is_record_handle()
+	local shandle = skynet.self()
+	if shandle <= 0 then return false end
+	local rhandle = skynet.get_record_handle()
+	return shandle == rhandle
+end
+
+local g_write_record = false
+function skynet.is_write_record()
+	return g_write_record
+end
+
 function skynet.localname(name)
 	return c.addresscommand("QUERY", name)
 end
@@ -1206,14 +1228,15 @@ debug.init(skynet, {
 	resume = coroutine_resume,
 })
 
-if skynet.getenv("recordfile") ~= "" and c.addresscommand "REG" > 1 then
+if g_recordfile ~= "" and skynet.self() > 1 then
 	local record_do = require "skynet.record_do"
 	record_do.skynet(skynet)
 end
 
 function skynet.start_record(ARGV)
 	--记录录像
-	if skynet.getenv("recordfile") == "" then
+	if g_recordfile == "" then
+		g_write_record = true
 		skynet.recordon()
 		skynet.recordstart(string.format("%08x", skynet.self()) .. SERVICE_NAME .. ' ' .. table.concat(ARGV, ' '))
 

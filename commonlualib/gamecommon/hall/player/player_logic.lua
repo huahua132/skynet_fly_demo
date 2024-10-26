@@ -1,10 +1,10 @@
 local log = require "skynet-fly.log"
 local time_util = require "skynet-fly.utils.time_util"
+local table_util = require "skynet-fly.utils.table_util"
 local skynet = require "skynet"
 local state_data = require "skynet-fly.hotfix.state_data"
 
 local assert = assert
-local pairs = pairs
 local tinsert = table.insert
 local tremote = table.remove
 local os = os
@@ -21,9 +21,9 @@ end
 --检测心跳
 function M.check_heart()
     local cur_time = os.time()                     --心跳用系统时间，避免加速时间导致测试号被踢下线
-    for player_id,player in pairs(g_player_map) do
-        if cur_time - player.heart_time > 60 then  --心跳超时
-            skynet.fork(g_logic_info.hall_interface.goout, g_logic_info.hall_interface, player_id, "heart timeout") --踢出
+    for player_id,player in table_util.sort_ipairs_byk(g_player_map) do
+        if g_player_map[player_id] and cur_time - player.heart_time > 60 then  --心跳超时
+            g_logic_info.hall_interface:goout(player_id, "heart timeout") --踢出
         end
     end
 end

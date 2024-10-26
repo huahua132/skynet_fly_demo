@@ -77,8 +77,8 @@ return {
 		launch_num = 1,
 	},
 
-	  -- orm
-	  orm_table_m = {
+	-- orm
+	orm_table_m = {
 		launch_seq = 5600,
 		launch_num = 5,
 		mod_args = {
@@ -99,6 +99,7 @@ return {
 	room_game_hall_m = {
 		launch_seq = 6000,
 		launch_num = 6,     --启动6个
+		is_record_on = 1,   --录像
 		default_arg = {
 			hall_plug = "common.plug.hall_plug",         --大厅加载的插件lua模块文件名
 		}

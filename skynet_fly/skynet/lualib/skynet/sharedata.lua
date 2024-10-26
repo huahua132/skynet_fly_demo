@@ -17,7 +17,9 @@ local function monitor(name, obj, cobj)
 		if newobj == nil then
 			break
 		end
-		sd.update(obj, newobj)
+		if not skynet.is_record_handle() then
+			sd.update(obj, newobj)
+		end
 		skynet.send(service, "lua", "confirm" , newobj)
 	end
 	if cache[name] == obj then
@@ -34,7 +36,17 @@ function sharedata.query(name)
 		skynet.send(service, "lua", "confirm" , obj)
 		return cache[name]
 	end
-	local r = sd.box(obj)
+	local r = nil
+	if not skynet.is_record_handle() then
+		r = sd.box(obj)
+	else
+		local f, err = loadfile(name)
+		if not f then
+			skynet.error("query err ", name, err)
+		end
+		assert(f, "query can`t loadfile ")
+		r = f()
+	end
 	skynet.send(service, "lua", "confirm" , obj)
 	skynet.fork(monitor,name, r, obj)
 	cache[name] = r
@@ -54,6 +66,7 @@ function sharedata.delete(name)
 end
 
 function sharedata.flush()
+	if skynet.is_record_handle() then return end
 	for name, obj in pairs(cache) do
 		sd.flush(obj)
 	end
@@ -61,6 +74,10 @@ function sharedata.flush()
 end
 
 function sharedata.deepcopy(name, ...)
+	if skynet.is_record_handle() then
+		assert(1 == 2, "record can`t use")
+		return
+	end
 	if cache[name] then
 		local cobj = cache[name].__obj
 		return sd.copy(cobj, ...)
