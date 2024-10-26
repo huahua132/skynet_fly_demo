@@ -2,6 +2,8 @@
 local M = {}
 --debug_port 规范为服务类型拼接自增id拼接 1 例如 09 .. 01 .. 1
 --游戏配置 09开头
+local RECORD_LIMIT = 1024 * 1024 * 100
+
 M.games = {
     chinese_chess_1 = {
         svr_id = 1,         --服务ID
@@ -85,12 +87,16 @@ M.world = {
         svr_id = 1,
         logpath = '../../logs/hallserver_1',
         debug_port = 11211,
+        recordlimit = RECORD_LIMIT,
+        recordpath = '../../records/hallserver_1',
     },
     hallserver_2 = {
         thread = 8,
         svr_id = 2,
         logpath = '../../logs/hallserver_2',
         debug_port = 11221,
+        recordlimit = RECORD_LIMIT,
+        recordpath = '../../records/hallserver_2',
     },
 }
 --世界配置 12开头

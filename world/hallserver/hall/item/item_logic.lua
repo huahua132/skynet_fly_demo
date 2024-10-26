@@ -6,10 +6,10 @@ local state_data = require "skynet-fly.hotfix.state_data"
 local event_mgr = require "common.event_mgr"
 local EVENT_ID = require "enum.EVENT_ID"
 local interface = require "hall.item.interface"
+local table_util = require "skynet-fly.utils.table_util"
 
 local assert = assert
 local tinsert = table.insert
-local pairs = pairs
 
 local g_item_entity = orm_table_client:instance("item")
 
@@ -93,7 +93,7 @@ function M.cmd_add_item_map(player_id, item_map)
     local ret_map = g_item_entity:add_item_map(player_id, item_map)
 
     local item_list = {}
-    for id, count in pairs(ret_map) do
+    for id, count in table_util.sort_ipairs_byk(ret_map) do
         tinsert(item_list, {id = id, count = count})
         local num = item_map[id]
         event_mgr.publish(EVENT_ID.ITEM_CHANGE, player_id, id, num, count)
