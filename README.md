@@ -10,6 +10,9 @@
 # [游戏示例视频](https://huahua132.github.io/video/chess.mp4)
 
 # 本地部署
+为了避免环境问题，请最好自行编译。
+拉最新的skynet_fly，编译好，执行binshell/make_release，会生成skynet_fly-release文件夹，把这个文件夹替换demo中的skynet_fly。
+
 拉取代码
 `git clone https://github.com/huahua132/skynet_fly_demo`
 
