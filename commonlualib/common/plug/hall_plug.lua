@@ -38,8 +38,10 @@ function M.init(interface_mgr)
 	--注册handle
 	for _, m in ipairs(g_modules_list) do
 		local handle = m.handle
-		for pack_id,func in pairs(handle) do
-			g_interface_mgr:handle(pack_id, func)
+		if handle then
+			for pack_id,func in pairs(handle) do
+				g_interface_mgr:handle(pack_id, func)
+			end
 		end
 	end
 
