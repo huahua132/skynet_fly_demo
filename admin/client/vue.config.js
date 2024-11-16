@@ -36,7 +36,16 @@ module.exports = {
       warnings: false,
       errors: true
     },
-    before: require('./mock/mock-server.js')
+    //mock 模拟服务器调用
+    before: require('./mock/mock-server.js'),
+
+    //代理模式(直接访问服务器)
+    // proxy: {
+    //   '/': {
+    //     target: 'http://localhost',
+    //     changeOrigin: true
+    //   }
+    // },
   },
   configureWebpack: {
     // provide the app's title in webpack's name field, so that
