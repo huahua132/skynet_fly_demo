@@ -22,7 +22,7 @@ function M.create_token(username,roles,routes_map)
     local signature = contriner_client:instance("signature_m"):mod_call("create", username)
     assert(signature, "can`t create signature")
 
-    local cur_time = time_util.time()
+    local cur_time = os.time()
     local claim = {
         iss = "skynet_fly_admin",               --签发者
         exp = cur_time + ENUM.TOKEN_TIMEOUT,    --过期时间
