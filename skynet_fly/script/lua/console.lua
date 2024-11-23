@@ -63,13 +63,13 @@ function CMD.reload()
 	assert(file)
 	local load_mods = loadfile(load_modsfile)()
 	local server_id = assert(ARGV[ARGV_HEAD + 1])
-	local mod_name_str = ",0"
+	local mod_name_str = "0"
 	for i = ARGV_HEAD + 2,#ARGV, 2 do
 		local module_name = ARGV[i]
-		mod_name_str = mod_name_str .. ',"' .. module_name .. '"'
+		mod_name_str = mod_name_str .. '/' .. module_name
 		assert(load_mods[module_name], "module_name not exists " .. module_name)
 	end
-	local reload_url = string.format('%s/call/%s/"load_modules"%s',get_host(),server_id,mod_name_str)
+	local reload_url = string.format('%s/call/%s/load_modules/%s',get_host(),server_id,mod_name_str)
 	file:write(string.format("'%s'",reload_url))
 	file:close()
 	print(string.format("'%s'",reload_url))
@@ -103,7 +103,7 @@ function CMD.try_again_reload()
 end
 
 function CMD.check_reload()
-	local module_info_dir = "make/module_info." .. load_modsfile
+	local module_info_dir = "make/module_info_" .. load_modsfile:sub(1, #load_modsfile - 4)
 	local dir_info = lfs.attributes(module_info_dir)
 	assert(dir_info and dir_info.mode == 'directory')
 	local load_mods = loadfile (load_modsfile)()
@@ -112,8 +112,12 @@ function CMD.check_reload()
 	for f_name,f_path,f_info in file_util.diripairs(module_info_dir) do
 		local m_name = string.sub(f_name,1,#f_name - 9)
 		if load_mods[m_name] and f_info.mode == 'file' and string.find(f_name,'.required',nil,true) then
-			local f_tb = loadfile(f_path)()
-			module_info_map[m_name] = f_tb
+			local func, err = loadfile(f_path)
+			if func then
+				module_info_map[m_name] = func()
+			else
+				error("loadfile err:" .. err)
+			end
 		end
 	end
 
@@ -135,7 +139,7 @@ function CMD.check_reload()
 		end
 
 		if #change_f_name > 0 then
-			need_reload_module[module_name] = "changefile:" .. table.concat(change_f_name,'|')
+			need_reload_module[module_name] = "changefile:" .. table.concat(change_f_name,':::')
 		end
   	end
 
@@ -164,9 +168,19 @@ function CMD.check_reload()
 		end
 	end
 
+
+	local args_list = {}
 	for module_name,change_file in pairs(need_reload_module) do
-		print(module_name)
-		print(string.format('change_des>>>%s', change_file))
+		table.insert(args_list, module_name)
+		table.insert(args_list, change_file)
+	end
+
+	if file_util.is_window() then
+		print(table.concat(args_list, ' '))
+	else
+		for _,v in ipairs(args_list) do
+			print(v)
+		end
 	end
 end
 
@@ -178,9 +192,18 @@ function CMD.check_kill_mod()
 	end
 	old_mod_confg = old_mod_confg()
 
+	local args_list = {}
 	for mod_name,_ in pairs(old_mod_confg) do
 		if not load_mods[mod_name] then
-			print(mod_name)
+			table.insert(args_list, mod_name)
+		end
+	end
+
+	if file_util.is_window() then
+		print(table.concat(args_list, ' '))
+	else
+		for _,v in ipairs(args_list) do
+			print(v)
 		end
 	end
 end
@@ -191,26 +214,24 @@ function CMD.call()
 
 	local mod_cmd_args = ""
 	for i = ARGV_HEAD + 2,#ARGV - 1 do
-		if tonumber(ARGV[i]) then
-			mod_cmd_args = mod_cmd_args .. string.format(',%s',ARGV[i])
-		else
-			mod_cmd_args = mod_cmd_args .. string.format(',"%s"',ARGV[i])
-		end
+		mod_cmd_args = mod_cmd_args .. string.format('/%s',ARGV[i])
 	end
 
-	local cmd_url = string.format('%s/call/%s/"%s"%s',get_host(),server_id,mod_cmd,mod_cmd_args)
+	local cmd_url = string.format('%s/call/%s/%s%s',get_host(),server_id,mod_cmd,mod_cmd_args)
  	print(string.format("'%s'",cmd_url))
 end
 
 function CMD.create_load_mods_old()
-	local cmd = string.format("cp %s make/%s.old", load_modsfile, load_modsfile)
-	os.execute(cmd)
+	local copy_obj = file_util.new_copy_file(false)
+	copy_obj.set_source_target(load_modsfile, string.format("make/%s.old", load_modsfile))
+	copy_obj.execute(cmd)
 end
 
 --拷贝一个运行时配置供console.lua读取
 function CMD.create_running_config()
-	local cmd = string.format("cp make/%s_config.lua make/%s_config.lua.%s.run",svr_name, svr_name, load_modsfile)
-	os.execute(cmd)
+	local copy_obj = file_util.new_copy_file(false)
+	copy_obj.set_source_target(string.format("make/%s_config.lua", svr_name), string.format("make/%s_config.lua.%s.run", svr_name, load_modsfile))
+	copy_obj.execute(cmd)
 end
 
 --快进时间
@@ -219,7 +240,7 @@ function CMD.fasttime()
 	local one_add = ARGV[ARGV_HEAD + 2]  --单次加速时间 1表示1秒
 	assert(fastdate,"not fastdate")
 	assert(one_add, "not one_add")
-	local date,err = time_util.string_to_date(fastdate)
+	local date,err = time_util.string_to_date(fastdate, '-', ':')
 	if not date then
 		error(err)
 	end
@@ -230,7 +251,7 @@ end
 
 --检查热更
 function CMD.check_hotfix()
-	local module_info_dir = "make/hotfix_info." .. load_modsfile
+	local module_info_dir = "make/hotfix_info_" .. load_modsfile:sub(1, #load_modsfile - 4)
 	local dir_info = lfs.attributes(module_info_dir)
 	assert(dir_info and dir_info.mode == 'directory')
 	local load_mods = loadfile (load_modsfile)()
@@ -239,8 +260,12 @@ function CMD.check_hotfix()
 	for f_name,f_path,f_info in file_util.diripairs(module_info_dir) do
 		local m_name = string.sub(f_name,1,#f_name - 9)
 		if load_mods[m_name] and f_info.mode == 'file' and string.find(f_name,'.required',nil,true) then
-			local f_tb = loadfile(f_path)()
-			module_info_map[m_name] = f_tb
+			local func, err = loadfile(f_path)
+			if func then
+				module_info_map[m_name] = func()
+			else
+				error("loadfile err:" .. err)
+			end
 		end
 	end
 
@@ -262,13 +287,21 @@ function CMD.check_hotfix()
 		end
 
 		if #change_f_name > 0 then
-			need_reload_module[module_name] = table.concat(change_f_name,'|')
+			need_reload_module[module_name] = table.concat(change_f_name,':::')
 		end
   	end
 
+	local args_list = {}
 	for module_name,change_file in pairs(need_reload_module) do
-		print(module_name)
-		print(change_file)
+		table.insert(args_list, module_name)
+		table.insert(args_list, change_file)
+	end
+	if file_util.is_window() then
+		print(table.concat(args_list, ' '))
+	else
+		for _,v in ipairs(args_list) do
+			print(v)
+		end
 	end
 end
 
@@ -276,15 +309,15 @@ end
 function CMD.hotfix()
 	local load_mods = loadfile(load_modsfile)()
 	local server_id = assert(ARGV[ARGV_HEAD + 1])
-	local mod_name_str = ",0"
+	local mod_name_str = "0"
 	for i = ARGV_HEAD + 2,#ARGV, 2 do
 		local module_name = ARGV[i]
 		local hotmods = ARGV[i + 1]
-		mod_name_str = mod_name_str .. ',"' .. module_name .. '"'
-		mod_name_str = mod_name_str .. ',"' .. hotmods .. '"'
+		mod_name_str = mod_name_str .. '/' .. module_name
+		mod_name_str = mod_name_str .. '/' .. hotmods
 		assert(load_mods[module_name])
 	end
-	local url = string.format('%s/call/%s/"hotfix"%s',get_host(),server_id,mod_name_str)
+	local url = string.format('%s/call/%s/hotfix/%s',get_host(),server_id,mod_name_str)
 	print(string.format("'%s'",url))
 end
 
@@ -297,7 +330,7 @@ end
 --更新共享数据
 function CMD.upsharedata()
 	local server_id = assert(ARGV[ARGV_HEAD + 1])
-	local url = string.format('%s/call/%s/"check_reload"', get_host(), server_id)
+	local url = string.format('%s/call/%s/check_reload/', get_host(), server_id)
 	print(string.format("'%s'", url))
 end
 
@@ -305,6 +338,16 @@ end
 function CMD.handle_upsharedata_result()
 	local ret = ARGV[ARGV_HEAD + 2]
 	print("ret = ", ret)
+end
+
+--偏移拼接所有参数
+function CMD.offset_param()
+	local offset = tonumber(assert(ARGV[ARGV_HEAD + 1]))
+    local param = {}
+	for i = ARGV_HEAD + offset + 2,#ARGV do
+		table.insert(param, ARGV[i])
+	end
+	print(table.concat(param, ' '))
 end
 
 assert(CMD[cmd],'not cmd:' .. cmd)

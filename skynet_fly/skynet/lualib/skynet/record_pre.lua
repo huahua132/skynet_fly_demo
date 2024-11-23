@@ -86,7 +86,6 @@ function M.skynet()
     end
 
     socketdriver.udp_send = empty_func
-    socketdriver.udp_address = empty_func
     socketdriver.resolve = empty_func
  
     local old_mathrandomseed = math.randomseed

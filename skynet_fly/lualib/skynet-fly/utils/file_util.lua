@@ -90,7 +90,14 @@ end
 --获取当前目录文件夹名称
 function M.get_cur_dir_name()
 	local curdir = lfs.currentdir()
-	local strsplit = string_util.split(curdir,'/')
+	local strsplit = nil
+	--window系统下
+	if package.config:sub(1, 1) == '\\' then
+		strsplit = string_util.split(curdir,'\\')
+	else
+		strsplit = string_util.split(curdir,'/')
+	end
+
 	return strsplit[#strsplit]
 end
 
@@ -113,6 +120,87 @@ function M.convert_path(path)
     path = string.gsub(path, ":([^/]*)", "{%1}")
     path = string.gsub(path, "%*(%w*)", "{*%1}")
     return path
+end
+
+--递归创建文件夹
+function M.mkdir(path)
+    -- 逐层获取并创建每个文件夹
+    local current_path = ""
+
+    for part in path:gmatch("([^/\\]+)") do
+        current_path = current_path .. part .. "/"
+
+        -- 检查当前路径是否存在
+        if lfs.attributes(current_path) == nil then
+            -- 如果不存在，则创建目录
+            local success, err = lfs.mkdir(current_path)
+            if not success then
+                return nil, "Error creating directory: " .. current_path .. " - " .. err
+            end
+        end
+    end
+
+    return true
+end
+
+function M.convert_linux_to_windows_relative(linux_path)
+    -- 替换斜杠为反斜杠
+    local windows_path = linux_path:gsub("/", "\\")
+    return windows_path
+end
+
+function M.convert_windows_to_linux_relative(window_path)
+	local linux_path = window_path:gsub("\\", "/")
+    return linux_path
+end
+
+function M.is_window()
+	return package.config:sub(1, 1) == '\\'
+end
+
+function M.new_copy_file(is_dir)
+	local cmd = nil
+	--windows
+	local is_window = M.is_window()
+	if is_window then
+		if is_dir then
+			cmd = "xcopy "
+		else
+			cmd = "copy "
+		end
+	else
+		if is_dir then
+			cmd = "cp -r "
+		else
+			cmd = "cp "
+		end
+	end
+
+	local list = {}
+	return {
+		set_source_target = function(source, target)
+			if is_window then
+				if is_dir then
+					table.insert(list, cmd .. M.convert_linux_to_windows_relative(source) .. ' ' .. M.convert_linux_to_windows_relative(target) .. ' /E /I /Y')
+				else
+					table.insert(list, cmd .. M.convert_linux_to_windows_relative(source) .. ' ' .. M.convert_linux_to_windows_relative(target) .. ' /Y')
+				end
+			else
+				table.insert(list, cmd .. source .. ' ' .. target)
+			end
+		end,
+
+		execute = function()
+			local excute_cmd = nil
+			if is_window then
+				excute_cmd = table.concat(list, " && ")
+			else
+				excute_cmd = table.concat(list, ";")
+			end
+
+			return os.execute(excute_cmd)
+		end
+	}
 end
 
 return M

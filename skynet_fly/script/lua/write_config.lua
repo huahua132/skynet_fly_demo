@@ -23,6 +23,8 @@ else
 	is_daemon = false
 end
 
+skynet_fly_path = file_util.convert_windows_to_linux_relative(skynet_fly_path)
+
 local skynet_path = file_util.path_join(skynet_fly_path, '/skynet/')
 local server_path = "./"
 local common_path = "../../commonlualib/"
@@ -127,8 +129,9 @@ end
 
 local file_path = server_path .. 'make/'
 
-if not os.execute("mkdir -p " .. file_path) then
-	error("create file_path err")
+local isok, err = file_util.mkdir(file_path)
+if not isok then
+	error("create file_path err " .. err)
 end
 
 local config_path = file_path .. svr_name .. '_config.lua'
