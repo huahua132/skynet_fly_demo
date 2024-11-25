@@ -37,12 +37,12 @@ end
 
 local CMD = {}
 --新增邮件
-function CMD.add(title, context, item_list, vaild_time)
+function CMD.add(title, content, item_list, vaild_time)
     local guid = snowflake.new_guid()
     local new_email = {
         guid = guid,
         title = title,
-        context = context,
+        content = content,
         item_list = item_list,
         vaild_time = vaild_time,
     }
@@ -58,14 +58,14 @@ function CMD.del(guid)
     return true
 end
 --改变邮件
-function CMD.change(guid, title, context, item_list, vaild_time)
+function CMD.change(guid, title, content, item_list, vaild_time)
     local email = g_global_email_client:get_one_entry(guid)
     if not email then
         return false
     end
 
     email.title = title
-    email.context = context
+    email.content = content
     email.item_list = item_list
     email.vaild_time = vaild_time
 

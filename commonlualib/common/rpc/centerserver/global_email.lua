@@ -7,11 +7,11 @@ local sbyte = string.byte
 local M = {}
 
 --新增邮件
-function M.add(title, context, item_list, vaild_time) 
+function M.add(title, content, item_list, vaild_time) 
     local cli = frpc_client:instance("centerserver", "global_email_m")
-    local ret = cli:one_balance_call("add", title, context, item_list, vaild_time)
+    local ret = cli:one_balance_call("add", title, content, item_list, vaild_time)
     if not ret then
-        log.error("add email err ", title, context, item_list, vaild_time)
+        log.error("add email err ", title, content, item_list, vaild_time)
         return
     end
 
@@ -31,11 +31,11 @@ function M.del(guid)
 end
 
 --修改邮件
-function M.change(guid, title, context, item_list, vaild_time)
+function M.change(guid, title, content, item_list, vaild_time)
     local cli = frpc_client:instance("centerserver", "global_email_m")
-    local ret = cli:one_balance_call("change", guid, title, context, item_list, vaild_time)
+    local ret = cli:one_balance_call("change", guid, title, content, item_list, vaild_time)
     if not ret then
-        log.error("change email err ", guid, title, context, item_list, vaild_time)
+        log.error("change email err ", guid, title, content, item_list, vaild_time)
         return
     end
 

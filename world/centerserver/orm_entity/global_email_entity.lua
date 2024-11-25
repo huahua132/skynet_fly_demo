@@ -16,7 +16,7 @@ function M.init()
     g_ormobj = ormtable:new("global_email")
     :int64("guid")
     :string256("title")             --标题
-    :string8192("context")          --内容
+    :string8192("content")          --内容
     :table("item_list")             --奖励道具
     :int64("vaild_time")            --有效时间 0 表示永久生效
     :set_keys("guid")

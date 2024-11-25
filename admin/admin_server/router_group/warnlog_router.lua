@@ -12,18 +12,18 @@ return function(group)
         pre_day = tonumber(pre_day)
         local instance = frpc_client:instance("logserver","warn_m"):set_svr_id(1)
         local ret = instance:byid_mod_call('read', pre_day)
-        local context = ret.result
+        local content = ret.result
         
         local result = nil
-        if context then
+        if content then
             result = "OK"
-            context = context[1]
+            content = content[1]
         else
-            context = "无"
+            content = "无"
         end
         rsp_body.set_rsp(c,{
             result = result,
-            context = context
+            content = content
         })
     end)
 end

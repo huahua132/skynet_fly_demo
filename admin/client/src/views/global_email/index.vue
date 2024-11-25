@@ -10,7 +10,7 @@
             </el-table-column>
             <el-table-column align="center" label="内容" width="600">
                 <template slot-scope="scope">
-                {{ scope.row.context }}
+                {{ scope.row.content }}
                 </template>
             </el-table-column>
             <el-table-column align="center" label="奖励道具" width="350">
@@ -50,7 +50,7 @@
                 </el-form-item>
                 <el-form-item label="内容">
                     <el-input
-                        v-model="email.context"
+                        v-model="email.content"
                         :autosize="{ minRows: 2, maxRows: 4}"
                         type="textarea"
                         placeholder="内容"
@@ -112,7 +112,7 @@ import { MessageBox, Message } from 'element-ui'
 const defaultEmail = {
     guid: 0,
     title: "",
-    context: "",
+    content: "",
     item_list: [],
     vaild_time: 0,
 }

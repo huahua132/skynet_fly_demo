@@ -5,7 +5,7 @@
             </el-option>
         </el-select>
 
-        <div style="white-space: pre-wrap;">{{context}}</div>
+        <div style="white-space: pre-wrap;">{{content}}</div>
     </div>
 </template>
 
@@ -28,7 +28,7 @@ export default {
         return {
             pre_day : null,
             dayOption : day_options,
-            context : "",
+            content : "",
         }
     },
 
@@ -48,7 +48,7 @@ export default {
             if (data.result != "OK") {
                 return
             }
-            this.context = data.context
+            this.content = data.content
         },
 
         handleSetLine() {
