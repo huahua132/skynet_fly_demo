@@ -44,11 +44,22 @@ return {
             ]],              --系统命令
         }
     },
+    --集群客户端
+    frpc_client_m = {
+		launch_seq = 7000,
+		launch_num = 1,
+		default_arg = {
+			node_map = {
+				['hallserver'] = true,      --大厅服
+			},
+			watch = 'redis',  --监听redis的方式做服务发现
+		}
+	},
 
     -- orm
 	orm_table_m = {
 		launch_seq = 5000,
-		launch_num = 11,
+		launch_num = 12,
 		mod_args = {
 			{instance_name = "account_1",orm_plug  = "orm_entity.account_entity"},
             {instance_name = "account_2",orm_plug  = "orm_entity.account_entity"},
@@ -63,6 +74,8 @@ return {
 
             --自增id分配
             {instance_name = "allocid",   orm_plug = "orm_entity.allocid_entity"},
+            --全服邮件
+            {instance_name = "global_email", orm_plug = "orm_entity.global_email_entity"},
 		}
 	},
 
@@ -71,15 +84,8 @@ return {
         launch_num = 10,
     },
 
-    --集群客户端
-    frpc_client_m = {
-		launch_seq = 7000,
-		launch_num = 1,
-		default_arg = {
-			node_map = {
-				['hallserver'] = true,      --大厅服
-			},
-			watch = 'redis',  --监听redis的方式做服务发现
-		}
-	},
+    global_email_m = {
+        launch_seq = 7000,
+        launch_num = 1,
+    }
 }

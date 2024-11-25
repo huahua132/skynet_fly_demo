@@ -13,7 +13,7 @@ INTERFACE.item = interface
 
 return {
     export = {
-        ["item_info"] = {EXPORT_TARGET.hallserver},
+        ["item_info"] = {EXPORT_TARGET.hallserver, EXPORT_TARGET.admin_server},
     },
     check_func = function()
         

@@ -12,6 +12,7 @@ EXPORT_TARGET = {
     matchserver = 3,
     hallserver = 4,
     chinese_chess = 5,
+    admin_server = 6,
 }
 
 local EXPORT_TARGET_DIR = {
@@ -19,6 +20,7 @@ local EXPORT_TARGET_DIR = {
     gamecommon = "..\\..\\commonlualib\\gamecommon\\data_tables",     --游戏服公共
     hallserver = "..\\..\\world\\hallserver\\data_tables",            --大厅服
     matchserver = "..\\..\\world\\matchserver\\data_tables",          --匹配服
+    admin_server = "..\\..\\admin\\admin_server\\data_tables",        --后台
 
     chinese_chess = "..\\..\\games\\chinese_chess\\data_tables",      --象棋游戏服
 }

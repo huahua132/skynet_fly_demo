@@ -37,15 +37,15 @@ module.exports = {
       errors: true
     },
     //mock 模拟服务器调用
-    before: require('./mock/mock-server.js'),
+    //before: require('./mock/mock-server.js'),
 
     //代理模式(直接访问服务器)
-    // proxy: {
-    //   '/': {
-    //     target: 'http://localhost',
-    //     changeOrigin: true
-    //   }
-    // },
+    proxy: {
+      '/': {
+        target: 'http://127.0.0.1:80',
+        changeOrigin: true
+      }
+    },
   },
   configureWebpack: {
     // provide the app's title in webpack's name field, so that

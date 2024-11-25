@@ -12,7 +12,6 @@ local code = {
     EXISTS_USER = 50034,          --用户已存在
     SERVER_BUZY = 50035,          --服务器繁忙
     ACCOUNT_LEN = 50036,          --账号长度不符合要求
-    SERVER_ERR = 50037,           --服务器出错
 }
 
 return code

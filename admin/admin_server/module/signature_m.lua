@@ -33,6 +33,10 @@ function CMD.get(username)
     return signature or ""
 end
 
+function CMD.refresh(username)
+    g_cache:del_cache(username)
+end
+
 function CMD.start()
     return true
 end

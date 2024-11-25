@@ -120,7 +120,7 @@ function M.update_role(name,role)
         return nil,CODE.ERR_SERVER,"update err"
     end
 
-    contriner_client:instance("signature_m"):mod_call("refresh")   --刷新密钥，使之前的token失效
+    contriner_client:instance("signature_m"):mod_call("refresh", name)   --刷新密钥，使之前的token失效
 
     return "success"
 end

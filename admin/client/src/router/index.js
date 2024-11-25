@@ -164,6 +164,27 @@ export var asyncRoutes = [
     ]
   },
 
+  {
+    path: '/global_email',
+    component: Layout,
+    name: 'GlobalEmail',
+    meta: {
+      title: '全服邮件',
+      roles: ['admin', 'developer'] // you can set roles in root nav
+    },
+    children: [
+      {
+        path : 'index',
+        name : 'GlobalEmail',
+        component: () => import('@/views/global_email/index'),
+        meta: {
+          title: '全服邮件',
+          roles: ['admin']
+        },
+      }
+    ]
+  },
+
   // 404 page must be placed at the end !!!
   { path: '*', redirect: '/404', hidden: true }
 ]

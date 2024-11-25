@@ -87,10 +87,12 @@ local beans = {}
      ---@field public item_id integer @道具ID
      ---@field public main_type integer @道具类型
      ---@field public sub_type integer @子类型
+     ---@field public item_name string @道具名称
         local class = {
             { name='item_id', type='integer'},
             { name='main_type', type='integer'},
             { name='sub_type', type='integer'},
+            { name='item_name', type='string'},
         }
         beans['item.item_info'] = class
     end

@@ -53,6 +53,7 @@ M.world = {
         thread = 8,
         debug_port = 11011,
         logpath = '../../logs/centerserver',
+        machine_id = 1,                         --机器人号，全局唯一，用于雪花算法guid生成
     },
 
     logserver = {
