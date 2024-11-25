@@ -119,7 +119,6 @@ return function(group)
         local item_list = new_email.item_list
         local vaild_time = new_email.vaild_time
 
-        log.info("update email>>> ", guid, new_email)
         local isok = global_email.change(guid, title, context, item_list, vaild_time)
         if isok then
             rsp_body.set_rsp(c, "succ")
