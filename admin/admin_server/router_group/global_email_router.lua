@@ -26,7 +26,7 @@ end)
 
 local function check_email(email)
     local title = email.title
-    local context = email.context
+    local content = email.content
     local item_list = email.item_list
     local vaild_time = email.vaild_time
     if not title then
@@ -35,11 +35,11 @@ local function check_email(email)
     if title:len() > 256 then
         return false, CODE.ERR_PARAM, "title len limit 256"
     end
-    if not context then
-        return false, CODE.ERR_PARAM, "not context"
+    if not content then
+        return false, CODE.ERR_PARAM, "not content"
     end
-    if context:len() > 8192 then
-        return false, CODE.ERR_PARAM, "context len limit 8192"
+    if content:len() > 8192 then
+        return false, CODE.ERR_PARAM, "content len limit 8192"
     end
     if not item_list then
         return false, CODE.ERR_PARAM, "not item_list"
@@ -91,10 +91,10 @@ return function(group)
             return rsp_body.set_rsp(c, nil, code, msg)
         end
         local title = new_email.title
-        local context = new_email.context
+        local content = new_email.content
         local item_list = new_email.item_list
         local vaild_time = new_email.vaild_time
-        local isok = global_email.add(title, context, item_list, vaild_time)
+        local isok = global_email.add(title, content, item_list, vaild_time)
         if isok then
             rsp_body.set_rsp(c, "succ")
         else
@@ -115,11 +115,11 @@ return function(group)
             return rsp_body.set_rsp(c, nil, code, msg)
         end
         local title = new_email.title
-        local context = new_email.context
+        local content = new_email.content
         local item_list = new_email.item_list
         local vaild_time = new_email.vaild_time
 
-        local isok = global_email.change(guid, title, context, item_list, vaild_time)
+        local isok = global_email.change(guid, title, content, item_list, vaild_time)
         if isok then
             rsp_body.set_rsp(c, "succ")
         else
