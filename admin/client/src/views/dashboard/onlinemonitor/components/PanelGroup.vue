@@ -1,17 +1,17 @@
 <template>
     <div>
         <el-select v-model="svr_name" placeholder="请选择服务名">
-            <el-option v-for="(item, index) in svrNameList" :key="index" :label="item" :value="item">
+            <el-option v-for="(item, idx) in svrNameList" :key="idx" :label="item" :value="item">
             </el-option>
         </el-select>
 
         <el-select v-model="tag" placeholder="请选择数据标签">
-            <el-option v-for="(item, index) in tagList" :key="index" :label="item" :value="item">
+            <el-option v-for="(item, idx) in tagList" :key="idx" :label="item" :value="item">
             </el-option>
         </el-select>
 
         <el-select v-model="date" placeholder="请选择日期">
-            <el-option v-for="item in dayOption" :key="index" :label="item" :value="item">
+            <el-option v-for="(item, idx) in dayOption" :key="idx" :label="item" :value="item">
             </el-option>
         </el-select>
     </div>

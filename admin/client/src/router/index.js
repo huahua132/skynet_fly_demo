@@ -146,9 +146,7 @@ export var asyncRoutes = [
   {
     path: '/user',
     component: Layout,
-    name: 'User',
     meta: {
-      title: '用户管理',
       roles: ['admin', 'developer'] // you can set roles in root nav
     },
     children: [
@@ -167,9 +165,7 @@ export var asyncRoutes = [
   {
     path: '/global_email',
     component: Layout,
-    name: 'GlobalEmail',
     meta: {
-      title: '全服邮件',
       roles: ['admin', 'developer'] // you can set roles in root nav
     },
     children: [
@@ -179,6 +175,25 @@ export var asyncRoutes = [
         component: () => import('@/views/global_email/index'),
         meta: {
           title: '全服邮件',
+          roles: ['admin']
+        },
+      }
+    ]
+  },
+
+  {
+    path: '/gm',
+    component: Layout,
+    meta: {
+      roles: ['admin', 'developer'] // you can set roles in root nav
+    },
+    children: [
+      {
+        path : 'index',
+        name : 'gm',
+        component: () => import('@/views/gm/index'),
+        meta: {
+          title: 'GM',
           roles: ['admin']
         },
       }

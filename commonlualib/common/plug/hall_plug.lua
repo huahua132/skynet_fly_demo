@@ -6,11 +6,14 @@ local skynet = require "skynet"
 local errors_msg = require "common.msg.errors_msg"
 local g_modules_list = require "hall.hall"
 local pack_helper = require "common.pack_helper"
+local table_util = require "skynet-fly.utils.table_util"
 
 local assert = assert
 local ipairs = ipairs
 local pairs = pairs
 local x_pcall = x_pcall
+local type = type
+local string = string
 local tinsert = table.insert
 
 local g_interface_mgr = nil
@@ -21,6 +24,7 @@ local g_loginout_funcs = {}
 
 local g_before_funcs = {}
 local g_before_id_funcs = {}
+local g_gm_cmd_map = {}
 
 local M = {}
 
@@ -142,15 +146,67 @@ function M.goout(player_id, is_jump_exit)
 	end
 end
 
-M.register_cmd = {}
+local CMD = {}
+--注册gm 命令
+local function reg_gm_cmd(cmd_name, func, help_des)
+	assert(not g_gm_cmd_map[cmd_name], "exists cmd_name:" .. cmd_name)
+	assert(type(func) == 'function', "not func")
+	assert(type(help_des) == 'string', "not help_des")				--描述信息
+	g_gm_cmd_map[cmd_name] = {
+		func = func,
+		help_des = help_des
+	}
+
+	
+end
+
+--help 命令
+reg_gm_cmd('help', function(find_name)
+	local res_list = {}
+	for cmd_name, info in table_util.sort_ipairs_byk(g_gm_cmd_map) do
+		if cmd_name ~= 'help' and (not find_name or find_name == "" or string.find(cmd_name, find_name, nil, true)) then
+			tinsert(res_list, {
+				cmd_name = cmd_name,
+				help_des = info.help_des,
+			})
+		end
+	end
+	
+	return res_list
+end, "help cmd")
+
+--gm 命令
+function CMD.gm_cmd(cmd_name, ...)
+	local gm = g_gm_cmd_map[cmd_name]
+	if not gm then
+		return nil, "cmd_name not exists:" .. cmd_name
+	end
+
+	local func = gm.func
+	return func(...)
+end
+
+M.register_cmd = CMD
 
 do
 	--设置CMD命令
 	for _, m in ipairs(g_modules_list) do
 		local register_cmd = m.register_cmd
-		for cmdname,func in pairs(register_cmd) do
-			assert(not M.register_cmd[cmdname], "exists cmdname: " .. cmdname)
-			M.register_cmd[cmdname] = func
+		if register_cmd then
+			for cmdname,func in pairs(register_cmd) do
+				assert(not M.register_cmd[cmdname], "exists cmdname: " .. cmdname)
+				M.register_cmd[cmdname] = func
+			end
+		end
+	end
+
+	--设置GM命令
+	for _, m in ipairs(g_modules_list) do
+		local gm_cmd = m.gm_cmd
+		if gm_cmd then
+			for cmdname, info in pairs(gm_cmd) do
+				reg_gm_cmd(cmdname, info.func, info.help_des)
+			end
 		end
 	end
 end

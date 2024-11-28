@@ -6,6 +6,7 @@ local enum = {
     hallserver_match = 103,              --匹配
     hallserver_friend = 104,             --好友
     hallserver_game_record = 105,        --游戏记录
+    hallserver_email = 106,              --邮件
 }
 
 return enum

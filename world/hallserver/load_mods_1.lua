@@ -62,6 +62,7 @@ return {
 		launch_num = 1,
 		default_arg = {
 			node_map = {
+				['centerserver'] = true,    --中心服
 				['matchserver'] = true,     --匹配服
 				['hallserver'] = true,      --大厅服
 				['chinese_chess'] = true,   --象棋服
@@ -80,13 +81,14 @@ return {
 	-- orm
 	orm_table_m = {
 		launch_seq = 5600,
-		launch_num = 5,
+		launch_num = 6,
 		mod_args = {
             {instance_name = "player", orm_plug = "orm_entity.player_entity"},
 			{instance_name = "item", orm_plug = "orm_entity.item_entity"},
 			{instance_name = "game_record", orm_plug = "orm_entity.game_record_entity"},
 			{instance_name = "friend", orm_plug = "orm_entity.friend_entity"},
-			{instance_name = "friend_req", orm_plug = "orm_entity.friend_req_entity"}
+			{instance_name = "friend_req", orm_plug = "orm_entity.friend_req_entity"},
+			{instance_name = "email", orm_plug = "orm_entity.email_entity"},
 		}
 	},
 

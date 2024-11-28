@@ -105,7 +105,7 @@
 </template>
 
 <script>
-import { deepClone } from '@/utils'
+
 import { list, add, update, del, item_list } from '@/api/global_email'
 import { MessageBox, Message } from 'element-ui'
 
@@ -147,8 +147,9 @@ export default {
                 this.emailsList = []
             }
 
-            for (let i = 1; i < this.emailsList.length; i++) {
+            for (let i = 0; i < this.emailsList.length; i++) {
                 let oneEmail = this.emailsList[i]
+                oneEmail.vaild_time = oneEmail.vaild_time * 1000
                 if (!Array.isArray(oneEmail.item_list)) {        //说明是空
                     oneEmail.item_list = []
                 }
@@ -212,6 +213,7 @@ export default {
             const isEdit = this.dialogType === 'edit'
             this.dialogVisible = false
             console.log("confirmEmail:", this.email)
+            this.email.vaild_time = Math.floor(this.email.vaild_time / 1000)
             if (!isEdit) {
                 const res = await add(this.email)
                 if (res.data == "succ") {

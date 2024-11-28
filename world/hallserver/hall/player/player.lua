@@ -80,4 +80,13 @@ end
 
 M.register_cmd = CMD
 
+local gmCMD = {
+    ['player:info'] = {
+        func = player_logic.gm_info,
+        help_des = "查询玩家信息 arg1=player_id"
+    },
+}
+
+M.gm_cmd = gmCMD
+
 return M

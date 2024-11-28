@@ -13,6 +13,7 @@ local assert = assert
 local ipairs = ipairs
 local pairs = pairs
 local table = table
+local math = math
 
 local g_email_list = {}--全服邮件列表
 watch_syn_client.watch("centerserver", "global_email", "handle1", function(cluter_name, email_map)

@@ -277,4 +277,18 @@ function interface.get_players_info(player_list, field_map)
     return ret_map
 end
 
+--------------------------------------GM-----------------------------------
+function M.gm_info(player_id)
+    player_id = tonumber(player_id)
+    if not player_id then
+        return nil, "not player_id"
+    end
+    local player_info = M.cmd_get_info(player_id)
+    if not player_info then
+        return nil, "not player_info"
+    end
+
+    return player_info
+end
+
 return M

@@ -46,6 +46,10 @@ end
 function CMD.item_add_item_map(player_id, item_map)
     return item_logic.cmd_add_item_map(player_id, item_map)
 end
+--批量增加道具
+function CMD.item_add_item_list(player_id, item_list)
+    return item_logic.cmd_add_item_list(player_id, item_list)
+end
 
 M.register_cmd = CMD
 

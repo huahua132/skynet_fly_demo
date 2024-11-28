@@ -52,7 +52,6 @@ function M.do_record_list_req(player_id, pack_body)
         next_cursor = next_cursor
     }
 
-    log.info("do_record_list_req >>> ",  next_cursor, res_list, count)
     g_local_info.game_record_msg:record_list_res(player_id, res)
     return true
 end

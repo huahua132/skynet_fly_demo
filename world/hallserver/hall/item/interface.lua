@@ -18,4 +18,16 @@ function M.reduce_item(player_id, id, num)
     error("调用了未实现的接口 reduce_item")
 end
 
+--批量增加道具
+--item_map : {[id1] = count, [id2] = count}
+function M.add_item_map(player_id, item_map) 
+    error("调用了未实现的接口 add_item_map")
+end
+
+--批量增加道具 
+-- item_list : {{id = 1, count = 100},{id = 2, count = 200}}
+function M.add_item_list(player_id, item_list)
+    error("调用了未实现的接口 add_item_list")
+end
+
 return M

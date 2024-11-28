@@ -10,6 +10,11 @@
 
 local enums =
 {
+    ---@class email_type @邮件类型
+     ---@field public GLOBAL integer @全服邮件
+     ---@field public SYSTEM integer @系统邮件
+     ---@field public FRIEND integer @好友邮件
+    ['email_type'] = {   GLOBAL=1,  SYSTEM=2,  FRIEND=3,  };
     ---@class game_type @游戏类型
      ---@field public CHINESE_CHESS integer @中国象棋游戏
      ---@field public DIGITALBOMB integer @数字炸弹游戏
