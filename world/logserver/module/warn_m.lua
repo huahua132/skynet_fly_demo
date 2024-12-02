@@ -4,6 +4,7 @@ local log = require "skynet-fly.log"
 local time_util = require "skynet-fly.utils.time_util"
 local watch_client = require "skynet-fly.rpc.watch_client"
 local string_util = require "skynet-fly.utils.string_util"
+local file_util = require "skynet-fly.utils.file_util"
 local PUB_CHANNEL_NAME = require "common.enum.PUB_CHANNEL_NAME"
 contriner_client:register("logrotate_m")
 
@@ -26,7 +27,7 @@ local g_file_name = g_cfg.file_path .. g_cfg.filename
 
 --记录
 local function record(cluster_name,logstr)
-    if not os.execute("mkdir -p " .. g_cfg.file_path) then
+    if not file_util.mkdir(g_cfg.file_path) then
         error("create g_monitor_log_dir err")
     end
    
