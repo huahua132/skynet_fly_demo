@@ -1,12 +1,11 @@
 local skynet = require "skynet"
-local contriner_client = require "skynet-fly.client.contriner_client"
 local log = require "skynet-fly.log"
 local time_util = require "skynet-fly.utils.time_util"
 local watch_client = require "skynet-fly.rpc.watch_client"
 local string_util = require "skynet-fly.utils.string_util"
 local file_util = require "skynet-fly.utils.file_util"
 local PUB_CHANNEL_NAME = require "common.enum.PUB_CHANNEL_NAME"
-contriner_client:register("logrotate_m")
+local logrotate = require "skynet-fly.logrotate"
 
 local CMD = {}
 
@@ -14,8 +13,6 @@ local io = io
 local os = os
 local string = string
 local pairs = pairs
-
-local SELF_ADDRESS = skynet.self()
 
 local g_cfg = {
     filename = "warn.log",         --文件名
@@ -51,7 +48,7 @@ function CMD.read(pre_day)
         filename = string.format('%s%s_%s',g_cfg.file_path,date,g_cfg.filename)
     end
 
-    local file = io.open(filename, 'r')
+    local file = io.open(filename, 'rb')
     if file then
         local content = file:read "a"
         file:close()
@@ -63,24 +60,12 @@ end
 
 function CMD.start(config)
     skynet.fork(function()
-        if contriner_client:instance("logrotate_m"):mod_call("add_rotate", SELF_ADDRESS, g_cfg) then
-            --logrotate的服务更新之后需要重新发送切割任务
-            contriner_client:add_updated_cb("logrotate_m",function()
-                contriner_client:instance("logrotate_m"):mod_call("add_rotate", SELF_ADDRESS, g_cfg)
-            end)
-        else
-            log.error("rigister_rotate err ")
-        end
-
+        logrotate:new(g_cfg.filename):set_file_path(g_cfg.file_path):set_max_age(g_cfg.max_age):builder()
         for svr_name in pairs(config.node_map) do
             watch_client.watch(svr_name, PUB_CHANNEL_NAME.WANI_LOG, "record_handle", record)
         end
     end)
     return true
-end
-
-function CMD.fix_exit()
-    contriner_client:instance("logrotate_m"):mod_send("cancel", SELF_ADDRESS)
 end
 
 function CMD.exit()
