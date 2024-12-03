@@ -12,6 +12,7 @@ local tti = require "skynet-fly.cache.tti"
 local json = require "cjson"
 local log = require "skynet-fly.log"
 local file_util = require "skynet-fly.utils.file_util"
+local skynet_util = require "skynet-fly.utils.skynet_util"
 local os = os
 
 local tonumber = tonumber
@@ -25,6 +26,16 @@ local g_file_cache = tti:new(time_util.DAY, function(key, file)
     file:flush()
     file:close()
 end)
+
+--关服shutdown 处理
+skynet_util.reg_shutdown_func(function()
+    for key,file in g_file_cache:pairs() do
+        log.warn("关服shutdown >>>>> ", key)
+        file:flush()
+        file:close()
+    end
+end)
+
 local g_monitor_log_dir = "./monitor_log/"
 
 local g_time_map = {}
