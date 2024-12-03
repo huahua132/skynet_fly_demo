@@ -1,8 +1,10 @@
 @echo off
 
-set skynet_fly_path=..\..\skynet_fly_win
+set skynet_fly_path=..\..\skynet_fly
 set bat_path=%skynet_fly_path%\script\bat
 set make_cmd=%bat_path%\make_server.bat
+
+echo skynet_fly_path = %skynet_fly_path%
 
 cd ..
 
