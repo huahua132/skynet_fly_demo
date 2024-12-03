@@ -118,10 +118,10 @@ return function(group)
             return
         end
 
-        local split_str = string_util.split(cluster_name,':')
+        local split_str = string_util.split(cluster_name,'-')
         assert(#split_str == 2, "err cluster_name " .. cluster_name)
         local svr_name,svr_id = split_str[1],tonumber(split_str[2])
-        split_str = string_util.split(server_name,':')
+        split_str = string_util.split(server_name,'-')
         assert(#split_str == 2, "err server_name " .. cluster_name)
         local address = ':'..split_str[2]
 
