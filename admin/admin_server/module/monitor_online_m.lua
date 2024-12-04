@@ -21,13 +21,16 @@ local g_file_cache = tti:new(time_util.DAY, function(key, file)
     file:close()
 end)
 
---关服shutdown 处理
-skynet_util.reg_shutdown_func(function()
+local function close_cache()
     for key,file in g_file_cache:pairs() do
         file:flush()
         file:close()
+        g_file_cache:update_cache(key, "closed")
     end
-end)
+end
+
+--关服shutdown 处理
+skynet_util.reg_shutdown_func(close_cache)
 
 local os = os
 local tonumber = tonumber
@@ -85,8 +88,10 @@ local function write_info(svr_name, tag, infostr)
         file = io.open(fname, 'a+')
     end
     if file then
-        file:write(infostr .. '\n')
-        g_file_cache:set_cache(fname, file)
+        if file ~= 'closed' then
+            file:write(infostr .. '\n')
+            g_file_cache:set_cache(fname, file)
+        end
     else
         log.error("open file err ",fname)
     end
@@ -183,6 +188,7 @@ function CMD.fix_exit()
             time_obj:cancel()
         end
     end
+    close_cache()
 end
 
 function CMD.exit()

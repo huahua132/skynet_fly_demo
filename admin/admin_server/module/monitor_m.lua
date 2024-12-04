@@ -27,14 +27,16 @@ local g_file_cache = tti:new(time_util.DAY, function(key, file)
     file:close()
 end)
 
---关服shutdown 处理
-skynet_util.reg_shutdown_func(function()
+local function close_cache()
     for key,file in g_file_cache:pairs() do
-        log.warn("关服shutdown >>>>> ", key)
         file:flush()
         file:close()
+        g_file_cache:update_cache(key, "closed")
     end
-end)
+end
+
+--关服shutdown 处理
+skynet_util.reg_shutdown_func(close_cache)
 
 local g_monitor_log_dir = "./monitor_log/"
 
@@ -154,9 +156,11 @@ local function monitor(svr_name)
                 file = io.open(fname,'a+')
             end
             if file then
-                local info_json = json.encode({[cur_date] = info})
-                file:write(info_json .. '\n')
-                g_file_cache:set_cache(fname, file)
+                if file ~= 'closed' then
+                    local info_json = json.encode({[cur_date] = info})
+                    file:write(info_json .. '\n')
+                    g_file_cache:set_cache(fname, file)
+                end
             else
                 log.error("open file err ",fname)
             end
@@ -186,6 +190,7 @@ function CMD.fix_exit()
         --取消定时器
         time_obj:cancel()
     end
+    close_cache()
 end
 
 --退出
