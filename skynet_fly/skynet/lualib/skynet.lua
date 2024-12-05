@@ -613,8 +613,9 @@ function skynet.self()
 	return self_address
 end
 
-function skynet.recordon()
-	c.command("RECORDON", skynet.address(skynet.self()))
+function skynet.recordon(filename)
+	assert(filename:len() <= 128, "len need to be less than 128")
+	c.command("RECORDON", skynet.address(skynet.self()) .. ' ' .. filename)
 end
 
 function skynet.recordoff()
@@ -1233,11 +1234,11 @@ if g_recordfile ~= "" and skynet.self() > 1 then
 	record_do.skynet(skynet)
 end
 
-function skynet.start_record(ARGV)
+function skynet.start_record(ARGV, filename)
 	--记录录像
 	if g_recordfile == "" then
 		g_write_record = true
-		skynet.recordon()
+		skynet.recordon(filename)
 		skynet.recordstart(string.format("%08x", skynet.self()) .. SERVICE_NAME .. ' ' .. table.concat(ARGV, ' '))
 
 		local old_mathrandseed = math.randomseed
@@ -1267,6 +1268,12 @@ function skynet.start_record(ARGV)
 	
 	--设置随机种子，以便录像播放时使用
 	math.randomseed(os.time(), math.random(1, 10000) + skynet.self())
+end
+
+function skynet.close_record()
+	if g_recordfile == "" then
+		skynet.recordoff()
+	end
 end
 
 return skynet

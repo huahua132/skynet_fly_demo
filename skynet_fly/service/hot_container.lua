@@ -18,7 +18,7 @@ assert(MODULE_NAME)
 local new_loaded = _loaded
 
 if IS_RECORD_ON == 1 then
-	skynet.start_record(ARGV)
+	skynet.start_record(ARGV, MODULE_NAME .. '-' .. VERSION .. '-' .. INDEX .. '-' .. os.date('%Y%m%d-%H%M%S', LAUNCH_TIME))
 end
 
 local CMD = {}
@@ -28,6 +28,15 @@ skynet_util.set_cmd_table(CMD)
 
 local MODULE_NAME = MODULE_NAME
 local module_info = require "skynet-fly.etc.module_info"
+module_info.set_base_info {
+	module_name = MODULE_NAME,
+	index = INDEX,
+	launch_date = LAUNCH_DATE,
+	launch_time = LAUNCH_TIME,
+	version = VERSION,
+	is_record_on = IS_RECORD_ON,
+}
+
 local contriner_interface = require "skynet-fly.contriner.contriner_interface"
 local table_util = require "skynet-fly.utils.table_util"
 local SERVER_STATE_TYPE = require "skynet-fly.enum.SERVER_STATE_TYPE"
@@ -45,17 +54,10 @@ if g_breakpoint_debug_module_name == MODULE_NAME and INDEX == g_breakpoint_debug
 	g_breakpoint_debug_port = tonumber(skynet.getenv("breakpoint_debug_port"))
 end
 
-module_info.set_base_info {
-	module_name = MODULE_NAME,
-	index = INDEX,
-	launch_date = LAUNCH_DATE,
-	launch_time = LAUNCH_TIME,
-	version = VERSION,
-	is_record_on = IS_RECORD_ON,
-}
-
 local SERVER_STATE = SERVER_STATE_TYPE.loading
 local IS_CLOSE_HOT_RELOAD = false
+
+local g_time_point_obj = nil
 
 --启动成功之后回调列表
 local g_start_after_cb = {}
@@ -160,11 +162,12 @@ local function check_exit()
 				log.warn("warning " .. MODULE_NAME .. ' can`t exit')
 			end
 			g_check_timer:cancel()
+			skynet.close_record()
 		end
 	end
 end
 
-function CMD.start(cfg)
+function CMD.start(cfg, auto_reload, record_backup)
 	if g_breakpoint_debug_host and g_breakpoint_debug_port then
 		log.warn_fmt("start breakpoint module_name[%s] index[%s] host[%s] port[%s]", MODULE_NAME, INDEX, g_breakpoint_debug_host, g_breakpoint_debug_port)
 		require("skynet-fly.LuaPanda").start(g_breakpoint_debug_host, g_breakpoint_debug_port);
@@ -184,6 +187,60 @@ function CMD.start(cfg)
 		for _,func in ipairs(g_start_after_cb) do
 			skynet.fork(func)
 		end
+
+		--自动热更处理
+		if auto_reload and INDEX == 1 then
+			local timer_point = require "skynet-fly.time_extend.timer_point"
+			g_time_point_obj = timer_point:new(auto_reload.type)
+
+			local function set_time_point_opt(opt)
+				if auto_reload[opt] then
+					local set_func = assert(timer_point['set_' .. opt], "opt func not exists: " .. opt)
+					g_time_point_obj = set_func(g_time_point_obj, auto_reload[opt])
+				end
+			end
+			set_time_point_opt('month')
+			set_time_point_opt('day')
+			set_time_point_opt('hour')
+			set_time_point_opt('min')
+			set_time_point_opt('sec')
+			set_time_point_opt('wday')
+			set_time_point_opt('yday')
+			g_time_point_obj = g_time_point_obj:builder(function()
+				log.info("auto reload >>>>>>>>>> ", MODULE_NAME)
+				skynet.send('.contriner_mgr','lua','load_modules', skynet.self(), MODULE_NAME)
+			end)
+		end
+
+		--录像保留文件整理
+		if record_backup and INDEX == 1 and IS_RECORD_ON == 1 then
+			local logrotate = require "skynet-fly.logrotate"
+			skynet.fork(function()
+				local rotate_obj = logrotate:new()
+				:set_file_path(skynet.getenv('recordpath'))
+				local function set_rotate_opt(opt)
+					if record_backup[opt] then
+						local set_func = assert(logrotate['set_' .. opt], "opt func not exists: " .. opt)
+						rotate_obj = set_func(rotate_obj, record_backup[opt])
+					end
+				end
+				set_rotate_opt('max_age')
+				set_rotate_opt('max_backups')
+
+				set_rotate_opt('point_type')
+				set_rotate_opt('month')
+				set_rotate_opt('day')
+				set_rotate_opt('hour')
+				set_rotate_opt('min')
+				set_rotate_opt('sec')
+				set_rotate_opt('wday')
+				set_rotate_opt('yday')
+				
+				rotate_obj:set_back_pattern(MODULE_NAME)	--设置匹配文件名
+				rotate_obj:builder()
+			end)
+		end
+
 		contriner_client:open_ready()
 		SERVER_STATE = SERVER_STATE_TYPE.starting
 	else
@@ -207,6 +264,10 @@ function CMD.close()
 		skynet.fork(func)
 	end
 	SERVER_STATE = SERVER_STATE_TYPE.fix_exited
+
+	if g_time_point_obj then
+		g_time_point_obj:cancel()
+	end
 end
 
 --退出之前
@@ -257,6 +318,6 @@ end)
 
 if IS_RECORD_ON == 1 then
 	skynet_util.reg_shutdown_func(function()
-		skynet.recordoff()
-	end)
+		skynet.close_record()
+	end, -1) -- -1 最后执行
 end
