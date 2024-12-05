@@ -102,6 +102,25 @@ return {
 		launch_seq = 6000,
 		launch_num = 6,     --启动6个
 		is_record_on = 1,   --录像
+
+		--自动定时热更 skynet-fly.time_extend.time_point.lua 的配置项
+		auto_reload = {
+			type = 3,    --每天
+			hour = 5,    --5点
+			min = 30,    --30分
+			sec = 30,    --30秒
+		},
+
+		--录像文件自动整理
+		--需要启动logrotate_m
+		record_backup = {
+			max_age = 3,      --最大保留天数
+			max_backups = 50, --最大保留文件数
+			point_type = 3,   --每天
+			hour = 5,         --5点
+			sec = 20,         --20
+		},
+
 		default_arg = {
 			hall_plug = "common.plug.hall_plug",         --大厅加载的插件lua模块文件名
 		}
