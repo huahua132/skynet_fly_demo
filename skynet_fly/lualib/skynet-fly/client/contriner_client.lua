@@ -2,6 +2,7 @@ local skynet = require "skynet"
 local module_info = require "skynet-fly.etc.module_info"
 local skynet_util = require "skynet-fly.utils.skynet_util"
 local table_util = require "skynet-fly.utils.table_util"
+local wait = require "skynet-fly.time_extend.wait"
 local setmetatable = setmetatable
 local assert = assert
 local pairs = pairs
@@ -34,8 +35,12 @@ local g_querycbed_map = {}	  --查询到地址已执行回调列表
 local g_updated_map = {}      --更新地址的回调列表
 local g_always_swtich_map = {}--总能切换的modulename服务，不受is_close_swtich限制
 local g_pre_gc_time = 0	 	  --上次调用gc的时间
+local g_wait = wait:new()
 
 local SERVICE_NAME = SERVICE_NAME
+if MODULE_NAME then
+	g_week_visitor_map[MODULE_NAME] = true		--自己标记为弱访问者
+end
 --弱引用原表
 local g_week_meta = {__mode = "kv"}
 local g_id_list_map = {}          --记录id_list的弱引用，用与其他服务查询该服务是否还需要访问自己
@@ -117,6 +122,9 @@ local function monitor(t,key)
 			if updated then
 				skynet.fork(call_back_updated, updated)
 			end
+		else
+			--等待开放swtich
+			g_wait:wait("open_swtich")
 		end
 	end
 end
@@ -225,6 +233,7 @@ end
 --开启服务切换
 function M:open_switch()
 	is_close_swtich = false
+	g_wait:wakeup("open_switch")
 end
 
 skynet.init(function()
