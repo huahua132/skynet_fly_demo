@@ -161,7 +161,8 @@ local function create_one_robot_logic(idx)
 
             m_state = STATE_ENUM.GAMEING
         else
-            log.error("连接游戏失败 ",idx, host)
+            log.error("连接游戏失败 ",idx, host, m_hall_fd)
+            skynet.sleep(math.random(timer.second * 5, timer.second * 15))
         end
     end
 
@@ -197,7 +198,7 @@ local function create_one_robot_logic(idx)
             account = m_account,
             password = m_password,
         }
-        local isok,_,bodystr = pcall(httpc.request, "POST", get_login_server_host(), '/user/login', nil, g_header, json.encode(req))
+        local isok,code,bodystr = pcall(httpc.request, "POST", get_login_server_host(), '/user/login', nil, g_header, json.encode(req))
         --log.info("请求登录:", idx, isok, code, bodystr)
         if not isok then
             --log.error("请求登录 网络错误:", idx, isok, tostring(code))
@@ -229,7 +230,7 @@ local function create_one_robot_logic(idx)
                 }
                 send_hall_msg(PACK.login.LoginReq, login_req)
             else
-                log.error("连接大厅失败 ", host)
+                log.error("连接大厅失败 ", host, m_hall_fd)
                 skynet.sleep(math.random(timer.second * 5, timer.second * 15))
             end
         else
@@ -263,6 +264,7 @@ local function create_one_robot_logic(idx)
             m_state = STATE_ENUM.UNLOGIN_HALL
         else
             log.warn("请求注册 注册失败:",idx, code, bodystr)
+            skynet.sleep(math.random(timer.second * 5, timer.second * 15))
         end
     end
 

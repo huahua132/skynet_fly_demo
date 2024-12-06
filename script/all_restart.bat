@@ -61,15 +61,4 @@ call make\script\restart.bat load_mods_1.lua
 call make\script\restart.bat load_mods_2.lua
 cd ..\..\
 
-@REM #启动机器人
-cd robots\chinese_chess_robot
-call %make_cmd% %skynet_fly_path%
-call make\script\restart.bat load_mods.lua
-cd ..\..\
-
-cd robots\digitalbomb_robot
-call %make_cmd% %skynet_fly_path%
-call make\script\restart.bat load_mods.lua
-cd ..\..\
-
 pause
