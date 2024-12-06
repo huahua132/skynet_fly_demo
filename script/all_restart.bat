@@ -45,7 +45,7 @@ cd ..\..\
 @REM #启动web游戏客户端服务
 cd admin\game_client_server
 call %make_cmd% %skynet_fly_path%
-make\script\restart.bat load_mods.lua
+call make\script\restart.bat load_mods.lua
 cd ..\..\
 
 @REM #启动游戏
@@ -59,6 +59,17 @@ cd games\digitalbomb
 call %make_cmd% %skynet_fly_path%
 call make\script\restart.bat load_mods_1.lua
 call make\script\restart.bat load_mods_2.lua
+cd ..\..\
+
+@REM #启动机器人
+cd robots\chinese_chess_robot
+call %make_cmd% %skynet_fly_path%
+call make\script\restart.bat load_mods.lua
+cd ..\..\
+
+cd robots\digitalbomb_robot
+call %make_cmd% %skynet_fly_path%
+call make\script\restart.bat load_mods.lua
 cd ..\..\
 
 pause

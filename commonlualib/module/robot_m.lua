@@ -144,8 +144,9 @@ local function create_one_robot_logic(idx)
         local token = body.gametoken
 
         m_game_table_id = body.table_id
-        m_game_fd = websocket.connect("ws://" .. host)
-        if m_game_fd then
+        local isok
+        isok,m_game_fd = pcall(websocket.connect, "ws://" .. host)
+        if isok and m_game_fd then
             socket.onclose(m_game_fd, function(close_fd)
                 websocket.close(close_fd)
                 --log.info("m_game_fd close:", m_game_fd, close_fd)
