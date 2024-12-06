@@ -1,6 +1,24 @@
 package hallserver_email;
 import "../../commonlualib/protos/common/common.proto";
 
+//协议主码 本服独有协议 占用 101-654 公共占用1-50 游戏公共占用50-100
+enum main {
+	hallserver_email = 106;
+}
+//协议子码 req res 占用1-80  通知占用80-100
+enum sub {
+    ReadEmailReq       = 1;       //请求已读
+    ReadEmailRes       = 2;       //回复已读
+    ItemListEmailReq   = 3;       //领取道具列表
+    ItemListEmailRes   = 4;       //回复领取道具列表
+    DelEmailReq        = 5;       //删除邮件
+    DelEmailRes        = 6;       //回复删除邮件
+
+    AllEmailNotice     = 80;      //通知所有邮件
+    OneEmailNotice     = 81;      //通知一条邮件
+    DelEmailNotice     = 82;      //通知删除邮件
+}
+
 //读取邮件
 message ReadEmailReq {
     repeated string guid_list = 1;       //邮件guid

@@ -1,0 +1,19 @@
+package login;
+//协议主码 本服独有协议 占用 101-654 公共占用1-50 游戏公共占用50-100
+enum main {
+	login = 2;
+}
+//协议子码 req res 占用1-80  通知占用80-100
+enum sub {
+	LoginReq = 1;
+	LoginRes = 2;
+}
+
+message LoginReq {
+	optional string token = 1;
+	optional int64 player_id = 2;
+}
+
+message LoginRes {
+	optional int32 isreconnect = 1;
+}

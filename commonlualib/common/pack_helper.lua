@@ -19,45 +19,43 @@ function M.new(name, pack_obj)
     local pack_obj = pack_obj
     local m_PACK = {}
     local m_ID = {}
+    local m_check_id = {}
 
     local ret_M = {}
 
-    function ret_M.set_pack_id_names(dirs)
-        for _, dir in pairs(dirs) do
-            --指定目录下 PACK.lua 编写主码
-            local p = dir .. 'PACK.lua'
-            local packs = loadfile(p)
-            if not packs then
-                log.error(m_name .. " set_pack_id_names not exists " .. p)
-                return
-            end
-            packs = packs()
-    
-            --对应packid 目录下编写子码
-            for packname, id in pairs(packs) do
-                assert(id >= 1 and id <= 654)                           --因为packid是uint16 最大值为65535，所以主码最大值为654
-                local p = dir .. '/packid/' .. packname .. '.lua'
-                local sub_packs = loadfile(p)
-                if not sub_packs then
-                    log.error(m_name .. "set_pack_id_names subpack not exists " .. p)
-                    return
-                end
-                sub_packs = sub_packs()
-
-                m_ID[packname] = id
-    
-                if not m_PACK[packname] then
-                    m_PACK[packname] = {}
-                end
-                local name_pack_id = m_PACK[packname]
-    
-                for name, sub_id in pairs(sub_packs) do
-                    assert(sub_id >= 1 and sub_id <= 100)
-                    local pack_id = id * 100 + sub_id
-                    local packname = string.format('.%s.%s', packname, name)
-                    pack_obj.set_packname_id(pack_id, packname)
-    
-                    name_pack_id[name] = pack_id
+    function ret_M.set_pack_id_names()
+        for file_path, info in pairs(pack_obj.get_loaded()) do
+            local packname = info.package
+            m_PACK[packname] = {}
+            local main_id = nil
+            local name_pack_id = m_PACK[packname]
+            if info.enum_type then
+                for i = 1, #info.enum_type do
+                    local one_enum = info.enum_type[i]
+                    local value = one_enum.value
+                    if one_enum.name == "main" then
+                        assert(#value == 1, string.format("main enum err It must be one m_name[%s] package[%s] file_path[%s]", m_name, packname, file_path))
+                        local name = value[1].name
+                        local number = value[1].number
+                        assert(name == packname, string.format("main enum name must package m_name[%s] name[%s] package[%s] file_path[%s]", m_name, name,  packname, file_path))
+                        main_id = number
+                        assert(main_id >= 1 and main_id <= 654)         --uint16 最大能表示65535
+                        m_ID[packname] = main_id
+                        assert(not m_check_id[main_id], string.format("repeat use main_id m_name[%s] main_id[%s] packname[%s] curpackname[%s]", m_name, main_id, m_check_id[main_id], packname))
+                        m_check_id[main_id] = packname                
+                    elseif one_enum.name == "sub" then
+                        assert(main_id, string.format("sub enum err not main_id m_name[%s] package[%s] file_path[%s]", m_name, packname, file_path))
+                        for j = 1, #value do
+                            local one_v = value[j]
+                            local sub_id = one_v.number
+                            assert(sub_id >= 1 and sub_id <= 100)
+                            local pack_id = main_id * 100 + sub_id
+                            local msgname = string.format('.%s.%s', packname, one_v.name)
+                            pack_obj.set_packname_id(pack_id, msgname)
+            
+                            name_pack_id[one_v.name] = pack_id
+                        end
+                    end
                 end
             end
         end

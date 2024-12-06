@@ -25,10 +25,7 @@ do
     hall_pack.load('../../commonlualib/protos/hallserver')
 
     --协议码 协议消息名建立映射关系
-    hall_helper.set_pack_id_names {
-        "../../commonlualib/packids/common/",
-        "../../commonlualib/packids/hallserver/",
-    }
+    hall_helper.set_pack_id_names()
 end
 
 local hall_net = ws_pbnet_byid.new("hall", hall_pack)

@@ -1,4 +1,17 @@
 package chinese_chess_game;
+//协议主码 本服独有协议 占用 101-654 公共占用1-50 游戏公共占用50-100
+enum main {
+	chinese_chess_game = 101;
+}
+//协议子码 req res 占用1-80  通知占用80-100
+enum sub {
+	gameStateReq       = 1;       //游戏状态数据请求
+    gameStateRes       = 2;       //游戏状态数据回复
+    moveReq            = 3;       //请求移动棋子
+    moveRes            = 4;       //回复移动棋子
+
+    nextDoing         = 80;       //通知接下来操作
+}
 
 message gameStateReq {
 	optional int64 player_id = 1;

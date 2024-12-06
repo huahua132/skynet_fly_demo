@@ -1,0 +1,16 @@
+package hallserver_item;
+import "../../commonlualib/protos/common/common.proto";
+
+//协议主码 本服独有协议 占用 101-654 公共占用1-50 游戏公共占用50-100
+enum main {
+	hallserver_item = 102;
+}
+//协议子码 req res 占用1-80  通知占用80-100
+enum sub {
+    ItemListNotice = 80;       //玩家道具信息
+}
+
+
+message ItemListNotice {
+    repeated common.Item item_list = 1;
+}

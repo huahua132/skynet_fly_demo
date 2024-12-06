@@ -14,11 +14,7 @@ do
 	game_pack.load('../../commonlualib/protos/digitalbomb')
 
 	--协议码 协议消息名建立映射关系
-	game_helper.set_pack_id_names {
-		"../../commonlualib/packids/gamecommon/",
-		"../../commonlualib/packids/common/",
-		"../../commonlualib/packids/digitalbomb/",
-	}
+	game_helper.set_pack_id_names()
 end
 
 local PACK = game_helper.PACK

@@ -1,5 +1,25 @@
 package hallserver_friend;
 
+//协议主码 本服独有协议 占用 101-654 公共占用1-50 游戏公共占用50-100
+enum main {
+	hallserver_friend = 104;
+}
+//协议子码 req res 占用1-80  通知占用80-100
+enum sub {
+    FriendListReq      = 1;       //请求好友列表
+    FriendListRes      = 2;       //回复好友列表
+    AddFriendReq       = 3;       //请求添加好友
+    AddFriendRes       = 4;       //回复添加好友
+    AgreeAddFriendReq  = 5;       //同意添加好友请求
+    AgreeAddFriendRes  = 6;       //同意添加好友回复
+    RefuseAddFriendReq = 7;       //拒绝添加好友请求
+    RefuseAddFriendRes = 8;       //拒绝添加好友回复
+    DelFriendReq       = 9;       //删除好友请求
+    DelFriendRes       = 10;      //删除好友回复
+
+    AddReqListNotice   = 80;      //通知请求添加好友列表
+}
+
 message OneFriend {
     optional int64 player_id = 1;           //玩家ID
     optional string nickname = 2;           //昵称

@@ -6,10 +6,7 @@ do
 	pb_netpack.load('../../commonlualib/protos/hallserver')
 
 	--协议码 协议消息名建立映射关系
-	pack_helper.set_pack_id_names {
-		"../../commonlualib/packids/common/",
-		"../../commonlualib/packids/hallserver/",
-	}
+	pack_helper.set_pack_id_names()
 end
 
 return {

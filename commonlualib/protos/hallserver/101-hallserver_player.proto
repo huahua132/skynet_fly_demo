@@ -1,5 +1,16 @@
 package hallserver_player;
 
+//协议主码 本服独有协议 占用 101-654 公共占用1-50 游戏公共占用50-100
+enum main {
+	hallserver_player = 101;
+}
+//协议子码 req res 占用1-80  通知占用80-100
+enum sub {
+    HeartReq            = 1;              //心跳
+    PlayerInfoNotice    = 80;             //玩家信息通知
+    PlayerInfoSynNotice = 81;             //玩家字段信息同步
+}
+
 //心跳包
 message HeartReq {
 	optional int64 time = 1;

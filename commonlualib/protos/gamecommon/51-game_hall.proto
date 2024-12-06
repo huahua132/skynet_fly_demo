@@ -1,0 +1,24 @@
+package game_hall;
+
+//协议主码 本服独有协议 占用 101-654 公共占用1-50 游戏公共占用50-100
+enum main {
+	game_hall = 51;
+}
+//协议子码 req res 占用1-80  通知占用80-100
+enum sub {
+    JoinReq = 1;     //加入房间请求
+    JoinRes = 2;     //回复加入房间请求
+    HeartReq = 3;    //心跳包
+}
+
+message JoinReq {
+	optional string table_id = 1;
+}
+
+message JoinRes {
+	optional string table_id = 1;
+}
+//心跳包
+message HeartReq {
+	optional int64 time = 1;
+}
