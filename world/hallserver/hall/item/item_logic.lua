@@ -131,7 +131,7 @@ function M.cmd_add_item_list(player_id, item_list)
         assert(item_cfg, "not item_cfg " .. id)
         assert(count >= 0, "count err " .. count)
         if not item_map[id] then
-            item_map[id] = {}
+            item_map[id] = 0
         end
         item_map[id] = item_map[id] + count
     end

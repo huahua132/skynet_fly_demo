@@ -24,15 +24,15 @@ end
 M.handle = {
     --读取邮件
     [PACK.hallserver_email.ReadEmailReq] = function(player_id, pack_id, pack_body)
-        email_logic.do_read_email(player_id, pack_body)
+        return email_logic.do_read_email(player_id, pack_body)
     end,
     --领取道具列表
     [PACK.hallserver_email.ItemListEmailReq] = function(player_id, pack_id, pack_body)
-        email_logic.do_item_list_email(player_id, pack_body)
+        return email_logic.do_item_list_email(player_id, pack_body)
     end,
     --删除邮件
     [PACK.hallserver_email.DelEmailReq] = function(player_id, pack_id, pack_body)
-        email_logic.do_del_email(player_id, pack_body)
+        return email_logic.do_del_email(player_id, pack_body)
     end,
 }
 

@@ -89,7 +89,7 @@ function M.on_recv_global_emails(all_global_emails)
         local old_email = old_global_emails[i]
         local new_email = new_global_email_map[old_email.guid]
         if not new_email then
-            table.insert(del_list, new_email)
+            table.insert(del_list, old_email)
         else
             if check_email_change(old_email, new_email) then
                 table.insert(change_list, new_email)
@@ -115,7 +115,9 @@ local function handle_res_list(player_id, res_list, email_list, flag)
         if not res then
             log.error_fmt("change_global_email %s err guid[%s]", flag, email.guid)
         else
-            g_logic_info.email_msg:one_email_notice(player_id, email)
+            g_logic_info.email_msg:one_email_notice(player_id, {
+                email = email,
+            })
         end
     end
 end
@@ -164,22 +166,23 @@ function M.change_global_email(player_id, add_list, change_list, del_list)
         local res_list = g_email_entity:change_save_entry(change_email_list)
         handle_res_list(player_id, res_list, change_email_list, "change email")
     end
-
+    
     if del_list and #del_list > 0 then
         --处理删除
         local del_email_list = {}
         for i = 1, #del_list do
             local one_email = del_list[i]
-            table.insert(del_email_list, {
-                player_id = player_id,
-                guid = one_email.guid,
-                email_type = schema.enums.email_type.GLOBAL,
-                del_flag = 1,           --标记删除
-            })
+            table.insert(del_email_list, one_email.guid)
         end
 
-        local res_list = g_email_entity:change_save_entry(del_email_list)
-        handle_res_list(player_id, res_list, del_email_list, "del_flag email")
+        local ret = g_email_entity:delete_entry_by_in(del_email_list, player_id)
+        if ret then
+            g_logic_info.email_msg:del_email_notice(player_id, {
+                guid_list = del_email_list
+            })
+        else
+            log.warn("delete_entry_by_in err ", player_id, del_email_list)
+        end
     end
 end
 
@@ -204,7 +207,9 @@ function M.on_login(player_id)
             table.remove(all_email_list, i)
         end
     end
-    g_logic_info.email_msg:all_email_notice(player_id, all_email_list)
+    g_logic_info.email_msg:all_email_notice(player_id, {
+        email_list = all_email_list
+    })
     local email_map = {}
     for i = 1, #all_email_list do
         local one_email = all_email_list[i]
@@ -213,9 +218,14 @@ function M.on_login(player_id)
     --检查出来全服邮件
     local add_list = {}     --新增全服邮件
     local change_list = {}  --全服邮件内容改变
+    local del_list = {}     --删除全服邮件
+
+    local gemail_map = {}
     local all_global_emails = g_logic_info.all_global_emails
     for i = 1, #all_global_emails do
         local one_email = all_global_emails[i]
+        gemail_map[one_email.guid] = one_email
+
         if not email_map[one_email.guid] then
             table.insert(add_list, one_email)
         else
@@ -224,8 +234,15 @@ function M.on_login(player_id)
             end
         end
     end
+
+    for i = 1, #all_email_list do
+        local one_email = all_email_list[i]
+        if one_email.email_type == schema.enums.email_type.GLOBAL and not gemail_map[one_email.guid] then
+            table.insert(del_list, one_email)
+        end
+    end
   
-    M.change_global_email(player_id, add_list, change_list, nil)
+    M.change_global_email(player_id, add_list, change_list, del_list)
 end
 
 --登出
@@ -277,7 +294,7 @@ function M.do_item_list_email(player_id, pack_body)
     end
 
     local item_list_ret = g_email_entity:reward_item_list(player_id, guid_list)
-
+    
     local ret_guid_list = {}
     for i = 1, #item_list_ret do
         local one_ret = item_list_ret[i]
@@ -285,7 +302,7 @@ function M.do_item_list_email(player_id, pack_body)
         local item_list = one_ret.item_list
         item_interface.add_item_list(player_id, item_list)
     end
-
+    --log.info("do_item_list_email >>> ", item_list_ret, ret_guid_list)
     g_logic_info.email_msg:item_list_email_res(player_id, {
         guid_list = ret_guid_list,
     })

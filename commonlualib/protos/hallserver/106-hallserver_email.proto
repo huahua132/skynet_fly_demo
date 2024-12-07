@@ -21,34 +21,34 @@ enum sub {
 
 //读取邮件
 message ReadEmailReq {
-    repeated string guid_list = 1;       //邮件guid
+    repeated int64 guid_list = 1;       //邮件guid
 }
 
 message ReadEmailRes {
-    repeated string guid_list = 1;       //邮件guid
+    repeated int64 guid_list = 1;       //邮件guid
 }
 
 //领取邮件奖励道具
 message ItemListEmailReq {
-    repeated string guid_list = 1;       //邮件guid
+    repeated int64 guid_list = 1;       //邮件guid
 }
 
 message ItemListEmailRes {
-    repeated string guid_list = 1;       //邮件guid
+    repeated int64 guid_list = 1;       //邮件guid
 }
 
 //删除邮件
 message DelEmailReq {
-    repeated string guid_list = 1;       //邮件guid
+    repeated int64 guid_list = 1;       //邮件guid
 }
 
 //回复删除邮件
 message DelEmailRes {
-    repeated string guid_list = 1;       //邮件guid
+    repeated int64 guid_list = 1;       //邮件guid
 }
 
 message oneEmail {
-    optional string guid = 1;
+    optional int64 guid = 1;
     optional int32 email_type = 2;      //邮件类型 1全服邮件 2系统邮件 3好友
     optional int64 from_id = 3;         //来源ID   好友ID
     optional string title = 4;          //标题
@@ -72,5 +72,5 @@ message OneEmailNotice {
 
 //通知删除邮件
 message DelEmailNotice {
-    repeated string guid_list = 1;       //邮件guid
+    repeated int64 guid_list = 1;       //邮件guid
 }
