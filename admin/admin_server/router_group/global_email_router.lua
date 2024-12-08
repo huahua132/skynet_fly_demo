@@ -77,13 +77,13 @@ end
 --全服邮件接口
 return function(group)
     --获取邮件列表
-    permission_mid.set('get',group:calculate_absolute_convert_path('/list'),ENUM.client_path .. '/global_email') --设置权限验证
+    permission_mid.set('get',group:calculate_absolute_convert_path('/list'),ENUM.client_path .. '/global_email/index') --设置权限验证
     group:get('/list',function(c)
         rsp_body.set_rsp(c, g_email_list)
     end)
 
     --新增邮件
-    permission_mid.set('post',group:calculate_absolute_convert_path('/add'),ENUM.client_path .. '/global_email') --设置权限验证
+    permission_mid.set('post',group:calculate_absolute_convert_path('/add'),ENUM.client_path .. '/global_email/index') --设置权限验证
     group:post('/add', function(c)
         local new_email = c.req.body
         assert(new_email, "not new_email")
@@ -104,7 +104,7 @@ return function(group)
     end)
 
     --修改邮件
-    permission_mid.set('put',group:calculate_absolute_convert_path('/update/:guid'),ENUM.client_path .. '/global_email') --设置权限验证
+    permission_mid.set('put',group:calculate_absolute_convert_path('/update/:guid'),ENUM.client_path .. '/global_email/index') --设置权限验证
     group:put('/update/:guid', function(c)
         local params = c.params
         local guid = tonumber(params.guid)
@@ -129,7 +129,7 @@ return function(group)
     end)
 
     --删除邮件
-    permission_mid.set('delete',group:calculate_absolute_convert_path('/del/:guid'),ENUM.client_path .. '/global_email') --设置权限验证
+    permission_mid.set('delete',group:calculate_absolute_convert_path('/del/:guid'),ENUM.client_path .. '/global_email/index') --设置权限验证
     group:delete('/del/:guid', function(c)
         local params = c.params
         local guid = tonumber(params.guid)
@@ -143,7 +143,7 @@ return function(group)
     end)
 
     --查询道具列表
-    permission_mid.set('get',group:calculate_absolute_convert_path('/itemList'),ENUM.client_path .. '/global_email') --设置权限验证
+    permission_mid.set('get',group:calculate_absolute_convert_path('/itemList'),ENUM.client_path .. '/global_email/index') --设置权限验证
     group:get('/itemList', function(c)
         rsp_body.set_rsp(c, item_conf.get_item_list())
     end)
