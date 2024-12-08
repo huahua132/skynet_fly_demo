@@ -4,7 +4,6 @@ local permission_mid = require "middleware.permission_mid"
 local global_email = require "common.rpc.centerserver.global_email"
 local item_conf = require "common.conf.item_conf"
 local rsp_body = require "common.rsp_body"
-local ENUM = require "enum.ENUM"
 local CODE = require "common.enum.CODE"
 local log = require "skynet-fly.log"
 
@@ -77,13 +76,13 @@ end
 --全服邮件接口
 return function(group)
     --获取邮件列表
-    permission_mid.set('get',group:calculate_absolute_convert_path('/list'),ENUM.client_path .. '/global_email/index') --设置权限验证
+    permission_mid.set('get',group:calculate_absolute_convert_path('/list'),'/global_email/index') --设置权限验证
     group:get('/list',function(c)
         rsp_body.set_rsp(c, g_email_list)
     end)
 
     --新增邮件
-    permission_mid.set('post',group:calculate_absolute_convert_path('/add'),ENUM.client_path .. '/global_email/index') --设置权限验证
+    permission_mid.set('post',group:calculate_absolute_convert_path('/add'),'/global_email/index') --设置权限验证
     group:post('/add', function(c)
         local new_email = c.req.body
         assert(new_email, "not new_email")
@@ -104,7 +103,7 @@ return function(group)
     end)
 
     --修改邮件
-    permission_mid.set('put',group:calculate_absolute_convert_path('/update/:guid'),ENUM.client_path .. '/global_email/index') --设置权限验证
+    permission_mid.set('put',group:calculate_absolute_convert_path('/update/:guid'),'/global_email/index') --设置权限验证
     group:put('/update/:guid', function(c)
         local params = c.params
         local guid = tonumber(params.guid)
@@ -129,7 +128,7 @@ return function(group)
     end)
 
     --删除邮件
-    permission_mid.set('delete',group:calculate_absolute_convert_path('/del/:guid'),ENUM.client_path .. '/global_email/index') --设置权限验证
+    permission_mid.set('delete',group:calculate_absolute_convert_path('/del/:guid'),'/global_email/index') --设置权限验证
     group:delete('/del/:guid', function(c)
         local params = c.params
         local guid = tonumber(params.guid)
@@ -143,7 +142,7 @@ return function(group)
     end)
 
     --查询道具列表
-    permission_mid.set('get',group:calculate_absolute_convert_path('/itemList'),ENUM.client_path .. '/global_email/index') --设置权限验证
+    permission_mid.set('get',group:calculate_absolute_convert_path('/itemList'),'/global_email/index') --设置权限验证
     group:get('/itemList', function(c)
         rsp_body.set_rsp(c, item_conf.get_item_list())
     end)
