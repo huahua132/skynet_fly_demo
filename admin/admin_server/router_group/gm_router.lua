@@ -13,7 +13,7 @@ local table = table
 --gm 接口
 return function(group)
     --获取gm 帮助信息
-    permission_mid.set('get',group:calculate_absolute_convert_path('/help/:find_name'),ENUM.client_path .. '/gm') --设置权限验证
+    permission_mid.set('get',group:calculate_absolute_convert_path('/help/:find_name'),ENUM.client_path .. '/gm/index') --设置权限验证
     group:get('/help/:find_name',function(c)
         local params = c.params
         local find_name = params.find_name
@@ -35,7 +35,7 @@ return function(group)
     end)
 
     --debug 命令
-    permission_mid.set('post',group:calculate_absolute_convert_path('/debug'),ENUM.client_path .. '/gm') --设置权限验证
+    permission_mid.set('post',group:calculate_absolute_convert_path('/debug'),ENUM.client_path .. '/gm/index') --设置权限验证
     group:post('/debug', function(c)
         local args = c.req.body
         local player_id = tonumber(args.player_id)
