@@ -6,7 +6,6 @@ local permission_mid = require "middleware.permission_mid"
 local ENUM = require "enum.ENUM"
 local assert = assert
 local error = error
-local client_path = ENUM.client_path
 
 local function login(c)
     local req = c.req
@@ -69,12 +68,12 @@ return function(group)
     group:post('/login', login)
     group:get('/info', info)
     group:post('/logout', logout)
-    permission_mid.set('get',group:calculate_absolute_convert_path('/list'),client_path .. '/user')
+    permission_mid.set('get',group:calculate_absolute_convert_path('/list'),'/user/index')
     group:get('/list', list)
-    permission_mid.set('post',group:calculate_absolute_convert_path('/add'),client_path .. '/user')
+    permission_mid.set('post',group:calculate_absolute_convert_path('/add'),'/user/index')
     group:post('/add', add)
-    permission_mid.set('put',group:calculate_absolute_convert_path('/up/:username'),client_path .. '/user')
+    permission_mid.set('put',group:calculate_absolute_convert_path('/up/:username'),'/user/index')
     group:put('/up/:username', update)
-    permission_mid.set('delete',group:calculate_absolute_convert_path('/del/:username'),client_path .. '/user')
+    permission_mid.set('delete',group:calculate_absolute_convert_path('/del/:username'),'/user/index')
     group:delete('/del/:username', delete)
 end

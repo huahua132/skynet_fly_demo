@@ -6,15 +6,13 @@ local ENUM = require "enum.ENUM"
 local permission_mid = require "middleware.permission_mid"
 local assert = assert
 
-local client_path = ENUM.client_path
-
 return function(group)
     group:get('/roles',function(c)
         local roles = model_role.get_all_roles()
         rsp_body.set_rsp(c,roles,CODE.ERR_SERVER,"")
     end)
 
-    permission_mid.set('post',group:calculate_absolute_convert_path('/role'),client_path .. '/role')
+    permission_mid.set('post',group:calculate_absolute_convert_path('/role'),'/permission/role')
     group:post('/role',function(c)
         local new_role = c.req.body
 
@@ -22,7 +20,7 @@ return function(group)
         rsp_body.set_rsp(c,data,code,msg)
     end)
 
-    permission_mid.set('put',group:calculate_absolute_convert_path('/role/:name'),client_path .. '/role')
+    permission_mid.set('put',group:calculate_absolute_convert_path('/role/:name'),'/permission/role')
     group:put('/role/:name',function(c)
         local role = c.req.body
         local params = c.params
@@ -33,7 +31,7 @@ return function(group)
         rsp_body.set_rsp(c,data,code,msg)
     end)
 
-    permission_mid.set('delete',group:calculate_absolute_convert_path('/role/:name'),client_path .. '/role')
+    permission_mid.set('delete',group:calculate_absolute_convert_path('/role/:name'),'/permission/role')
     group:delete('/role/:name',function(c)
         local params = c.params
 		local name = params.name

@@ -49,7 +49,7 @@ return function(group)
         local query = c.req.query
         local cluster_name = assert(query.cluster_name, "not cluster_name") --集群服务的名字
         assert(g_register_map[cluster_name], "cluster_name not exists")          --不存在
-        local split_str = string_util.split(cluster_name,':')
+        local split_str = string_util.split(cluster_name,'-')
         assert(#split_str == 2, "err cluster_name " .. cluster_name)
         local svr_name,svr_id = split_str[1],tonumber(split_str[2])
 

@@ -147,6 +147,7 @@ export var asyncRoutes = [
     path: '/user',
     component: Layout,
     meta: {
+      title: '用户管理',
       roles: ['admin', 'developer'] // you can set roles in root nav
     },
     children: [
@@ -166,6 +167,7 @@ export var asyncRoutes = [
     path: '/global_email',
     component: Layout,
     meta: {
+      title: '全服邮件',
       roles: ['admin', 'developer'] // you can set roles in root nav
     },
     children: [
@@ -185,6 +187,7 @@ export var asyncRoutes = [
     path: '/gm',
     component: Layout,
     meta: {
+      title: 'GM',
       roles: ['admin', 'developer'] // you can set roles in root nav
     },
     children: [
