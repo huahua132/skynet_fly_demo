@@ -35,15 +35,14 @@ local g_svr_id = env_util.get_svr_id()
 local M = {}
 local mata = {__index = M}
 
-function M:new(table_id, interface, play_type)
+function M:new(table_id, m_interface_mgr, play_type)
     if table_id == 1 then  -- 1是测试创建的房间
         return
     end
-    local m_interface_mgr = interface:new(table_id)
+    
     local t = {
         m_table_id = table_id,
         m_interface_mgr = m_interface_mgr,
-        m_errors_msg = errors_msg:new(m_interface_mgr),
         m_game_msg = game_msg:new(m_interface_mgr),
         m_game_state = GAME_STATE.waiting, 	         --参与游戏的玩家座位号
         m_doing_seat_id = nil,                  	 --操作座位号

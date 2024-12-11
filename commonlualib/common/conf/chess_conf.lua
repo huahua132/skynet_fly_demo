@@ -34,7 +34,7 @@ end
 function M.get_rank_level(score)
     local data_tables = g_chess_rank:get_data_table()
 
-    local index_cfg = nil
+    local index_cfg = data_tables[1]
     for i = 1, #data_tables do
         local cfg = data_tables[i]
         if cfg.need_score > score then
