@@ -99,8 +99,8 @@ function HANDLER.close(fd, code, reason)
 	closed(fd)
 end
 
-function HANDLER.error(fd, err)
-	log.error("ws error ", fd, err)
+function HANDLER.error(fd)
+	log.error("ws error ",fd)
 	closed(fd)
 end
 

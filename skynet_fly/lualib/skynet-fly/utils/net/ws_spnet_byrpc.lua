@@ -10,16 +10,16 @@ function M.new(name, pack_obj)
     pack_obj = pack_obj or sp_netpack.new(name)
 
     --单发
-    ret_M.send = util_net_base.create_ws_gate_send_binary(pack_obj.pack)
+    ret_M.send = util_net_base.create_ws_gate_send_binary(pack_obj.pack_by_rpc)
 
     --群发
-    ret_M.broadcast = util_net_base.create_ws_gate_broadcast_binary(pack_obj.pack)
+    ret_M.broadcast = util_net_base.create_ws_gate_broadcast_binary(pack_obj.pack_by_rpc)
 
     --解包
-    ret_M.unpack = util_net_base.create_ws_gate_unpack(pack_obj.unpack)
+    ret_M.unpack = util_net_base.create_ws_gate_unpack(pack_obj.unpack_by_rpc)
 
     --读取
-    ret_M.recv = util_net_base.create_recv(websocket.read,pack_obj.unpack)
+    ret_M.recv = util_net_base.create_recv(websocket.read,pack_obj.unpack_by_rpc)
 
     return ret_M
 end

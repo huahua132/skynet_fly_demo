@@ -14,16 +14,16 @@ function M.new(name, pack_obj)
     local pack_obj = pack_obj or pb_netpack.new(name)
 
     --给fd发送socket消息
-    ret_M.send = util_net_base.create_gate_send(pack_obj.pack_by_id)
+    ret_M.send = util_net_base.create_gate_send(pack_obj.pack_by_rpc)
 
     --群发
-    ret_M.broadcast = util_net_base.create_gate_broadcast(pack_obj.pack_by_id)
+    ret_M.broadcast = util_net_base.create_gate_broadcast(pack_obj.pack_by_rpc)
 
     --解包
-    ret_M.unpack = util_net_base.create_gate_unpack(pack_obj.unpack_by_id)
+    ret_M.unpack = util_net_base.create_gate_unpack(pack_obj.unpack_by_rpc)
 
     --客户端读取消息包
-    ret_M.recv = util_net_base.create_recv(socket.read,pack_obj.unpack_by_id)
+    ret_M.recv = util_net_base.create_recv(socket.read,pack_obj.unpack_by_rpc)
 
     return ret_M
 end
