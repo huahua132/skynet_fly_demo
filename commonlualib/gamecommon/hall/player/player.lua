@@ -26,7 +26,7 @@ end
 
 M.handle = {
     --心跳
-    [PACK.game_hall.HeartReq] = function(player_id, pack_id, pack_body)
+    [PACK.login.HeartReq] = function(player_id, pack_id, pack_body)
        return player_logic.do_heart(player_id, pack_body)
     end,
 }

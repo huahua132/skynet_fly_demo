@@ -61,9 +61,12 @@ function M.do_heart(player_id, pack_body)
         return
     end
 
-    player.heart_time = time_util.time()
+    local cur_time = time_util.time()
+    player.heart_time = cur_time
 
-    return true
+    return {
+        time = cur_time
+    }
 end
 
 ---------------------------CMD-------------------------------

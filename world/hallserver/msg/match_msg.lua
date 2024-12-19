@@ -13,24 +13,12 @@ function M:new(interface_mgr)
 	return t
 end
 
-function M:match_game_res(player_id, res)
-	self.interface_mgr:send_msg(player_id, PACK.hallserver_match.MatchGameRes, res)
-end
-
-function M:cancel_match_game_res(player_id, res)
-	self.interface_mgr:send_msg(player_id, PACK.hallserver_match.CancelMatchGameRes, res)
-end
-
 function M:match_game_notice(player_id, res)
-	self.interface_mgr:send_msg(player_id, PACK.hallserver_match.MatchGameNotice, res)
-end
-
-function M:accept_match_res(player_id, res)
-	self.interface_mgr:send_msg(player_id, PACK.hallserver_match.AcceptMatchRes, res)
+	self.interface_mgr:rpc_push_msg(player_id, PACK.hallserver_match.MatchGameNotice, res)
 end
 
 function M:join_game_notice(player_id, res)
-    self.interface_mgr:send_msg(player_id, PACK.hallserver_match.JoinGameNotice, res)
+    self.interface_mgr:rpc_push_msg(player_id, PACK.hallserver_match.JoinGameNotice, res)
 end
 
 return M

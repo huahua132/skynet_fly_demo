@@ -52,8 +52,7 @@ function M.do_record_list_req(player_id, pack_body)
         next_cursor = next_cursor
     }
 
-    g_local_info.game_record_msg:record_list_res(player_id, res)
-    return true
+    return res  --回复给客户端的结果 RecordListRes
 end
 
 return M

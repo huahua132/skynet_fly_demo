@@ -6,14 +6,8 @@ enum main {
 }
 //协议子码 req res 占用1-80  通知占用80-100
 enum sub {
-    HeartReq            = 1;              //心跳
     PlayerInfoNotice    = 80;             //玩家信息通知
     PlayerInfoSynNotice = 81;             //玩家字段信息同步
-}
-
-//心跳包
-message HeartReq {
-	optional int64 time = 1;
 }
 
 //玩家信息通知

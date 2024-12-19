@@ -181,9 +181,12 @@ function M.do_heart(player_id, pack_body)
         return
     end
 
-    g_p_heart_map[player_id] = time_util.time()
+    local cur_time = time_util.time()
+    g_p_heart_map[player_id] = cur_time
 
-    return true
+    return {
+        time = cur_time
+    }
 end
 
 ---------------------------CMD--------------------------------------------

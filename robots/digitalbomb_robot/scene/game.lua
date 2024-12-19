@@ -57,24 +57,21 @@ function M:clear()
 end
 
 --建立连接
-function M:on_connect(player_id, table_id, token, send_msg)
+function M:on_connect(player_id, table_id, token, game_rpc)
     self:clear()
     self.m_player_id = player_id
     self.m_table_id = table_id
-    self.m_send_msg = send_msg
+    self.m_game_rpc = game_rpc
     --请求登录
     local login_req = {
         token = token,
         player_id = player_id,
     }
-    send_msg(PACK.login.LoginReq, login_req)
-end
-
---消息处理
-function M:on_handle(pack_id, packbody)
-    local HANDLE_FUNC = {}
-     --游戏服登录成功
-     HANDLE_FUNC[PACK.login.LoginRes] = function(body)
+    local packid, packbody = game_rpc:req(PACK.login.LoginReq, login_req)
+    if not packid or packid == PACK.errors.Error then
+        log.warn("登录游戏服失败 >>>", self.m_player_id, packid, packbody)
+        return false
+    else
         --发送心跳包
         if self.m_heart_timer then
             self.m_heart_timer:cancel()
@@ -85,36 +82,36 @@ function M:on_handle(pack_id, packbody)
         }
         self.m_heart_timer = timer:new(timer.second * 5, 0, function()
             heart_req.time = time_util.time()
-            self.m_send_msg(PACK.game_hall.HeartReq, heart_req)
+            local packid, packbody = game_rpc:req(PACK.login.HeartReq, heart_req)
+            if not packid or packid == PACK.errors.Error then
+                log.warn("游戏心跳异常 >>> ", self.m_player_id, packid, packbody)
+                if self.m_heart_timer then
+                    self.m_heart_timer:cancel()
+                    self.m_heart_timer = nil
+                end
+            end
         end)
 
-        if body.isreconnect == 1 then   --如果是重连
-            --请求游戏状态
-            self.m_send_msg(PACK.digitalbomb_game.GameStatusReq, {
-                player_id = self.m_player_id
-            })
+        if packbody.isreconnect == 1 then   --如果是重连
+            M:req_game_state()
         else                            --首次进入
             --请求进入桌子
-            self.m_send_msg(PACK.game_hall.JoinReq, {
+            local packid, packbody = game_rpc:req(PACK.game_hall.JoinReq, {
                 table_id = self.m_table_id
             })
+            if not packid or packid == PACK.errors.Error then
+                log.warn("请求进入桌子 失败 >>> ", self.m_player_id, packid, packbody)
+            else
+                self:req_game_state()
+            end
         end
     end
+    return true
+end
 
-    --进入桌子成功
-    HANDLE_FUNC[PACK.game_hall.JoinRes] = function()
-        --请求游戏状态
-        self.m_send_msg(PACK.digitalbomb_game.GameStatusReq, {
-            player_id = self.m_player_id
-        })
-    end
-
-    --游戏状态数据
-    HANDLE_FUNC[PACK.digitalbomb_game.GameStatusRes] = function(body)
-        self.m_game_data = body
-        self:check_doing()
-    end
-
+--消息处理
+function M:on_handle(pack_id, packbody)
+    local HANDLE_FUNC = {}
     --通知操作
     HANDLE_FUNC[PACK.digitalbomb_game.NextDoingCast] = function(body)
         if not self.m_game_data then
@@ -132,6 +129,19 @@ function M:on_handle(pack_id, packbody)
     end
 end
 
+--请求游戏状态
+function M:req_game_state()
+    local packid, packbody = self.m_game_rpc:req(PACK.digitalbomb_game.GameStatusReq, {
+        player_id = self.m_player_id
+    })
+    if not packid or packid == PACK.errors.Error then
+        --log.warn("请求游戏状态 >>> ", packid, packbody)
+    else
+        self.m_game_data = packbody
+        self:check_doing()
+    end
+end
+
 --操作
 function M:doing()
     if not self.m_send_msg then return end
@@ -142,7 +152,6 @@ function M:doing()
 
     local opt_num = math.random(min_num, max_num)
 
-    --log.info("doing:", one_can_move, pos_index, row, col)
     self.m_send_msg(PACK.digitalbomb_game.DoingReq, {
         opt_num = opt_num
     })

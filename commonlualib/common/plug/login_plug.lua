@@ -1,5 +1,5 @@
 local log = require "skynet-fly.log"
-local ws_pbnet_byid = require "skynet-fly.utils.net.ws_pbnet_byid"
+local ws_pbnet_byrpc = require "skynet-fly.utils.net.ws_pbnet_byrpc"
 local pb_netpack = require "skynet-fly.netpack.pb_netpack"
 local errorcode = require "common.enum.errorcode"
 local timer = require "skynet-fly.timer"
@@ -20,45 +20,47 @@ end
 local assert = assert
 
 local errors_msg = require "common.msg.errors_msg"
-local login_msg = require "common.msg.login_msg"
-local g_login_req_pack_id = assert(login_msg.login_req_pack_id, "not exists g_login_req_pack_id")
+local rsp_msg = require "common.msg.rsp_msg"
+local PACK = require "common.pack_helper".PACK
 
 local M = {}
 
 --登录检测的超时时间
 M.time_out = timer.second * 5
 --解包函数
-M.ws_unpack = ws_pbnet_byid.unpack
+M.ws_unpack = ws_pbnet_byrpc.unpack
 --发包函数
-M.ws_send = ws_pbnet_byid.send
+M.ws_send = ws_pbnet_byrpc.send
 --广播函数
-M.ws_broadcast = ws_pbnet_byid.broadcast
+M.ws_broadcast = ws_pbnet_byrpc.broadcast
 --跳转新到大厅
 M.is_jump_new = true
+--rpc打包工具
+M.rpc_pack = require "skynet-fly.utils.net.rpc_server"
 
 function M.init(interface_mgr)
-	login_msg = login_msg:new(interface_mgr)
+	rsp_msg = rsp_msg:new(interface_mgr)
 	errors_msg = errors_msg:new(interface_mgr)
 end
 
 --登录检测函数 pack_id,pack_body是解包函数返回的
 --登入成功后返回玩家id
-function M.check(pack_id,pack_body)
+function M.check(pack_id, pack_body)
 	if not pack_id then
-		log.error("unpack err ",pack_id,pack_body)
-		return false,errorcode.PROTOCOL_ERR,"PROTOCOL_ERR"
+		log.error("unpack err ", pack_id, pack_body)
+		return false, errorcode.PROTOCOL_ERR, "PROTOCOL_ERR"
 	end
 	--检测是不是登录请求
-	if pack_id ~= g_login_req_pack_id then
+	if pack_id ~= PACK.login.LoginReq then
 		log.error("login_check msg err ",pack_id)
-		return false,errorcode.NOT_LOGIN,"not login"
+		return false, errorcode.NOT_LOGIN, "not login"
 	end
 
 	local player_id = pack_body.player_id
 	local token = pack_body.token
 	if not player_id or not token then
 		log.error("login check err ",pack_body)
-		return false,errorcode.REQ_PARAM_ERR,"not player_id"
+		return false, errorcode.REQ_PARAM_ERR, "not player_id"
 	end
 
 	--校验token
@@ -71,14 +73,15 @@ function M.check(pack_id,pack_body)
 end
 
 --登录失败
-function M.login_failed(player_id, errcode, errmsg)
-	errors_msg:errors(player_id, errcode, errmsg, g_login_req_pack_id)
+function M.login_failed(player_id, errcode, errmsg, packid, rsp_session, fd)
+	log.info("login_failed >>> ", player_id, errcode, errmsg, packid, rsp_session, fd)
+	errors_msg:errors(player_id, errcode, errmsg, packid, rsp_session, fd)
 end
 
 --登录成功
-function M.login_succ(player_id,login_res)
-	--log.info("login_succ:",player_id,login_res)
-	login_msg:login_res(player_id,login_res)
+function M.login_succ(player_id, login_res, packid, rsp_session)
+	--log.info("login_succ:",player_id, login_res)
+	rsp_msg:rsp_msg(player_id, packid, login_res, rsp_session)
 end
 
 --登出回调
@@ -92,13 +95,14 @@ function M.disconnect(player_id)
 end
 
 --正在登录中
-function M.logining(player_id)
-	log.info("logining >>>>> ", player_id)
+function M.logining(player_id, packid, rsp_session, fd)
+	log.info("logining >>>>> ", player_id, packid, fd)
+	errors_msg:errors(player_id, errorcode.LOGINING, "logining", packid, rsp_session, fd)
 end
 
 --重复登录
-function M.repeat_login(player_id)
-	errors_msg:errors(player_id,errorcode.REPAET_LOGIN,"repeat_login")
+function M.repeat_login(player_id, packid, rsp_session)
+	errors_msg:errors(player_id, errorcode.REPAET_LOGIN, "repeat_login", packid, rsp_session)
 end
 
 return M

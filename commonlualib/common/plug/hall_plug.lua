@@ -1,9 +1,10 @@
 
 local log = require "skynet-fly.log"
-local ws_pbnet_byid = require "skynet-fly.utils.net.ws_pbnet_byid"
+local ws_pbnet_byrpc = require "skynet-fly.utils.net.ws_pbnet_byrpc"
 local timer = require "skynet-fly.timer"
 local skynet = require "skynet"
 local errors_msg = require "common.msg.errors_msg"
+local rsp_msg = require "common.msg.rsp_msg"
 local g_modules_list = require "hall.hall"
 local pack_helper = require "common.pack_helper"
 local table_util = require "skynet-fly.utils.table_util"
@@ -15,6 +16,7 @@ local x_pcall = x_pcall
 local type = type
 local string = string
 local tinsert = table.insert
+local tunpack = table.unpack
 
 local g_interface_mgr = nil
 local g_login_funcs = {}
@@ -29,15 +31,17 @@ local g_gm_cmd_map = {}
 local M = {}
 
 --指定解包函数
-M.ws_unpack = ws_pbnet_byid.unpack
-M.ws_send = ws_pbnet_byid.send
-M.ws_broadcast = ws_pbnet_byid.broadcast
+M.ws_unpack = ws_pbnet_byrpc.unpack
+M.ws_send = ws_pbnet_byrpc.send
+M.ws_broadcast = ws_pbnet_byrpc.broadcast
 M.disconn_time_out = timer.minute                   --掉线一分钟就清理
+M.rpc_pack = require "skynet-fly.utils.net.rpc_server"
 
 --初始化
 function M.init(interface_mgr)
 	g_interface_mgr = interface_mgr
 	errors_msg = errors_msg:new(interface_mgr)
+	rsp_msg = rsp_msg:new(interface_mgr)
 
 	--注册handle
 	for _, m in ipairs(g_modules_list) do
@@ -156,8 +160,6 @@ local function reg_gm_cmd(cmd_name, func, help_des)
 		func = func,
 		help_des = help_des
 	}
-
-	
 end
 
 --help 命令
@@ -212,13 +214,13 @@ do
 end
 
 --客户端消息前置处理
-function M.handle_before(player_id, pack_id, pack_body)
+function M.handle_before(player_id, pack_id, pack_body, rsp_session)
 	local ret, errcode, errmsg
 	for i = 1, #g_before_funcs do
 		local func = g_before_funcs[i]
 		ret, errcode, errmsg = func(player_id, pack_id, pack_body)
 		if not ret then
-			errors_msg:errors(player_id, errcode, errmsg, pack_id)
+			errors_msg:errors(player_id, errcode, errmsg, pack_id, rsp_session)
 			return false
 		end
 	end
@@ -230,7 +232,7 @@ function M.handle_before(player_id, pack_id, pack_body)
 			local func = funcs[i]
 			ret, errcode, errmsg = func(player_id, pack_id, pack_body)
 			if not ret then
-				errors_msg:errors(player_id, errcode, errmsg, pack_id)
+				errors_msg:errors(player_id, errcode, errmsg, pack_id, rsp_session)
 				return false
 			end
 		end
@@ -240,10 +242,15 @@ function M.handle_before(player_id, pack_id, pack_body)
 end
 
 -- 客户端消息处理结束
-function M.handle_end(player_id, pack_id, pack_body, ret, errcode, errmsg)
-	if not ret then
-		log.info("handle_end err >>> ", player_id, pack_id, ret, errcode, errmsg)
-		errors_msg:errors(player_id, errcode, errmsg, pack_id)
+function M.handle_end_rpc(player_id, pack_id, pack_body, rsp_session, handle_res)
+	local ret, errcode, errmsg = tunpack(handle_res)
+	if ret then	--rpc回复
+		if ret ~= true and rsp_session then
+			rsp_msg:rsp_msg(player_id, pack_id, ret, rsp_session)
+		end
+	else
+		log.info("handle_end_rpc err >>> ", player_id, pack_id, ret, errcode, errmsg)
+		errors_msg:errors(player_id, errcode, errmsg, pack_id, rsp_session)
 	end
 end
 

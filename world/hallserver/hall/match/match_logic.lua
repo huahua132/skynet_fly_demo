@@ -118,14 +118,16 @@ function M.do_match_game(player_id, pack_body)
         return ret, errcode, errmsg
     end
     --log.info("do_match_game3 >>> ",player_id, pack_body)
-    --回复匹配
-    g_local_info.match_msg:match_game_res(player_id, {game_id = game_id})
 
     g_matching_map[player_id] = {
         game_type = game_id,
         play_type = play_type,
     }
-    return true
+
+    --回复匹配
+    return {
+        game_id = game_id
+    }
 end
 
 --取消匹配
@@ -149,10 +151,12 @@ function M.do_cancel_match_game(player_id, pack_body)
         return ret, errcode, errmsg
     end
 
-    --回复取消匹配
-    g_local_info.match_msg:cancel_match_game_res(player_id, {game_id = game_id})
     g_matching_map[player_id] = nil
-    return true
+
+    --回复取消匹配
+    return {
+        game_id = game_id
+    }
 end
 
 --接受对局
@@ -171,9 +175,10 @@ function M.do_accept_match(player_id, pack_body)
     end
 
     --回复接受对局
-    g_local_info.match_msg:accept_match_res(player_id, {game_id = game_id, session_id = session_id})
-
-    return true
+    return {
+        game_id = game_id,
+        session_id = session_id,
+    }
 end
 
 ---------------------------服务器传来的消息处理---------------------------

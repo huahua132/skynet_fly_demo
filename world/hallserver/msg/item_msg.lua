@@ -15,7 +15,7 @@ end
 
 function M:item_list_notice(player_id, res)
 	if self.interface_mgr:is_online(player_id) then
-    	self.interface_mgr:send_msg(player_id, PACK.hallserver_item.ItemListNotice, res)
+    	self.interface_mgr:rpc_push_msg(player_id, PACK.hallserver_item.ItemListNotice, res)
 	end
 end
 

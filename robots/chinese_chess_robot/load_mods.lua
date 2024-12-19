@@ -56,7 +56,7 @@ return {
 	--机器人逻辑
 	robot_m = {
 		launch_seq = 6,
-		launch_num = 6,
+		launch_num = 20,
 		default_arg = {
 			game_name = "chinese_chess",
 		}

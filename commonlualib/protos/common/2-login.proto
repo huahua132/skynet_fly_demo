@@ -7,13 +7,27 @@ enum main {
 enum sub {
 	LoginReq = 1;
 	LoginRes = 2;
+	HeartReq = 3;
+	HeartRes = 4;
 }
 
+//登录请求
 message LoginReq {
 	optional string token = 1;
 	optional int64 player_id = 2;
 }
 
+//登录回复
 message LoginRes {
 	optional int32 isreconnect = 1;
+}
+
+//心跳包请求
+message HeartReq {
+	optional int64 time = 1;
+}
+
+//心跳包回复
+message HeartRes {
+    optional int64 time = 2;
 }

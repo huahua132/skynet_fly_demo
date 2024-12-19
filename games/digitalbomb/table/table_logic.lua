@@ -258,7 +258,7 @@ function M:game_status_req(player_id, pack_id, pack_body)
         doing_seat_id = self.m_doing_seat_id
     end
     --log.error("send_msg GameStatusRes",player_id)
-    self.m_game_msg:game_status_res(player_id,{
+    return {
         game_state = self.m_game_state,
         next_doing = {
             doing_player_id = doing_player_id,
@@ -266,8 +266,7 @@ function M:game_status_req(player_id, pack_id, pack_body)
             min_num = self.m_mine_min,
             max_num = self.m_mine_max,
         }
-    })
-    return true
+    }
 end
 -----------------------------------------------------------------------
 --client req

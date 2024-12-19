@@ -7,13 +7,14 @@ local CHANNEL = require "common.enum.CHANNEL"
 local CODE = require "common.enum.CODE"
 local websocket = require "http.websocket"
 local socket = require "skynet.socket"
-local ws_pbnet_byid = require "skynet-fly.utils.net.ws_pbnet_byid"
+local ws_pbnet_byrpc = require "skynet-fly.utils.net.ws_pbnet_byrpc"
 local pb_netpack = require "skynet-fly.netpack.pb_netpack"
 local time_util = require "skynet-fly.utils.time_util"
 local GAME_ID_ENUM = require "common.enum.GAME_ID_ENUM"
 local errorcode = require "common.enum.errorcode"
 local pack_helper = require "common.pack_helper"
 local schema = hotfix_require "common.enum.schema"
+local rpc_client = require "skynet-fly.utils.net.rpc_client"
 
 
 local hall_pack = pb_netpack.instance("hall")
@@ -28,14 +29,15 @@ do
     hall_helper.set_pack_id_names()
 end
 
-local hall_net = ws_pbnet_byid.new("hall", hall_pack)
-local game_net = ws_pbnet_byid.new("game", game_pack)
+local hall_net = ws_pbnet_byrpc.new("hall", hall_pack)
+local game_net = ws_pbnet_byrpc.new("game", game_pack)
 
 local game = require "scene.game"
 
 local PACK = hall_helper.PACK
 
 local g_config = nil
+local g_rpc_timeout = 1000
 
 --http 请求设置5秒超时时间
 httpc.timeout = 6000
@@ -84,58 +86,42 @@ local function create_one_robot_logic(idx)
     local m_hall_fd = nil
     local m_hall_heart_timer = nil
     local m_hall_matching = nil     --是否匹配中
+   
 
     local m_game_fd = nil
     local m_game_table_id = nil
+    
     local m_game_scene = game:new()
 
-    --给游戏服发送消息
-    local function send_game_msg(pack_id, packbody)
-        if m_game_fd then
-            game_net.send(nil, m_game_fd, pack_id, packbody)
-        else
-            --.warn("给游戏服发送消息 连接不存在 ", idx, m_player_id)
-        end
-    end
-
     --给大厅服发送消息
-    local function send_hall_msg(pack_id, packbody)
+    local function send_hall_msg(packid, packbody)
         if m_hall_fd then
-            hall_net.send(nil, m_hall_fd, pack_id, packbody)
+            hall_net.send(nil, m_hall_fd, packid, packbody)
         else
-            --log.warn("给大厅服发送消息 连接不存在 ", idx, m_player_id)
+            log.warn("给大厅服发送消息 连接不存在 ", idx, m_player_id)
         end
     end
+    local m_hall_rpc = rpc_client:new(send_hall_msg, g_rpc_timeout)
+
+    --给游戏服发送消息
+    local function send_game_msg(packid, packbody)
+        if m_game_fd then
+            game_net.send(nil, m_game_fd, packid, packbody)
+        else
+            log.warn("给游戏服发送消息 连接不存在 ", idx, m_player_id)
+        end
+    end
+    local m_game_rpc = rpc_client:new(send_game_msg, g_rpc_timeout)
 
     local m_HALL_SERVER_HANDLE = {}
-    --登录大厅成功
-    m_HALL_SERVER_HANDLE[PACK.login.LoginRes] = function(body)
-        m_hall_matching = false
-        --登录大厅成功
-        m_state = STATE_ENUM.ONLINE_HALL
-        --发送心跳包
-        if m_hall_heart_timer then
-            m_hall_heart_timer:cancel()
-        end
 
-        local heart_req = {
-            time = nil
-        }
-        m_hall_heart_timer = timer:new(timer.second * 5, 0, function()
-            heart_req.time = time_util.time()
-            send_hall_msg(PACK.hallserver_player.HeartReq, heart_req)
-        end)
+    local function accept_match(body)
+        m_hall_rpc:push(PACK.hallserver_match.AcceptMatchReq, body)
     end
-
-    --请求匹配成功
-    m_HALL_SERVER_HANDLE[PACK.hallserver_match.MatchGameRes] = function(body)
-        m_hall_matching = true
-    end
-
     --通知匹配成功
     m_HALL_SERVER_HANDLE[PACK.hallserver_match.MatchGameNotice] = function(body)
         --请求接受匹配
-        timer:new(math.random(1, 10) * timer.second, 1, send_hall_msg, PACK.hallserver_match.AcceptMatchReq, body)
+        timer:new(math.random(1, 10) * timer.second, 1, accept_match, body)
     end
     
     --通知进入游戏
@@ -153,13 +139,26 @@ local function create_one_robot_logic(idx)
                 m_game_fd = nil
             end)
 
-            m_game_scene:on_connect(m_player_id, m_game_table_id, token, send_game_msg)
             --监听游戏服消息
-            game_net.recv(m_game_fd, function(_,pack_id,packbody)
-                m_game_scene:on_handle(pack_id, packbody)
+            game_net.recv(m_game_fd, function(fd, packid, body)
+                if fd ~= m_game_fd then
+                    return
+                end
+                local packid, packbody = m_game_rpc:handle_msg(packid, body)
+                if packid == false then
+                    return
+                end
+                if not packid then
+                    log.warn("game_handle err ", packid, packbody)
+                    return
+                end
+                m_game_scene:on_handle(packid, packbody)
             end)
-
-            m_state = STATE_ENUM.GAMEING
+            if m_game_scene:on_connect(m_player_id, m_game_table_id, token, m_game_rpc) then
+                m_state = STATE_ENUM.GAMEING
+            else
+                websocket.close(m_game_fd)
+            end
         else
             log.error("连接游戏失败 ",idx, host, m_hall_fd)
             skynet.sleep(math.random(timer.second * 5, timer.second * 15))
@@ -176,10 +175,21 @@ local function create_one_robot_logic(idx)
         end
     end
 
-    local function hallserver_handle(_,pack_id,packbody)
+    local function hallserver_handle(fd, packid, body)
+        if fd ~= m_hall_fd then
+            return
+        end
+        local packid, packbody = m_hall_rpc:handle_msg(packid, body)
+        if packid == false then
+            return
+        end
+        if not packid then
+            log.warn("hallserver_handle err ", packid, packbody)
+            return
+        end
         --大厅服消息处理
         --log.info("hallserver_handle >>> ", pack_id, packbody)
-        local handle = m_HALL_SERVER_HANDLE[pack_id]
+        local handle = m_HALL_SERVER_HANDLE[packid]
         if not handle then
             --log.error("drop hallserver_handle pack_id = ", pack_id)
         else
@@ -198,7 +208,7 @@ local function create_one_robot_logic(idx)
             account = m_account,
             password = m_password,
         }
-        local isok,code,bodystr = pcall(httpc.request, "POST", get_login_server_host(), '/user/login', nil, g_header, json.encode(req))
+        local isok,_,bodystr = pcall(httpc.request, "POST", get_login_server_host(), '/user/login', nil, g_header, json.encode(req))
         --log.info("请求登录:", idx, isok, code, bodystr)
         if not isok then
             --log.error("请求登录 网络错误:", idx, isok, tostring(code))
@@ -215,7 +225,7 @@ local function create_one_robot_logic(idx)
             if isok and m_hall_fd then
                 socket.onclose(m_hall_fd, function(close_fd)
                     websocket.close(close_fd)
-                    --log.info("hall close fd :", close_fd)
+                    --log.info("hall close fd :", m_player_id, m_hall_fd, close_fd)
                     if close_fd == m_hall_fd then
                         m_hall_fd = nil
                     end
@@ -228,7 +238,42 @@ local function create_one_robot_logic(idx)
                     token = token,
                     player_id = m_player_id,
                 }
-                send_hall_msg(PACK.login.LoginReq, login_req)
+                local packid, packbody = m_hall_rpc:req(PACK.login.LoginReq, login_req)
+                if not packid or packid == PACK.errors.Error then
+                    log.warn("登录大厅失败 >>> ", m_player_id, packid, packbody, m_hall_fd)
+                    websocket.close(m_hall_fd)
+                else
+                    m_hall_matching = false
+                    --登录大厅成功
+                    m_state = STATE_ENUM.ONLINE_HALL
+                    --发送心跳包
+                    if m_hall_heart_timer then
+                        m_hall_heart_timer:cancel()
+                    end
+
+                    local heart_req = {
+                        time = nil
+                    }
+                    m_hall_heart_timer = timer:new(timer.second * 5, 0, function()
+                        heart_req.time = time_util.time()
+                        local pre_time = skynet.now()
+                        local packid = m_hall_rpc:req(PACK.login.HeartReq, heart_req)
+                        if not packid or packid == PACK.errors.Error then
+                            log.warn("心跳异常断开连接 ", m_player_id)
+                            websocket.close(m_hall_fd)
+                            if m_hall_heart_timer then
+                                m_hall_heart_timer:cancel()
+                                m_hall_heart_timer = nil
+                            end
+                        else
+                            local now_time = skynet.now()
+                            local use_time = now_time - pre_time
+                            if use_time > 100 then
+                                log.warn_fmt("大厅心跳延迟过大 >>> ", m_player_id, use_time)
+                            end
+                        end
+                    end)
+                end
             else
                 log.error("连接大厅失败 ", host, m_hall_fd)
                 skynet.sleep(math.random(timer.second * 5, timer.second * 15))
@@ -282,7 +327,12 @@ local function create_one_robot_logic(idx)
             elseif g_config.game_name == "digitalbomb" then
                 play_type = schema.enums.play_type.DB_RANGE_100
             end
-            send_hall_msg(PACK.hallserver_match.MatchGameReq, {game_id = GAME_ID_ENUM[g_config.game_name], play_type = play_type})
+            local packid, packbody = m_hall_rpc:req(PACK.hallserver_match.MatchGameReq, {game_id = GAME_ID_ENUM[g_config.game_name], play_type = play_type})
+            if not packid or packid == PACK.errors.Error then
+                log.warn("请求匹配失败 >>> ", m_player_id, packid, packbody)
+            else
+                m_hall_matching = true
+            end
         end
     end
 

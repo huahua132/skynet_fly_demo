@@ -25,7 +25,8 @@ local function remote_invaild_email()
     for _, email in pairs(all_email) do
         local guid = email.guid
         local vaild_time = email.vaild_time
-        if cur_time > vaild_time then
+        --0是永久的邮件
+        if vaild_time ~= 0 and cur_time > vaild_time then
             is_del = true
             g_global_email_client:delete_entry(guid)
         end

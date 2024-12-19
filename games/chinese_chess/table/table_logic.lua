@@ -138,12 +138,12 @@ function M:send_game_state(seat_player)
 		end
 	end
 
-	local player_id = nil
-	if seat_player then
-		player_id = seat_player.player_id
-	end
 	
-	self.m_game_msg:game_state_res(player_id,msg_body)
+	if seat_player then
+        return msg_body --rpc回复就行
+    else
+        self.m_game_msg:game_state_res(msg_body)        --广播
+	end
 end
 
 function M:set_next_doing(seat_id)
@@ -394,8 +394,7 @@ function M:game_state_req(player_id, pack_id, pack_body)
         return
     end
     local seat_player = self.m_seat_list[seat_id]
-    self:send_game_state(seat_player)
-    return true
+    return self:send_game_state(seat_player)
 end
 
 --移动棋子

@@ -14,7 +14,7 @@ function M:new(interface_mgr)
 	return t
 end
 
-function M:errors(player_id,code,msg,pack_id)
+function M:errors(player_id, code, msg, pack_id, rsp_session, fd)
 	if not code then
 		code = errorcode.UNKOWN_ERR
 		msg = "unkown err"
@@ -25,7 +25,19 @@ function M:errors(player_id,code,msg,pack_id)
 		pack_id = pack_id,
 	}
 
-	self.interface_mgr:send_msg(player_id,PACK.errors.Error,error)
+	if rsp_session then
+		if player_id then
+			self.interface_mgr:rpc_error_msg(player_id, PACK.errors.Error, error, rsp_session)
+		else
+			self.interface_mgr:rpc_error_msg_byfd(fd, PACK.errors.Error, error, rsp_session)
+		end
+	else
+		if player_id then
+			self.interface_mgr:rpc_push_msg(player_id, PACK.errors.Error, error)
+		else
+			self.interface_mgr:rpc_push_msg_byfd(fd, PACK.errors.Error, error)
+		end
+	end
 end
 
 return M

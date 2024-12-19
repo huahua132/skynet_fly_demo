@@ -8,7 +8,6 @@ enum main {
 enum sub {
     JoinReq = 1;     //加入房间请求
     JoinRes = 2;     //回复加入房间请求
-    HeartReq = 3;    //心跳包
 }
 
 message JoinReq {
@@ -17,8 +16,4 @@ message JoinReq {
 
 message JoinRes {
 	optional string table_id = 1;
-}
-//心跳包
-message HeartReq {
-	optional int64 time = 1;
 }

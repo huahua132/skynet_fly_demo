@@ -1,5 +1,4 @@
 package hallserver_email;
-import "../../commonlualib/protos/common/common.proto";
 
 //协议主码 本服独有协议 占用 101-654 公共占用1-50 游戏公共占用50-100
 enum main {

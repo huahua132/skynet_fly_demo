@@ -32,7 +32,8 @@ event_mgr.monitor(EVENT_ID.CROSS_DAY, function(player_id)
     local del_guid_list = {}
     for i = 1, #all_email_list do
         local one_email = all_email_list[i]
-        if cur_time > one_email.vaild_time then
+        --0是永久的邮件
+        if one_email.vaild_time ~= 0 and cur_time > one_email.vaild_time then
             table.insert(del_guid_list, one_email.guid)
         end
     end
@@ -272,11 +273,9 @@ function M.do_read_email(player_id, pack_body)
 
     g_email_entity:read_email_list(player_id, guid_list)
 
-    g_logic_info.email_msg:read_email_res(player_id, {
+    return {
         guid_list = guid_list,
-    })
-
-    return true
+    }
 end
 
 --领取道具奖励
@@ -303,11 +302,9 @@ function M.do_item_list_email(player_id, pack_body)
         item_interface.add_item_list(player_id, item_list)
     end
     --log.info("do_item_list_email >>> ", item_list_ret, ret_guid_list)
-    g_logic_info.email_msg:item_list_email_res(player_id, {
+    return {
         guid_list = ret_guid_list,
-    })
-
-    return true
+    }
 end
 
 --删除邮件
@@ -326,11 +323,9 @@ function M.do_del_email(player_id, pack_body)
 
     g_email_entity:del_email_list(player_id, guid_list)
 
-    g_logic_info.email_msg:del_email_res(player_id, {
+    return {
         guid_list = guid_list,
-    })
-
-    return true
+    }
 end
 
 

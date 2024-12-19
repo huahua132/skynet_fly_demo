@@ -14,6 +14,7 @@ function CMD.start(config)
         local cli = contriner_client:new("robot_m")
         for i = 1, robot_num do
             cli:set_mod_num(i)
+            skynet.sleep(10)
             cli:mod_send("launch", i)
         end
     end)
