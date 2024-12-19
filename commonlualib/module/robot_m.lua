@@ -98,7 +98,7 @@ local function create_one_robot_logic(idx)
         if m_hall_fd then
             hall_net.send(nil, m_hall_fd, packid, packbody)
         else
-            log.warn("给大厅服发送消息 连接不存在 ", idx, m_player_id)
+            --log.warn("给大厅服发送消息 连接不存在 ", idx, m_player_id)
         end
     end
     local m_hall_rpc = rpc_client:new(send_hall_msg, g_rpc_timeout)
@@ -108,7 +108,7 @@ local function create_one_robot_logic(idx)
         if m_game_fd then
             game_net.send(nil, m_game_fd, packid, packbody)
         else
-            log.warn("给游戏服发送消息 连接不存在 ", idx, m_player_id)
+            --log.warn("给游戏服发送消息 连接不存在 ", idx, m_player_id)
         end
     end
     local m_game_rpc = rpc_client:new(send_game_msg, g_rpc_timeout)
@@ -136,7 +136,10 @@ local function create_one_robot_logic(idx)
             socket.onclose(m_game_fd, function(close_fd)
                 websocket.close(close_fd)
                 --log.info("m_game_fd close:", m_game_fd, close_fd)
-                m_game_fd = nil
+                if close_fd == m_game_fd then
+                    m_game_fd = nil
+                    m_game_rpc:close()
+                end
             end)
 
             --监听游戏服消息
@@ -228,6 +231,7 @@ local function create_one_robot_logic(idx)
                     --log.info("hall close fd :", m_player_id, m_hall_fd, close_fd)
                     if close_fd == m_hall_fd then
                         m_hall_fd = nil
+                        m_hall_rpc:close()
                     end
                 end)
 
@@ -259,7 +263,6 @@ local function create_one_robot_logic(idx)
                         local pre_time = skynet.now()
                         local packid = m_hall_rpc:req(PACK.login.HeartReq, heart_req)
                         if not packid or packid == PACK.errors.Error then
-                            log.warn("心跳异常断开连接 ", m_player_id)
                             websocket.close(m_hall_fd)
                             if m_hall_heart_timer then
                                 m_hall_heart_timer:cancel()

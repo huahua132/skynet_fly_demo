@@ -155,7 +155,7 @@ function M:enter(player_id)
     return alloc_seat_id
 end
 
-function M:leave(player_id)
+function M:leave(player_id, reason)
     local seat_id = self.m_player_seat_map[player_id]
     if not seat_id then
         log.error("not in table ",player_id)
@@ -164,6 +164,7 @@ function M:leave(player_id)
 
     local seater = self.m_seat_list[seat_id]
     if not seater:is_can_leave() then
+        log.warn_fmt("can`t leave player_id = %s game_state = %s reason = %s", player_id, self.m_game_state, reason)
         return false,errorcode.playing,"playing..."
     else
         seater:leave()
