@@ -84,9 +84,8 @@ function M:on_connect(player_id, table_id, token, game_rpc)
         self.m_heart_timer = timer:new(timer.second * 5, 0, function()
             heart_req.time = time_util.time()
             local pre_time = skynet.now()
-            local packid, packbody = game_rpc:req(PACK.login.HeartReq, heart_req)
+            local packid = game_rpc:req(PACK.login.HeartReq, heart_req)
             if not packid or packid == PACK.errors.Error then
-                log.warn("游戏心跳异常 >>> ", self.m_player_id, packid, packbody)
                 if self.m_heart_timer then
                     self.m_heart_timer:cancel()
                     self.m_heart_timer = nil
