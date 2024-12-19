@@ -9,8 +9,9 @@ function M.init(interface_mgr)
     email_logic.init(interface_mgr)
 end
 
-function M.on_login(player_id)
-    email_logic.on_login(player_id)
+function M.on_login(player_id, is_jump_join)
+    if is_jump_join then return end
+    email_logic.on_login(player_id, is_jump_join)
 end
 
 function M.on_loginout(player_id)

@@ -35,6 +35,10 @@ M.ws_send = ws_pbnet_byrpc.send
 M.ws_broadcast = ws_pbnet_byrpc.broadcast
 --跳转新到大厅
 M.is_jump_new = true
+--单次跳转数量
+M.jump_once_cnt = 100
+--尝试跳转间隔
+M.jump_inval_time = 5
 --rpc打包工具
 M.rpc_pack = require "skynet-fly.utils.net.rpc_server"
 
