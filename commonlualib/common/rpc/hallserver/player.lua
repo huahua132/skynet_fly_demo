@@ -9,6 +9,7 @@ local log = require "skynet-fly.log"
 
 local tonumber = tonumber
 local table = table
+local pairs = pairs
 
 local g_svr_id = env_util.get_svr_id()
 local g_svr_name = env_util.get_svr_name()
@@ -81,7 +82,7 @@ end
 function M.get_players_info(player_list, field_map)
     local svr_map = player_util.get_svr_id_by_player_list(player_list)
     local res = {}
-    for svr_id, list in table_util.sort_ipairs_byk(svr_map) do
+    for svr_id, list in pairs(svr_map) do
         --本服
         if g_svr_name == "hallserver" and svr_id == g_svr_id then
             local ret_map = contriner_client:instance("room_game_hall_m"):balance_call("player_get_players_info", list, field_map)

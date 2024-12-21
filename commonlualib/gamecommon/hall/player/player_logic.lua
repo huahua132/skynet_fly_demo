@@ -8,6 +8,7 @@ local assert = assert
 local tinsert = table.insert
 local tremote = table.remove
 local os = os
+local pairs = pairs
 
 local g_logic_info = state_data.alloc_table("g_logic_info")
 local g_player_map = state_data.alloc_table("g_player_map")
@@ -21,7 +22,7 @@ end
 --检测心跳
 function M.check_heart()
     local cur_time = os.time()                     --心跳用系统时间，避免加速时间导致测试号被踢下线
-    for player_id,player in table_util.sort_ipairs_byk(g_player_map) do
+    for player_id,player in pairs(g_player_map) do
         if g_player_map[player_id] and cur_time - player.heart_time > 60 then  --心跳超时
             g_logic_info.hall_interface:goout(player_id, "heart timeout") --踢出
         end

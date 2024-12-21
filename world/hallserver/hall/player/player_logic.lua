@@ -100,7 +100,7 @@ end)
 function M.check_heart()
     --log.info("check_heart >>>> ")
     local cur_time = os.time()      --心跳用系统时间，避免加速时间导致测试号被踢下线
-    for player_id,heart_time in table_util.sort_ipairs_byk(g_p_heart_map) do
+    for player_id,heart_time in pairs(g_p_heart_map) do
         if g_p_heart_map[player_id] and cur_time - heart_time > 60 then  --心跳超时
             g_local_info.hall_interface:goout(player_id, "heart time out")          --踢出
         end
@@ -218,7 +218,7 @@ function M.cmd_get_players_info(player_list, field_map)
     end
 
     local res_map = {}
-    for server_id, list in table_util.sort_ipairs_byk(server_id_map) do
+    for server_id, list in pairs(server_id_map) do
         if server_id ~= self_address then
             local ret_map = skynet.call(server_id, 'lua', 'player_get_players_info_by_local', list, field_map)
             table_util.merge(res_map, ret_map)

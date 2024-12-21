@@ -9,7 +9,6 @@ local game_redis = require "common.redis.game"
 local watch_server = require "skynet-fly.rpc.watch_server"
 local SYN_CHANNEL_NAME = require "common.enum.SYN_CHANNEL_NAME"
 local timer = require "skynet-fly.timer"
-local table_util = require "skynet-fly.utils.table_util"
 
 contriner_client:register("share_config_m", "token_m")
 
@@ -18,6 +17,7 @@ local ipairs = ipairs
 local assert = assert
 local next = next
 local os = os
+local pairs = pairs
 
 local g_alloc_interface = nil
 local g_timer_obj = nil
@@ -76,7 +76,7 @@ end
 --设置玩家房间信息
 function CMD.set_game_room_info(game_info_map)
 	--log.info("set_game_room_info >>> ",game_info_map)
-	for player_id, game_room_info in table_util.sort_ipairs_byk(game_info_map) do
+	for player_id, game_room_info in pairs(game_info_map) do
 		game_redis.set_game_room_info(player_id, game_room_info)
 	end
 

@@ -108,7 +108,7 @@ function M.cmd_add_item_map(player_id, item_map)
 
     local ret_map = g_item_entity:add_item_map(player_id, item_map)
     local item_list = {}
-    for id, count in table_util.sort_ipairs_byk(ret_map) do
+    for id, count in pairs(ret_map) do
         tinsert(item_list, {id = id, count = count})
         local num = item_map[id]
         event_mgr.publish(EVENT_ID.ITEM_CHANGE, player_id, id, num, count)
@@ -138,7 +138,7 @@ function M.cmd_add_item_list(player_id, item_list)
 
     local ret_map = g_item_entity:add_item_map(player_id, item_map)
     local item_list = {}
-    for id, count in table_util.sort_ipairs_byk(ret_map) do
+    for id, count in pairs(ret_map) do
         tinsert(item_list, {id = id, count = count})
         local num = item_map[id]
         event_mgr.publish(EVENT_ID.ITEM_CHANGE, player_id, id, num, count)
