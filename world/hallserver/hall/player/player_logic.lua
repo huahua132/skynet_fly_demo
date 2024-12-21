@@ -181,7 +181,7 @@ function M.do_heart(player_id, pack_body)
         return
     end
 
-    local cur_time = time_util.time()
+    local cur_time = os.time()
     g_p_heart_map[player_id] = cur_time
 
     return {
