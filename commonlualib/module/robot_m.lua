@@ -346,6 +346,7 @@ local function create_one_robot_logic(idx)
             --去重启登录
             m_game_scene:clear()
             m_state = STATE_ENUM.ONLINE_HALL
+            m_hall_matching = false
         end
     end
 
