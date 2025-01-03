@@ -4,6 +4,7 @@
 *.pid
 *.old
 *.aof
+*.rdb
 
 admin/*/script
 admin/*/*_config.lua*

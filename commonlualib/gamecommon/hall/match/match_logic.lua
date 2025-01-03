@@ -1,5 +1,6 @@
 local log = require "skynet-fly.log"
 local state_data = require "skynet-fly.hotfix.state_data"
+local errorcode = require "common.enum.errorcode"
 
 local next = next
 
@@ -17,6 +18,9 @@ end
 ---------------------------客户端消息处理-------------------------------
 function M.do_join(player_id, pack_body)
 	--log.info("JoinReq:",player_id,pack_body)
+	if not pack_body.table_id then
+		return false, errorcode.REQ_PARAM_ERR, "table_id is nil"
+	end
 	local ok,errorcode,errormsg = g_logic_info.hall_interface:join_table(player_id, "default", pack_body.table_id)
 	if ok then
 		return {table_id = ok}
