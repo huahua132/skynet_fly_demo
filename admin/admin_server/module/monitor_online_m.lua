@@ -71,7 +71,7 @@ local function rigister_rotate(svr_name, file_path, file_name, tag)
     local cfg = assert(TAG_TIMER_POINT_CFG[tag], "not exists tag :" .. tag)
 
     g_rigister_info[svr_name] = file_name
-    logrotate:new(file_name):set_file_path(file_path):set_max_age(cfg.max_age):set_point_type(cfg.point_type):builder()
+    logrotate:new(file_name):set_file_path(file_path):set_max_age(cfg.max_age):set_hour(5):set_point_type(cfg.point_type):builder()
 end
 
 local function write_info(svr_name, tag, infostr)
@@ -176,6 +176,15 @@ function CMD.start(config)
                 assert(TAG_TIMER_POINT_CFG[tag], "not exists tag cfg " .. tag)
                 g_time_map[svr_name][tag] = timer_point:new(point_type):builder(handle, svr_name, tag)
             end
+        end
+    end)
+
+    timer_point:new(timer_point.EVERY_DAY)  --每天
+    :set_hour(0)                            --0点
+    :set_min(10)                            --10分
+    :builder(function()
+        for key,file in g_file_cache:pairs() do
+            g_file_cache:del_cache(key)
         end
     end)
     return true

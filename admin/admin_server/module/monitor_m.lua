@@ -53,7 +53,7 @@ local function rigister_rotate(cluster_name,server_name,file_path,file_name)
     end
 
     g_rigister_info[cluster_name][server_name] = file_name
-    logrotate:new(file_name):set_file_path(file_path):set_max_age(7):builder()
+    logrotate:new(file_name):set_file_path(file_path):set_max_age(7):set_hour(5):builder()
 end
 
 local function monitor(svr_name)
@@ -171,6 +171,7 @@ end
 local CMD = {}
 
 function CMD.get_rigister_info()
+    os.date()
     return g_rigister_info,g_monitor_log_dir
 end
 
@@ -179,6 +180,15 @@ function CMD.start(config)
     skynet.fork(function()
         for _,svr_name in ipairs(node_list) do
             g_time_map[svr_name] = timer_point:new(timer_point.EVERY_MINUTE):builder(monitor,svr_name)
+        end
+    end)
+    
+    timer_point:new(timer_point.EVERY_DAY)  --每天
+    :set_hour(0)                            --0点
+    :set_min(10)                            --10分
+    :builder(function()
+        for key,file in g_file_cache:pairs() do
+            g_file_cache:del_cache(key)
         end
     end)
     return true
