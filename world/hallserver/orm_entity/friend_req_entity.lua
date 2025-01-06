@@ -3,8 +3,6 @@ local ormadapter_mysql = require "skynet-fly.db.ormadapter.ormadapter_mysql"
 local skynet = require "skynet"
 local env_util = require "skynet-fly.utils.env_util"
 
-local svr_id = env_util.get_svr_id()
-
 local ipairs = ipairs
 local table = table
 
@@ -15,7 +13,7 @@ local handle = {}
 
 --玩家信息
 function M.init()
-    local adapter = ormadapter_mysql:new("hall_" .. svr_id)
+    local adapter = ormadapter_mysql:new("orm_db")
     g_ormobj = ormtable:new("friend_req")
     :int64("player_id")         --玩家id
     :int64("req_player_id")     --申请人玩家ID

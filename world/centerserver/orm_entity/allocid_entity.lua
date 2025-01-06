@@ -14,7 +14,7 @@ local handle = {}
 
 --id分配器
 function M.init()
-    local adapter = ormadapter_mysql:new("center")
+    local adapter = ormadapter_mysql:new("orm_db")
     g_ormobj = ormtable:new("allocid")
     :int64("module_id")       --模块id
     :int64("incr")            --自增值

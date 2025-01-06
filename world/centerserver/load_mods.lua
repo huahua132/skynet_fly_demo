@@ -15,7 +15,7 @@ return {
 			},
 
             mysql = {
-                [mysql_cfg.world.centerserver.database] = mysql_cfg.world.centerserver
+                orm_db = mysql_cfg.world.centerserver
             },
 
 			--cluster_server用的配置

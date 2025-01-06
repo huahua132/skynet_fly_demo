@@ -14,7 +14,7 @@ local handle = {}
 --账号
 function M.init()
     local index = module_info.get_base_info().index
-    local adapter = ormadapter_mysql:new("center")
+    local adapter = ormadapter_mysql:new("orm_db")
     g_ormobj = ormtable:new("account_" .. index)
     :string32("account")
     :string256("password")

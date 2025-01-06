@@ -25,7 +25,7 @@ return {
 			},
 
 			mysql = {
-				[mysql_cfg.games.chinese_chess_1.database] = mysql_cfg.games.chinese_chess_1,
+				orm_db = mysql_cfg.games.chinese_chess_1,
 			},
 
 			--cluster_server用的配置

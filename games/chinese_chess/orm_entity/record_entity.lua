@@ -7,8 +7,6 @@ local skynet = require "skynet"
 local env_util = require "skynet-fly.utils.env_util"
 local GAME_ID_ENUM = require "common.enum.GAME_ID_ENUM"
 
-local svr_id = env_util.get_svr_id()
-
 local pairs = pairs
 local ipairs = ipairs
 local table = table
@@ -23,7 +21,7 @@ local handle = {}
 
 --对局记录
 function M.init()
-    local adapter = ormadapter_mysql:new("game_" .. svr_id)
+    local adapter = ormadapter_mysql:new("orm_db")
     g_ormobj = ormtable:new("newrecord_" .. GAME_ID_ENUM.chinese_chess)
     :int64("create_time")       --创建时间
     :string64("table_id")       --桌子ID

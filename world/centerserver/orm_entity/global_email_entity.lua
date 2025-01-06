@@ -12,7 +12,7 @@ local handle = {}
 
 --全服邮件
 function M.init()
-    local adapter = ormadapter_mysql:new("center")
+    local adapter = ormadapter_mysql:new("orm_db")
     g_ormobj = ormtable:new("global_email")
     :int64("guid")
     :string256("title")             --标题

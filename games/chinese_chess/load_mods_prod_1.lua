@@ -7,7 +7,7 @@ local cfg = loadfile('load_mods_1.lua')()
 
 cfg.share_config_m.default_arg.redis.rpc = redis_cfg.rpc
 cfg.share_config_m.default_arg.redis.global = redis_cfg.global
-cfg.share_config_m.default_arg.mysql[mysql_cfg.games.chinese_chess_1.database] = mysql_cfg.games.chinese_chess_1
+cfg.share_config_m.default_arg.mysql.orm_db = mysql_cfg.games.chinese_chess_1
 
 cfg.share_config_m.default_arg.frpc_server = frpc_server_cfg.games.chinese_chess_1
 cfg.share_config_m.default_arg.server_cfg = server_cfg.games.chinese_chess_1

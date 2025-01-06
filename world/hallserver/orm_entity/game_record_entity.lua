@@ -5,8 +5,6 @@ local env_util = require "skynet-fly.utils.env_util"
 local time_util = require "skynet-fly.utils.time_util"
 local log = require "skynet-fly.log"
 
-local svr_id = env_util.get_svr_id()
-
 local ipairs = ipairs
 local table = table
 local assert = assert
@@ -20,7 +18,7 @@ local handle = {}
 
 --玩家信息
 function M.init()
-    local adapter = ormadapter_mysql:new("hall_" .. svr_id)
+    local adapter = ormadapter_mysql:new("orm_db")
     g_ormobj = ormtable:new("new_game_record")
     :int64("player_id")         --玩家id
     :int64("create_time")       --创建时间

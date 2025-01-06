@@ -18,7 +18,7 @@ local function syn_all_email()
 end
 
 --定时删除过期邮件
-local function remote_invaild_email()
+local function remove_invaild_email()
     local all_email = g_global_email_client:get_all_entry()
     local is_del = false
     local cur_time = time_util.time()
@@ -81,7 +81,7 @@ function CMD.start()
     :set_hour(5)                            --5点
     :set_min(30)                            --30分
     :set_sec(30)                            --30秒
-    :builder(remote_invaild_email)          --执行一次
+    :builder(remove_invaild_email)          --执行一次
 
     skynet.fork(function()
         syn_all_email()

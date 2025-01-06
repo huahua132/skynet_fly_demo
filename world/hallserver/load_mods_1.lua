@@ -19,7 +19,7 @@ return {
 			},
 
 			mysql = {
-				[mysql_cfg.world.hallserver_1.database] = mysql_cfg.world.hallserver_1,
+				orm_db = mysql_cfg.world.hallserver_1,
 			},
 			--cluster_server用的配置
 			frpc_server = frpc_server_cfg.world.hallserver_1,
