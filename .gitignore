@@ -21,6 +21,6 @@ games/*/module_info*
 redis-6.0.8
 etc_prod
 ~*
-logs*
-records*
+logs
+records
 make
