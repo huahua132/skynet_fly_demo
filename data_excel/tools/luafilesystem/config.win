@@ -1,6 +1,0 @@
-CC = gcc
-CFLAGS = -I"../lua/5.1/include" -O2 -Wall
-LDFLAGS = -L"../lua/5.1/lib" -llua5.1
-LUA_LIBDIR = "../lua/5.1/lib"
-
-INSTALL_CMD = test -d $(LUA_LIBDIR) || mkdir -p $(LUA_LIBDIR); cp src/lfs.dll $(LUA_LIBDIR)

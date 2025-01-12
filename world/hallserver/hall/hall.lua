@@ -15,4 +15,5 @@ return {
 	require "hall.item.item",
 	require "hall.game_record.game_record",
 	require "hall.email.email",
+	require "hall.misc.misc",
 }

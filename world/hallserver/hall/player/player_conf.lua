@@ -1,15 +1,18 @@
+local skynet = require "skynet"
 local sharedata = require "skynet-fly.sharedata"
 local log = require "skynet-fly.log"
 
 local assert = assert
 
-local g_player_level = sharedata:new("./data_tables/player_level.lua", sharedata.enum.sharedata)
-                       :set_map("level_idx", "level")
-                       :builder()
+local g_player_level = nil
 
 local g_max_level = 0
 
-do
+local function init()
+    g_player_level = sharedata:new("./data_tables/player_level.lua", sharedata.enum.sharedata)
+                       :set_map("level_idx", "level")
+                       :builder()
+
     local level_idx_map = g_player_level:get_map("level_idx")
     for level in pairs(level_idx_map) do
         if level > g_max_level then
@@ -18,7 +21,13 @@ do
     end
 end
 
+skynet.init(init)
+
 local M = {}
+
+function M.hotfix()
+    init()
+end
 
 --获取等级需要经验值
 function M.get_level_exp(level)

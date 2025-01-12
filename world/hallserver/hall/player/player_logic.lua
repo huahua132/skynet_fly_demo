@@ -80,7 +80,6 @@ local function check_up_level(player_id, item_id, change_num, total_count)
         player_info = g_p_info_map[player_id]
     end
     player_info.level = next_level
-    log.info("check_up_level >>> ", player_id, item_id, change_num, total_count, level, next_level)
     --保存数据
     g_player_entity:change_save_one_entry({player_id = player_id, level = next_level})
     event_mgr.publish(EVENT_ID.PLAYER_UP_LEVEL, player_id, level, player_info.level)
@@ -123,7 +122,7 @@ function M.on_login(player_id)
         log.error("player_entity not exists " .. player_id)
         return
     end
-    --log.info("on_login >>> ", player_id)
+    
     assert(not g_p_heart_map[player_id], "is exists " .. player_id)
     g_p_heart_map[player_id] = os.time()
     g_p_info_map[player_id] = player_info

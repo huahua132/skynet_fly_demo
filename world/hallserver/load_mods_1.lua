@@ -81,7 +81,7 @@ return {
 	-- orm
 	orm_table_m = {
 		launch_seq = 5600,
-		launch_num = 6,
+		launch_num = 7,
 		mod_args = {
             {instance_name = "player", orm_plug = "orm_entity.player_entity"},
 			{instance_name = "item", orm_plug = "orm_entity.item_entity"},
@@ -89,6 +89,7 @@ return {
 			{instance_name = "friend", orm_plug = "orm_entity.friend_entity"},
 			{instance_name = "friend_req", orm_plug = "orm_entity.friend_req_entity"},
 			{instance_name = "email", orm_plug = "orm_entity.email_entity"},
+			{instance_name = "misc", orm_plug = "orm_entity.misc_entity"},
 		}
 	},
 

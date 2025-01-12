@@ -36,6 +36,9 @@ local enums =
      ---@field public DB_RANGE_100 integer @范围100玩法
      ---@field public DB_RANGE_10000 integer @范围10000玩法
     ['play_type'] = {   CC_RANKING=10001,  CC_FIVE_MINUTE=10002,  CC_TEN_MINUTE=10003,  DB_RANGE_100=20001,  DB_RANGE_10000=20002,  };
+    ---@class sys_email_id @系统邮件ID
+     ---@field public LOGIN_REWARD integer @每日登录奖励
+    ['sys_email_id'] = {   LOGIN_REWARD=0,  };
 }
 
 local beans = {}
@@ -88,6 +91,20 @@ local beans = {}
         beans['chess.chess_type'] = class
     end
     do
+    ---@class email.email_sys 
+     ---@field public id integer @系统邮件ID
+     ---@field public title string @邮件标题
+     ---@field public content string @邮件内容
+     ---@field public vaild_time integer @有效时间(秒)(0表示永久)
+        local class = {
+            { name='id', type='integer'},
+            { name='title', type='string'},
+            { name='content', type='string'},
+            { name='vaild_time', type='integer'},
+        }
+        beans['email.email_sys'] = class
+    end
+    do
     ---@class item.item_info 
      ---@field public item_id integer @道具ID
      ---@field public main_type integer @道具类型
@@ -112,6 +129,14 @@ local beans = {}
         beans['match.match_game'] = class
     end
     do
+    ---@class misc.msic_param 
+     ---@field public login_rewards table<integer,integer> @每日登录奖励
+        local class = {
+            { name='login_rewards', type='table<integer,integer>'},
+        }
+        beans['misc.msic_param'] = class
+    end
+    do
     ---@class player.player_level 
      ---@field public level integer @等级
      ---@field public exp integer @经验
@@ -124,12 +149,14 @@ local beans = {}
 
 local tables =
 {
-    { name='level', file='player_level', mode='map', index='level', value_type='player.player_level' },
-    { name='info', file='item_info', mode='map', index='item_id', value_type='item.item_info' },
-    { name='type', file='chess_type', mode='map', index='play_type', value_type='chess.chess_type' },
-    { name='param', file='chess_param', mode='one', value_type='chess.chess_param'},
-    { name='rank', file='chess_rank', mode='map', index='rank_id', value_type='chess.chess_rank' },
-    { name='game', file='match_game', mode='list', index='', value_type='match.match_game' },
+    { name='tb_player_level', file='player_level', mode='map', index='level', value_type='player.player_level' },
+    { name='tb_item_info', file='item_info', mode='map', index='item_id', value_type='item.item_info' },
+    { name='tb_chess_type', file='chess_type', mode='map', index='play_type', value_type='chess.chess_type' },
+    { name='tb_chess_param', file='chess_param', mode='one', value_type='chess.chess_param'},
+    { name='tb_chess_rank', file='chess_rank', mode='map', index='rank_id', value_type='chess.chess_rank' },
+    { name='tb_match_game', file='match_game', mode='list', index='', value_type='match.match_game' },
+    { name='tb_email_sys', file='email_sys', mode='map', index='id', value_type='email.email_sys' },
+    { name='tb_misc_param', file='msic_param', mode='one', value_type='misc.msic_param'},
 }
 
 return { enums = enums, beans = beans, tables = tables }

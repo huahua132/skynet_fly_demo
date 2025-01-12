@@ -13,6 +13,7 @@ local assert = assert
 local tinsert = table.insert
 local pairs = pairs
 local next = next
+local type = type
 
 local g_item_entity = orm_table_client:instance("item")
 
@@ -172,6 +173,39 @@ end
 --批量增加道具
 function interface.add_item_list(player_id, item_list)
     return M.cmd_add_item_list(player_id, item_list)
+end
+
+--道具转换
+function interface.convert_item_list(items)
+    local item_list = nil
+    --适配items的模式
+    if items and next(items) then
+        local v = nil
+        for k,vv in pairs(items) do         --next 对应sharedata数据 会返回 c confctrl 还是用pairs去取一个数据吧
+            v = vv
+            break
+        end
+        --[id] = num 模式
+        local vt = type(v)
+        if vt == 'number' then
+            item_list = {}
+            for id, count in pairs(items) do
+                tinsert(item_list, {id = id, count = count})
+            end
+        else
+            if v.id then
+                item_list = items
+            else
+                item_list = {}
+                --{{id,count},{id,count}}
+                for i = 1, #items do
+                    tinsert(item_list, {id = items[i][1], count = items[i][2]})
+                end
+            end
+        end
+    end
+
+    return item_list
 end
 
 return M

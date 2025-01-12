@@ -24,6 +24,10 @@ skynet.init(init)
 
 local M = {}
 
+function M.hotfix()
+    init()
+end
+
 --获取玩法配置
 function M.get_type_cfg(play_type)
     local type_idx_map = g_chess_type:get_map("type_idx")

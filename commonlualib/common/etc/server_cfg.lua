@@ -90,6 +90,7 @@ M.world = {
         debug_port = 11211,
         recordlimit = RECORD_LIMIT,
         recordpath = '../../records/hallserver_1',
+        machine_id = 11,                         --机器人号，全局唯一，用于雪花算法guid生成
     },
     hallserver_2 = {
         thread = 8,
@@ -98,6 +99,7 @@ M.world = {
         debug_port = 11221,
         recordlimit = RECORD_LIMIT,
         recordpath = '../../records/hallserver_2',
+        machine_id = 12,                         --机器人号，全局唯一，用于雪花算法guid生成
     },
 }
 --世界配置 12开头

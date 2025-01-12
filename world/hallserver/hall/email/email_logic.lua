@@ -2,14 +2,17 @@ local log = require "skynet-fly.log"
 local orm_table_client = require "skynet-fly.client.orm_table_client"
 local state_data = require "skynet-fly.hotfix.state_data"
 local watch_syn_client = require "skynet-fly.rpc.watch_syn_client"
+local snowflake = require "skynet-fly.snowflake"
 local email_msg = require "msg.email_msg"
 local schema = hotfix_require "common.enum.schema"
 local time_util = require "skynet-fly.utils.time_util"
 local event_mgr = require "common.event_mgr"
 local EVENT_ID = require "enum.EVENT_ID"
 local errorcode = hotfix_require "common.enum.errorcode"
+local email_conf = hotfix_require "hall.email.email_conf"
 
 --interface
+local interface = require "hall.email.interface"
 local player_interface = require "hall.player.interface"
 local item_interface = require "hall.item.interface"
 
@@ -17,6 +20,8 @@ local table = table
 local next = next
 local tonumber = tonumber
 local pairs = pairs
+local string = string
+local type = type
 
 local M = {}
 
@@ -328,6 +333,52 @@ function M.do_del_email(player_id, pack_body)
     }
 end
 
+-------------------------------------------interface-----------------------------------
+--新增系统邮件
+function interface.add_sys_email(player_id, email_id, items, title_params, content_params)
+    local item_list = item_interface.convert_item_list(items)
+    local email_cfg = email_conf.get_email_cfg(email_id)
+    if not email_cfg then
+        log.error("add_sys_email can`t find email_cfg: ", player_id, email_id)
+        return
+    end
+
+    local title = email_cfg.title
+    if title_params then
+        title = string.gsub(title, "{(.-)}", title_params)
+    end
+
+    local content = email_cfg.content
+    if content_params then
+        content = string.gsub(content, "{(.-)}", content_params)
+    end
+
+    local cur_time = time_util.time()
+    local email = {
+        player_id = player_id,
+        guid = snowflake.new_guid(),
+        from_id = 0,
+        email_type = schema.enums.email_type.SYSTEM,
+        title = title,
+        content = content,
+        create_time = cur_time,
+        vaild_time = 0,
+        item_list = item_list,
+        read_flag = 0,
+        item_flag = 0,
+        del_flag = 0,
+    }
+    if email_cfg.vaild_time > 0 then
+        email.vaild_time = cur_time + email_cfg.vaild_time
+    end
+    
+    g_email_entity:create_one_entry(email)
+    g_logic_info.email_msg:one_email_notice(player_id, {
+        email = email,
+    })
+
+    return true
+end
 
 --------------------------------------------GM-----------------------------------------
 function M.gm_get_list(player_id)

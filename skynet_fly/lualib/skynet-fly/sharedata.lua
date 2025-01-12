@@ -8,8 +8,16 @@ local module_info = require "skynet-fly.etc.module_info"
 local log = require "skynet-fly.log"
 local file_util = require "skynet-fly.utils.file_util"
 local string_util = require "skynet-fly.utils.string_util"
+local table_util = require "skynet-fly.utils.table_util"
 
 local sinterface = service_watch_interface:new(".sharedata_service")
+
+----------------------------------------------
+-- 使用注意点
+-- 对于使用sharedata配置，被其他外部引用的表会被更新到，sharetable不会，所以如果想拿到最新的配置就必须用这个文件的`get_map,get_map_list,get_data_table`拿取
+-- 对于不想更新到的表sharedata需要做个深拷贝
+-- 直接用sharedata 的表数据传入pb，该部分数据打包不进去，需要深拷贝后导入
+----------------------------------------------
 
 local next = next
 local assert = assert
@@ -158,7 +166,7 @@ end})
 
 --加载指定路径列表下配置， mode = sharedata or sharetable
 function M.load(dir_list, mode)
-    assert(mode == M.enum.sharedata or mode == M.enum.sharetable)
+    assert(mode == M.enum.sharedata or mode == M.enum.sharetable, "not exists mode = " .. mode)
     local sd = skynet.uniqueservice("sharedata_service")
     skynet.call(sd, 'lua', 'load', dir_list, mode)
 end
@@ -181,7 +189,9 @@ end
 
 --访问代理
 function M:new(file_path, mode)
-    assert(mode == M.enum.sharedata or mode == M.enum.sharetable)
+    assert(mode == M.enum.sharedata or mode == M.enum.sharetable, "not exists mode = " .. mode)
+    local sd = skynet.uniqueservice("sharedata_service")
+    assert(skynet.call(sd, 'lua', 'is_vaild_file_path', file_path, mode))
     local t = {
         mode = mode,
         file_path = file_path,
@@ -195,6 +205,7 @@ function M:new(file_path, mode)
         map_map = {},               --map映射表
         map_map_fields = {},        --map映射表key字段列表
     }
+    
     g_mode_map[file_path] = mode
     t.data_table = g_data_map[file_path]
     t.version = g_version_map[file_path]
@@ -339,6 +350,17 @@ function M:builder()
         end
     end
     return self
+end
+
+--[[
+local cfg = {
+    items = {{id = 1, count = 2000}}
+}
+    比如pb需要items,就只需要 M:copy_table(cfg.items)即可
+]]
+--copy 配置表  直接用sharedata 的表数据传入pb，该部分数据打包不进去，需要深拷贝后导入
+function M:copy_table(tab)
+    return table_util.copy(tab)
 end
 
 --获取数据表

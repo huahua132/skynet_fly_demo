@@ -30,4 +30,9 @@ function M.add_item_list(player_id, item_list)
     error("调用了未实现的接口 add_item_list")
 end
 
+--道具转换
+function M.convert_item_list(items)
+    error("调用了未实现的接口 convert_item_list")
+end
+
 return M
