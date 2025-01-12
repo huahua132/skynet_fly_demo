@@ -16,6 +16,7 @@ local schema = hotfix_require "common.enum.schema"
 local player_conf = hotfix_require "hall.player.player_conf"
 local chess_conf = hotfix_require "common.conf.chess_conf"
 local table_util = require "skynet-fly.utils.table_util"
+local errorcode = hotfix_require "common.enum.errorcode"
 
 contriner_client:register("room_game_hall_m")
 
@@ -188,6 +189,26 @@ function M.do_heart(player_id, pack_body)
     }
 end
 
+--玩家请求修改昵称
+function M.do_change_nickname(player_id, pack_body)
+    local nickname = pack_body.nickname
+    if not nickname then
+        return false, errorcode.REQ_PARAM_ERR, "not nickname"
+    end
+
+    local len = #nickname
+    if len <= 0 or len > 32 then
+        return false, errorcode.REQ_PARAM_ERR, "nickname len err"
+    end
+
+    local player_info = M.cmd_get_info(player_id)
+    player_info.nickname = nickname
+    --保存数据
+    g_player_entity:save_one_entry({player_id = player_id, nickname = nickname})
+
+    --回复消息
+    return player_info
+end
 ---------------------------CMD--------------------------------------------
 --获取玩家信息
 function M.cmd_get_info(player_id)

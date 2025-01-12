@@ -6,6 +6,7 @@ local env_util = require "skynet-fly.utils.env_util"
 local ipairs = ipairs
 local table = table
 local assert = assert
+local pairs = pairs
 
 local g_ormobj = nil
 
@@ -21,7 +22,9 @@ function M.init()
     :int8("sex")                --性别
     :uint16("level")            --等级
     :uint16("viplevel")         --vip等级
-    :string256("head_url")      --头像url
+    --:string256("head_url")    --头像url    弃用
+    :int32("head_frame_id")     --头像框id
+    :int32("head_id")           --头像id
     :int64("create_time")       --创建时间
     :int64("last_login_time")   --最后登录时间
     :int64("last_logout_time")  --最后登出时间

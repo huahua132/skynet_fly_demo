@@ -49,6 +49,10 @@ M.handle = {
     [PACK.login.HeartReq] = function(player_id, pack_id, pack_body)
        return player_logic.do_heart(player_id, pack_body)
     end,
+    --请求修改昵称
+    [PACK.hallserver_player.ReqChangeNickName] = function(player_id, pack_id, pack_body)
+        return player_logic.do_change_nickname(player_id, pack_body)
+    end
 }
 
 local CMD = {}

@@ -6,14 +6,19 @@ enum main {
 }
 //协议子码 req res 占用1-80  通知占用80-100
 enum sub {
+    ReqChangeNickName   = 1;              //请求修改昵称
+    ResChangeNickName   = 2;              //回复修复昵称
     PlayerInfoNotice    = 80;             //玩家信息通知
     PlayerInfoSynNotice = 81;             //玩家字段信息同步
 }
 
 //玩家信息通知
 message PlayerInfoNotice {
-    optional string nickname = 1;       //昵称
-    optional int32 rank_score = 2;      //段位积分
+    optional string nickname     = 1;       //昵称
+    optional int32 rank_score    = 2;      //段位积分
+    optional int32 level         = 3;      //玩家等级
+    optional int32 head_frame_id = 4;      //头像框ID
+    optional int32 head_id       = 5;      //头像ID
 }
 
 message oneSynInfo {
@@ -25,5 +30,14 @@ message oneSynInfo {
 
 //玩家信息字段同步通知
 message PlayerInfoSynNotice {
-    repeated oneSynInfo synList = 1;
+    optional int64 player_id    = 1;    //玩家ID
+    repeated oneSynInfo synList = 2;    //同步信息
+}
+
+message ReqChangeNickName {
+    optional string nickname = 1;       //修改后的昵称
+}
+
+message ResChangeNickName {
+    optional string nickname = 2;       //修改后的昵称
 }
