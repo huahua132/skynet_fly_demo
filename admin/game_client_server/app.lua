@@ -14,9 +14,9 @@ function M.init()
     app:options('/*', cors_mid.end_point)
 
     --游戏前端入口路径
-    app:static_dir("/","../game_client/build/web-mobile")
+    app:static_dir("/","../../client/chinesechess_oops/build/web-mobile")
     --游戏前端入口
-    app:static_file("/","../game_client/build/web-mobile/index.html")
+    app:static_file("/","../../client/chinesechess_oops/build/web-mobile/index.html")
 	app:run()
 end
 
