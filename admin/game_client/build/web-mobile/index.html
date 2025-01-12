@@ -7,7 +7,7 @@
 
   <!--http://www.html5rocks.com/en/mobile/mobifying/-->
   <meta name="viewport"
-        content="width=device-width,user-scalable=no,initial-scale=1, minimum-scale=1,maximum-scale=1"/>
+        content="width=device-width,user-scalable=no,initial-scale=1,minimum-scale=1,maximum-scale=1,minimal-ui=true"/>
 
   <!--https://developer.apple.com/library/safari/documentation/AppleApplications/Reference/SafariHTMLRef/Articles/MetaTags.html-->
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -25,10 +25,6 @@
   <meta name="full-screen" content="yes"/>
   <meta name="x5-fullscreen" content="true"/>
   <meta name="360-fullscreen" content="true"/>
-  
-  <!-- force screen orientation on some browser -->
-  <meta name="screen-orientation" content=""/>
-  <meta name="x5-orientation" content="">
 
   <!--fix fireball/issues/3568 -->
   <!--<meta name="browsermode" content="application">-->
@@ -37,54 +33,31 @@
   <!--<link rel="apple-touch-icon" href=".png" />-->
   <!--<link rel="apple-touch-icon-precomposed" href=".png" />-->
 
-  <link rel="stylesheet" type="text/css" href="style-mobile.6e9cd.css"/>
-  <link rel="icon" href="favicon.8de18.ico"/>
+  <link rel="stylesheet" type="text/css" href="style.css"/>
+
 </head>
 <body>
-  <canvas id="GameCanvas" oncontextmenu="event.preventDefault()" tabindex="0"></canvas>
-  <div id="splash">
-    <div class="progress-bar stripes">
-      <span style="width: 0%"></span>
+  <div id="GameDiv" cc_exact_fit_screen="true">
+      <div id="Cocos3dGameContainer">
+        <canvas id="GameCanvas" oncontextmenu="event.preventDefault()" tabindex="99"></canvas>
+      </div>
     </div>
-  </div>
+  
 
-<script src="src/settings.204a2.js" charset="utf-8"></script>
+<!-- Polyfills bundle. -->
 
-<script src="main.912fc.js" charset="utf-8"></script>
+<script src="src/polyfills.bundle.js" charset="utf-8"> </script>
 
-<script type="text/javascript">
-(function () {
-    // open web debugger console
-    if (typeof VConsole !== 'undefined') {
-        window.vConsole = new VConsole();
-    }
 
-    var debug = window._CCSettings.debug;
-    var splash = document.getElementById('splash');
-    splash.style.display = 'block';
+<!-- SystemJS support. -->
+<script src="src/system.bundle.js" charset="utf-8"> </script>
 
-    function loadScript (moduleName, cb) {
-      function scriptLoaded () {
-          document.body.removeChild(domScript);
-          domScript.removeEventListener('load', scriptLoaded, false);
-          cb && cb();
-      };
-      var domScript = document.createElement('script');
-      domScript.async = true;
-      domScript.src = moduleName;
-      domScript.addEventListener('load', scriptLoaded, false);
-      document.body.appendChild(domScript);
-    }
+<!-- Import map -->
+<script src="src/import-map.json" type="systemjs-importmap" charset="utf-8"> </script>
 
-    loadScript(debug ? 'cocos2d-js.js' : 'cocos2d-js-min.c7c6e.js', function () {
-      if (CC_PHYSICS_BUILTIN || CC_PHYSICS_CANNON) {
-        loadScript(debug ? 'physics.js' : 'physics-min.ce5ee.js', window.boot);
-      }
-      else {
-        window.boot();
-      }
-    });
-})();
+<script>
+    System.import('./index.js').catch(function(err) { console.error(err); })
 </script>
+
 </body>
 </html>
