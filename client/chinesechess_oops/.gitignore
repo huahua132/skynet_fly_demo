@@ -1,0 +1,30 @@
+#///////////////////////////
+# Cocos Creator 3D Project
+#///////////////////////////
+oops-plugin-framework/
+oops-plugin-framework-tools/
+oops-plugin-hot-update/
+oops-plugin-excel-to-json/
+oops_framework_remote/
+library/
+temp/
+local/
+build/
+profiles/
+native
+#//////////////////////////
+# NPM
+#//////////////////////////
+# node_modules/
+
+#//////////////////////////
+# VSCode
+#//////////////////////////
+.vscode/
+
+#//////////////////////////
+# WebStorm
+#//////////////////////////
+.idea/
+
+node_modules

@@ -1,0 +1,19 @@
+{
+  "_sourceId": "c30b28da-749e-479b-bcb6-cecd8d7be9e3",
+  "creator": {
+    "version": "3.8.4"
+  },
+  "dependencies": {
+    "crypto-es": "^1.2.7",
+    "protobufjs": "^7.4.0",
+    "protobufjs-cli": "^1.1.3"
+  },
+  "description": "游戏项目模板",
+  "name": "chinesechess-oops",
+  "uuid": "00d7d957-a3e8-4ad6-80f4-2fcfb235bca4",
+  "version": "3.6.3",
+  "scripts": {
+    "build-proto:pbjs": "pbjs --dependency protobufjs/minimal.js --target static-module --wrap commonjs --out ./protos-js/proto.js ../../commonlualib/protos/*/*.proto",
+    "build-proto:pbts": "pbts --main --out ./protos-js/proto.d.ts ./protos-js/*.js"
+  }
+}
