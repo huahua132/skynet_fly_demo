@@ -101,16 +101,21 @@ function M.get_players_info(player_list, field_map)
     return res
 end
 
---发送到玩家所在room_game_hall
+--发送到玩家所在room_game_hall(优先在线)
 function M.send_player_hall(player_id, ...)
     local cli = base.hallserver_room_game_login(player_id)
     cli:byid_send_by_name("send_player_hall", player_id, ...)
 end
 
+--发送到玩家所在room_game_hall(优先在线)
+function M.call_player_hall(player_id, ...)
+    local cli = base.hallserver_room_game_login(player_id)
+    return cli:byid_call_by_name("call_player_hall", player_id, ...)
+end
+
 --改变玩家段位积分
 function M.change_rank_score(player_id, score)
-    local cli = base.hallserver_room_game_hall_m(player_id)
-    local ret = cli:byid_mod_call("player_change_rank_score", player_id, score)
+    local ret = M.call_player_hall(player_id, "player_change_rank_score", player_id, score)
     if not ret then
         return nil
     end
