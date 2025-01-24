@@ -75,6 +75,10 @@ end
 --收到全局邮件同步
 function M.on_recv_global_emails(all_global_emails)
     local old_global_emails = g_logic_info.all_global_emails
+    if not old_global_emails then                           --第一次同步
+        g_logic_info.all_global_emails = all_global_emails
+        return
+    end
     local add_list = {}     --新增邮件
     local change_list = {}  --修改邮件
     local del_list = {}     --删除邮件
@@ -194,7 +198,7 @@ end
 
 --初始化
 function M.init(interface_mgr)
-    g_logic_info.all_global_emails = {} --全服邮件同步
+    g_logic_info.all_global_emails = nil --全服邮件同步
     g_logic_info.all_global_email_map = {}
     g_logic_info.interface_mgr = interface_mgr
     watch_syn_client.watch("centerserver", "global_email", "email_logic", function(cluter_name, all_global_emails)

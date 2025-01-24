@@ -84,10 +84,7 @@ function M:on_connect(player_id, table_id, token, game_rpc)
             heart_req.time = time_util.time()
             local packid = game_rpc:req(PACK.login.HeartReq, heart_req)
             if not packid or packid == PACK.errors.Error then
-                if self.m_heart_timer then
-                    self.m_heart_timer:cancel()
-                    self.m_heart_timer = nil
-                end
+                break
             end
         end)
 
