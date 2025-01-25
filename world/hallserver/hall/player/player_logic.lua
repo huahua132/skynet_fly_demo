@@ -51,8 +51,9 @@ function M.init(interface_mgr)
     g_local_info.mod_queue = mod_queue:new(1024)
     timer_point:new(timer_point.EVERY_DAY):builder(function()
         --跨天
-        for i = 1, #g_player_list do
-            event_mgr.publish(EVENT_ID.CROSS_DAY, g_player_list[i])        --跨天
+        local player_list = table_util.copy(g_player_list)      --拷贝一份在线玩家列表 避免遍历过程中有玩家下线 导致玩家没有触发跨天
+        for i = 1, #player_list do
+            event_mgr.publish(EVENT_ID.CROSS_DAY, player_list[i])        --跨天
         end
     end)
 end
