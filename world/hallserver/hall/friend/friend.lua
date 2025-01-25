@@ -17,7 +17,8 @@ function M.init(interface_mgr)
     friend_logic.init(interface_mgr)
 end
 
-function M.on_login(player_id)
+function M.on_login(player_id, is_jump_join)
+    if is_jump_join then return end
     friend_logic.on_login(player_id)
 end
 
@@ -34,10 +35,6 @@ function M.on_disconnect(player_id)
 end
 
 M.handle = {
-    --好友列表
-    [PACK.hallserver_friend.FriendListReq] = function(player_id, pack_id, pack_body)
-        return friend_logic.do_friend_list_req(player_id, pack_body)
-    end,
     --请求添加好友
     [PACK.hallserver_friend.AddFriendReq] = function(player_id, pack_id, pack_body)
         return friend_logic.do_add_friend_req(player_id, pack_body)

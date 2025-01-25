@@ -19,6 +19,7 @@ import {Opt} from "../libs/network/NetNodeManager"
 import {BoardEntity} from "./game/board/BoardEntity"
 import { StorageSecuritySimple } from "../../extensions/oops-plugin-framework/assets/core/common/storage/StorageSecuritySimple"
 import {EmailEntity} from "./hall/email/EmailEntity"
+import {FirendEntity} from "./hall/firend/FirendEntity"
 
 const { ccclass, property } = _decorator;
 
@@ -63,5 +64,6 @@ export class Main extends Root {
         smc.hall = ecs.getEntity<HallEntity>(HallEntity);
         smc.game = ecs.getEntity<BoardEntity>(BoardEntity);
         smc.email = ecs.getEntity<EmailEntity>(EmailEntity);
+        smc.friend = ecs.getEntity<FirendEntity>(FirendEntity);
     }
 }

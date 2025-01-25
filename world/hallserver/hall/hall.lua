@@ -16,4 +16,5 @@ return {
 	require "hall.game_record.game_record",
 	require "hall.email.email",
 	require "hall.misc.misc",
+	require "hall.friend.friend",
 }

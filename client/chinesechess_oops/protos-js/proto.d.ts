@@ -4253,17 +4253,19 @@ export namespace hallserver_friend {
 
     /** sub enum. */
     enum sub {
-        FriendListReq = 1,
-        FriendListRes = 2,
-        AddFriendReq = 3,
-        AddFriendRes = 4,
-        AgreeAddFriendReq = 5,
-        AgreeAddFriendRes = 6,
-        RefuseAddFriendReq = 7,
-        RefuseAddFriendRes = 8,
-        DelFriendReq = 9,
-        DelFriendRes = 10,
-        AddReqListNotice = 80
+        AddFriendReq = 1,
+        AddFriendRes = 2,
+        AgreeAddFriendReq = 3,
+        AgreeAddFriendRes = 4,
+        RefuseAddFriendReq = 5,
+        RefuseAddFriendRes = 6,
+        DelFriendReq = 7,
+        DelFriendRes = 8,
+        FriendListNotice = 81,
+        AddReqListNotice = 82,
+        AddReqNotice = 83,
+        AddFriendNotice = 84,
+        DelFriendNotice = 85
     }
 
     /** Properties of an OneFriend. */
@@ -4381,218 +4383,97 @@ export namespace hallserver_friend {
         public static getTypeUrl(typeUrlPrefix?: string): string;
     }
 
-    /** Properties of a FriendListReq. */
-    interface IFriendListReq {
+    /** Properties of a FriendListNotice. */
+    interface IFriendListNotice {
 
-        /** FriendListReq pageageNum */
-        pageageNum?: (number|null);
-
-        /** FriendListReq pageageCount */
-        pageageCount?: (number|null);
-    }
-
-    /** Represents a FriendListReq. */
-    class FriendListReq implements IFriendListReq {
-
-        /**
-         * Constructs a new FriendListReq.
-         * @param [properties] Properties to set
-         */
-        constructor(properties?: hallserver_friend.IFriendListReq);
-
-        /** FriendListReq pageageNum. */
-        public pageageNum: number;
-
-        /** FriendListReq pageageCount. */
-        public pageageCount: number;
-
-        /**
-         * Creates a new FriendListReq instance using the specified properties.
-         * @param [properties] Properties to set
-         * @returns FriendListReq instance
-         */
-        public static create(properties?: hallserver_friend.IFriendListReq): hallserver_friend.FriendListReq;
-
-        /**
-         * Encodes the specified FriendListReq message. Does not implicitly {@link hallserver_friend.FriendListReq.verify|verify} messages.
-         * @param message FriendListReq message or plain object to encode
-         * @param [writer] Writer to encode to
-         * @returns Writer
-         */
-        public static encode(message: hallserver_friend.IFriendListReq, writer?: $protobuf.Writer): $protobuf.Writer;
-
-        /**
-         * Encodes the specified FriendListReq message, length delimited. Does not implicitly {@link hallserver_friend.FriendListReq.verify|verify} messages.
-         * @param message FriendListReq message or plain object to encode
-         * @param [writer] Writer to encode to
-         * @returns Writer
-         */
-        public static encodeDelimited(message: hallserver_friend.IFriendListReq, writer?: $protobuf.Writer): $protobuf.Writer;
-
-        /**
-         * Decodes a FriendListReq message from the specified reader or buffer.
-         * @param reader Reader or buffer to decode from
-         * @param [length] Message length if known beforehand
-         * @returns FriendListReq
-         * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {$protobuf.util.ProtocolError} If required fields are missing
-         */
-        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): hallserver_friend.FriendListReq;
-
-        /**
-         * Decodes a FriendListReq message from the specified reader or buffer, length delimited.
-         * @param reader Reader or buffer to decode from
-         * @returns FriendListReq
-         * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {$protobuf.util.ProtocolError} If required fields are missing
-         */
-        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): hallserver_friend.FriendListReq;
-
-        /**
-         * Verifies a FriendListReq message.
-         * @param message Plain object to verify
-         * @returns `null` if valid, otherwise the reason why it is not
-         */
-        public static verify(message: { [k: string]: any }): (string|null);
-
-        /**
-         * Creates a FriendListReq message from a plain object. Also converts values to their respective internal types.
-         * @param object Plain object
-         * @returns FriendListReq
-         */
-        public static fromObject(object: { [k: string]: any }): hallserver_friend.FriendListReq;
-
-        /**
-         * Creates a plain object from a FriendListReq message. Also converts values to other types if specified.
-         * @param message FriendListReq
-         * @param [options] Conversion options
-         * @returns Plain object
-         */
-        public static toObject(message: hallserver_friend.FriendListReq, options?: $protobuf.IConversionOptions): { [k: string]: any };
-
-        /**
-         * Converts this FriendListReq to JSON.
-         * @returns JSON object
-         */
-        public toJSON(): { [k: string]: any };
-
-        /**
-         * Gets the default type url for FriendListReq
-         * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
-         * @returns The default type url
-         */
-        public static getTypeUrl(typeUrlPrefix?: string): string;
-    }
-
-    /** Properties of a FriendListRes. */
-    interface IFriendListRes {
-
-        /** FriendListRes pageageNum */
-        pageageNum?: (number|null);
-
-        /** FriendListRes pageageCount */
-        pageageCount?: (number|null);
-
-        /** FriendListRes totalCount */
-        totalCount?: (number|null);
-
-        /** FriendListRes friendList */
+        /** FriendListNotice friendList */
         friendList?: (hallserver_friend.IOneFriend[]|null);
     }
 
-    /** Represents a FriendListRes. */
-    class FriendListRes implements IFriendListRes {
+    /** Represents a FriendListNotice. */
+    class FriendListNotice implements IFriendListNotice {
 
         /**
-         * Constructs a new FriendListRes.
+         * Constructs a new FriendListNotice.
          * @param [properties] Properties to set
          */
-        constructor(properties?: hallserver_friend.IFriendListRes);
+        constructor(properties?: hallserver_friend.IFriendListNotice);
 
-        /** FriendListRes pageageNum. */
-        public pageageNum: number;
-
-        /** FriendListRes pageageCount. */
-        public pageageCount: number;
-
-        /** FriendListRes totalCount. */
-        public totalCount: number;
-
-        /** FriendListRes friendList. */
+        /** FriendListNotice friendList. */
         public friendList: hallserver_friend.IOneFriend[];
 
         /**
-         * Creates a new FriendListRes instance using the specified properties.
+         * Creates a new FriendListNotice instance using the specified properties.
          * @param [properties] Properties to set
-         * @returns FriendListRes instance
+         * @returns FriendListNotice instance
          */
-        public static create(properties?: hallserver_friend.IFriendListRes): hallserver_friend.FriendListRes;
+        public static create(properties?: hallserver_friend.IFriendListNotice): hallserver_friend.FriendListNotice;
 
         /**
-         * Encodes the specified FriendListRes message. Does not implicitly {@link hallserver_friend.FriendListRes.verify|verify} messages.
-         * @param message FriendListRes message or plain object to encode
+         * Encodes the specified FriendListNotice message. Does not implicitly {@link hallserver_friend.FriendListNotice.verify|verify} messages.
+         * @param message FriendListNotice message or plain object to encode
          * @param [writer] Writer to encode to
          * @returns Writer
          */
-        public static encode(message: hallserver_friend.IFriendListRes, writer?: $protobuf.Writer): $protobuf.Writer;
+        public static encode(message: hallserver_friend.IFriendListNotice, writer?: $protobuf.Writer): $protobuf.Writer;
 
         /**
-         * Encodes the specified FriendListRes message, length delimited. Does not implicitly {@link hallserver_friend.FriendListRes.verify|verify} messages.
-         * @param message FriendListRes message or plain object to encode
+         * Encodes the specified FriendListNotice message, length delimited. Does not implicitly {@link hallserver_friend.FriendListNotice.verify|verify} messages.
+         * @param message FriendListNotice message or plain object to encode
          * @param [writer] Writer to encode to
          * @returns Writer
          */
-        public static encodeDelimited(message: hallserver_friend.IFriendListRes, writer?: $protobuf.Writer): $protobuf.Writer;
+        public static encodeDelimited(message: hallserver_friend.IFriendListNotice, writer?: $protobuf.Writer): $protobuf.Writer;
 
         /**
-         * Decodes a FriendListRes message from the specified reader or buffer.
+         * Decodes a FriendListNotice message from the specified reader or buffer.
          * @param reader Reader or buffer to decode from
          * @param [length] Message length if known beforehand
-         * @returns FriendListRes
+         * @returns FriendListNotice
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): hallserver_friend.FriendListRes;
+        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): hallserver_friend.FriendListNotice;
 
         /**
-         * Decodes a FriendListRes message from the specified reader or buffer, length delimited.
+         * Decodes a FriendListNotice message from the specified reader or buffer, length delimited.
          * @param reader Reader or buffer to decode from
-         * @returns FriendListRes
+         * @returns FriendListNotice
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): hallserver_friend.FriendListRes;
+        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): hallserver_friend.FriendListNotice;
 
         /**
-         * Verifies a FriendListRes message.
+         * Verifies a FriendListNotice message.
          * @param message Plain object to verify
          * @returns `null` if valid, otherwise the reason why it is not
          */
         public static verify(message: { [k: string]: any }): (string|null);
 
         /**
-         * Creates a FriendListRes message from a plain object. Also converts values to their respective internal types.
+         * Creates a FriendListNotice message from a plain object. Also converts values to their respective internal types.
          * @param object Plain object
-         * @returns FriendListRes
+         * @returns FriendListNotice
          */
-        public static fromObject(object: { [k: string]: any }): hallserver_friend.FriendListRes;
+        public static fromObject(object: { [k: string]: any }): hallserver_friend.FriendListNotice;
 
         /**
-         * Creates a plain object from a FriendListRes message. Also converts values to other types if specified.
-         * @param message FriendListRes
+         * Creates a plain object from a FriendListNotice message. Also converts values to other types if specified.
+         * @param message FriendListNotice
          * @param [options] Conversion options
          * @returns Plain object
          */
-        public static toObject(message: hallserver_friend.FriendListRes, options?: $protobuf.IConversionOptions): { [k: string]: any };
+        public static toObject(message: hallserver_friend.FriendListNotice, options?: $protobuf.IConversionOptions): { [k: string]: any };
 
         /**
-         * Converts this FriendListRes to JSON.
+         * Converts this FriendListNotice to JSON.
          * @returns JSON object
          */
         public toJSON(): { [k: string]: any };
 
         /**
-         * Gets the default type url for FriendListRes
+         * Gets the default type url for FriendListNotice
          * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
          * @returns The default type url
          */
@@ -5472,6 +5353,303 @@ export namespace hallserver_friend {
 
         /**
          * Gets the default type url for DelFriendRes
+         * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+         * @returns The default type url
+         */
+        public static getTypeUrl(typeUrlPrefix?: string): string;
+    }
+
+    /** Properties of an AddReqNotice. */
+    interface IAddReqNotice {
+
+        /** AddReqNotice playerId */
+        playerId?: (number|Long|null);
+
+        /** AddReqNotice nickname */
+        nickname?: (string|null);
+    }
+
+    /** Represents an AddReqNotice. */
+    class AddReqNotice implements IAddReqNotice {
+
+        /**
+         * Constructs a new AddReqNotice.
+         * @param [properties] Properties to set
+         */
+        constructor(properties?: hallserver_friend.IAddReqNotice);
+
+        /** AddReqNotice playerId. */
+        public playerId: (number|Long);
+
+        /** AddReqNotice nickname. */
+        public nickname: string;
+
+        /**
+         * Creates a new AddReqNotice instance using the specified properties.
+         * @param [properties] Properties to set
+         * @returns AddReqNotice instance
+         */
+        public static create(properties?: hallserver_friend.IAddReqNotice): hallserver_friend.AddReqNotice;
+
+        /**
+         * Encodes the specified AddReqNotice message. Does not implicitly {@link hallserver_friend.AddReqNotice.verify|verify} messages.
+         * @param message AddReqNotice message or plain object to encode
+         * @param [writer] Writer to encode to
+         * @returns Writer
+         */
+        public static encode(message: hallserver_friend.IAddReqNotice, writer?: $protobuf.Writer): $protobuf.Writer;
+
+        /**
+         * Encodes the specified AddReqNotice message, length delimited. Does not implicitly {@link hallserver_friend.AddReqNotice.verify|verify} messages.
+         * @param message AddReqNotice message or plain object to encode
+         * @param [writer] Writer to encode to
+         * @returns Writer
+         */
+        public static encodeDelimited(message: hallserver_friend.IAddReqNotice, writer?: $protobuf.Writer): $protobuf.Writer;
+
+        /**
+         * Decodes an AddReqNotice message from the specified reader or buffer.
+         * @param reader Reader or buffer to decode from
+         * @param [length] Message length if known beforehand
+         * @returns AddReqNotice
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): hallserver_friend.AddReqNotice;
+
+        /**
+         * Decodes an AddReqNotice message from the specified reader or buffer, length delimited.
+         * @param reader Reader or buffer to decode from
+         * @returns AddReqNotice
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): hallserver_friend.AddReqNotice;
+
+        /**
+         * Verifies an AddReqNotice message.
+         * @param message Plain object to verify
+         * @returns `null` if valid, otherwise the reason why it is not
+         */
+        public static verify(message: { [k: string]: any }): (string|null);
+
+        /**
+         * Creates an AddReqNotice message from a plain object. Also converts values to their respective internal types.
+         * @param object Plain object
+         * @returns AddReqNotice
+         */
+        public static fromObject(object: { [k: string]: any }): hallserver_friend.AddReqNotice;
+
+        /**
+         * Creates a plain object from an AddReqNotice message. Also converts values to other types if specified.
+         * @param message AddReqNotice
+         * @param [options] Conversion options
+         * @returns Plain object
+         */
+        public static toObject(message: hallserver_friend.AddReqNotice, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+        /**
+         * Converts this AddReqNotice to JSON.
+         * @returns JSON object
+         */
+        public toJSON(): { [k: string]: any };
+
+        /**
+         * Gets the default type url for AddReqNotice
+         * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+         * @returns The default type url
+         */
+        public static getTypeUrl(typeUrlPrefix?: string): string;
+    }
+
+    /** Properties of an AddFriendNotice. */
+    interface IAddFriendNotice {
+
+        /** AddFriendNotice friendInfo */
+        friendInfo?: (hallserver_friend.IOneFriend|null);
+    }
+
+    /** Represents an AddFriendNotice. */
+    class AddFriendNotice implements IAddFriendNotice {
+
+        /**
+         * Constructs a new AddFriendNotice.
+         * @param [properties] Properties to set
+         */
+        constructor(properties?: hallserver_friend.IAddFriendNotice);
+
+        /** AddFriendNotice friendInfo. */
+        public friendInfo?: (hallserver_friend.IOneFriend|null);
+
+        /**
+         * Creates a new AddFriendNotice instance using the specified properties.
+         * @param [properties] Properties to set
+         * @returns AddFriendNotice instance
+         */
+        public static create(properties?: hallserver_friend.IAddFriendNotice): hallserver_friend.AddFriendNotice;
+
+        /**
+         * Encodes the specified AddFriendNotice message. Does not implicitly {@link hallserver_friend.AddFriendNotice.verify|verify} messages.
+         * @param message AddFriendNotice message or plain object to encode
+         * @param [writer] Writer to encode to
+         * @returns Writer
+         */
+        public static encode(message: hallserver_friend.IAddFriendNotice, writer?: $protobuf.Writer): $protobuf.Writer;
+
+        /**
+         * Encodes the specified AddFriendNotice message, length delimited. Does not implicitly {@link hallserver_friend.AddFriendNotice.verify|verify} messages.
+         * @param message AddFriendNotice message or plain object to encode
+         * @param [writer] Writer to encode to
+         * @returns Writer
+         */
+        public static encodeDelimited(message: hallserver_friend.IAddFriendNotice, writer?: $protobuf.Writer): $protobuf.Writer;
+
+        /**
+         * Decodes an AddFriendNotice message from the specified reader or buffer.
+         * @param reader Reader or buffer to decode from
+         * @param [length] Message length if known beforehand
+         * @returns AddFriendNotice
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): hallserver_friend.AddFriendNotice;
+
+        /**
+         * Decodes an AddFriendNotice message from the specified reader or buffer, length delimited.
+         * @param reader Reader or buffer to decode from
+         * @returns AddFriendNotice
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): hallserver_friend.AddFriendNotice;
+
+        /**
+         * Verifies an AddFriendNotice message.
+         * @param message Plain object to verify
+         * @returns `null` if valid, otherwise the reason why it is not
+         */
+        public static verify(message: { [k: string]: any }): (string|null);
+
+        /**
+         * Creates an AddFriendNotice message from a plain object. Also converts values to their respective internal types.
+         * @param object Plain object
+         * @returns AddFriendNotice
+         */
+        public static fromObject(object: { [k: string]: any }): hallserver_friend.AddFriendNotice;
+
+        /**
+         * Creates a plain object from an AddFriendNotice message. Also converts values to other types if specified.
+         * @param message AddFriendNotice
+         * @param [options] Conversion options
+         * @returns Plain object
+         */
+        public static toObject(message: hallserver_friend.AddFriendNotice, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+        /**
+         * Converts this AddFriendNotice to JSON.
+         * @returns JSON object
+         */
+        public toJSON(): { [k: string]: any };
+
+        /**
+         * Gets the default type url for AddFriendNotice
+         * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+         * @returns The default type url
+         */
+        public static getTypeUrl(typeUrlPrefix?: string): string;
+    }
+
+    /** Properties of a DelFriendNotice. */
+    interface IDelFriendNotice {
+
+        /** DelFriendNotice playerId */
+        playerId?: (number|Long|null);
+    }
+
+    /** Represents a DelFriendNotice. */
+    class DelFriendNotice implements IDelFriendNotice {
+
+        /**
+         * Constructs a new DelFriendNotice.
+         * @param [properties] Properties to set
+         */
+        constructor(properties?: hallserver_friend.IDelFriendNotice);
+
+        /** DelFriendNotice playerId. */
+        public playerId: (number|Long);
+
+        /**
+         * Creates a new DelFriendNotice instance using the specified properties.
+         * @param [properties] Properties to set
+         * @returns DelFriendNotice instance
+         */
+        public static create(properties?: hallserver_friend.IDelFriendNotice): hallserver_friend.DelFriendNotice;
+
+        /**
+         * Encodes the specified DelFriendNotice message. Does not implicitly {@link hallserver_friend.DelFriendNotice.verify|verify} messages.
+         * @param message DelFriendNotice message or plain object to encode
+         * @param [writer] Writer to encode to
+         * @returns Writer
+         */
+        public static encode(message: hallserver_friend.IDelFriendNotice, writer?: $protobuf.Writer): $protobuf.Writer;
+
+        /**
+         * Encodes the specified DelFriendNotice message, length delimited. Does not implicitly {@link hallserver_friend.DelFriendNotice.verify|verify} messages.
+         * @param message DelFriendNotice message or plain object to encode
+         * @param [writer] Writer to encode to
+         * @returns Writer
+         */
+        public static encodeDelimited(message: hallserver_friend.IDelFriendNotice, writer?: $protobuf.Writer): $protobuf.Writer;
+
+        /**
+         * Decodes a DelFriendNotice message from the specified reader or buffer.
+         * @param reader Reader or buffer to decode from
+         * @param [length] Message length if known beforehand
+         * @returns DelFriendNotice
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): hallserver_friend.DelFriendNotice;
+
+        /**
+         * Decodes a DelFriendNotice message from the specified reader or buffer, length delimited.
+         * @param reader Reader or buffer to decode from
+         * @returns DelFriendNotice
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): hallserver_friend.DelFriendNotice;
+
+        /**
+         * Verifies a DelFriendNotice message.
+         * @param message Plain object to verify
+         * @returns `null` if valid, otherwise the reason why it is not
+         */
+        public static verify(message: { [k: string]: any }): (string|null);
+
+        /**
+         * Creates a DelFriendNotice message from a plain object. Also converts values to their respective internal types.
+         * @param object Plain object
+         * @returns DelFriendNotice
+         */
+        public static fromObject(object: { [k: string]: any }): hallserver_friend.DelFriendNotice;
+
+        /**
+         * Creates a plain object from a DelFriendNotice message. Also converts values to other types if specified.
+         * @param message DelFriendNotice
+         * @param [options] Conversion options
+         * @returns Plain object
+         */
+        public static toObject(message: hallserver_friend.DelFriendNotice, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+        /**
+         * Converts this DelFriendNotice to JSON.
+         * @returns JSON object
+         */
+        public toJSON(): { [k: string]: any };
+
+        /**
+         * Gets the default type url for DelFriendNotice
          * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
          * @returns The default type url
          */

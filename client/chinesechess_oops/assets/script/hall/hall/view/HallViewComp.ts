@@ -9,6 +9,8 @@ import { EmailViewComp } from "../../email/view/EmailViewComp";
 import { smc } from "../../../common/SingletonModuleComp";
 import {UIID} from "../../../common/enum/UIConfig";
 import {EmailBllComp} from "../../email/bll/EmailBll"
+import {FirendBllComp} from "../../firend/bll/FirendBll"
+import {FirendViewComp} from "../../firend/view/FirendViewComp"
 
 const { ccclass, property } = _decorator;
 
@@ -47,6 +49,7 @@ export class HallViewComp extends CCComp {
     //刷新玩家信息
     RefreshPlayerInfo() {
         const entity = this.ent as HallEntity;
+        console.log("RefreshPlayerInfo >>> ", this.getNode("playerId"), entity.HallModel.PlayerId);
         this.getNode("playerId")!.getComponent(Label)!.string = "ID:" + entity.HallModel.PlayerId.toString();
         this.getNode("nickName")!.getComponent(Label)!.string = entity.HallModel.NickName;
         this.getNode("rank")!.getComponent(Label)!.string = entity.HallModel.RankScore.toString();
@@ -79,6 +82,13 @@ export class HallViewComp extends CCComp {
         console.log("emailBtn >>> ")
         smc.email.addComponents<ecs.Comp>(EmailBllComp);
         ModuleUtil.addViewUi(smc.email, EmailViewComp, UIID.Email);
+    }
+
+    //好友
+    firendBtn() {
+        console.log("firendBtn >>> ")
+        smc.friend.addComponents<ecs.Comp>(FirendBllComp);
+        ModuleUtil.addViewUi(smc.friend, FirendViewComp, UIID.Firend);
     }
 
     //匹配按钮

@@ -8,7 +8,6 @@ import { EMAIL_TYPE } from "../../../common/enum/EMAIL_TYPE";
 import { ModuleUtil } from "../../../../../extensions/oops-plugin-framework/assets/module/common/ModuleUtil";
 import {EmailItemViewComp} from "../children/item/view/EmailItemViewComp";
 import { UIID } from "../../../common/enum/UIConfig";
-import { ECSEntity } from "../../../../../extensions/oops-plugin-framework/assets/libs/ecs/ECSEntity";
 
 /** 业务输入参数 */
 @ecs.register('EmailBll')

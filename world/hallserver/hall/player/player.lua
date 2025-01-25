@@ -58,8 +58,8 @@ M.handle = {
 local CMD = {}
 
 --获取玩家信息
-function CMD.player_get_info(player_id)
-    return player_logic.cmd_get_info(player_id)
+function CMD.player_get_info(player_id, field_map)
+    return player_logic.cmd_get_info(player_id, field_map)
 end
 
 --获取所有在线玩家ID
@@ -70,11 +70,6 @@ end
 --批量获取玩家字段信息
 function CMD.player_get_players_info(player_list, field_map)
     return player_logic.cmd_get_players_info(player_list, field_map)
-end
-
---批量获取本server下的玩家字段信息
-function CMD.player_get_players_info_by_local(player_list, field_map)
-    return player_logic.cmd_get_players_info_by_local(player_list, field_map)
 end
 
 --改变玩家段位积分

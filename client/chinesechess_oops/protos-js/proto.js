@@ -9966,31 +9966,35 @@ $root.hallserver_friend = (function() {
      * sub enum.
      * @name hallserver_friend.sub
      * @enum {number}
-     * @property {number} FriendListReq=1 FriendListReq value
-     * @property {number} FriendListRes=2 FriendListRes value
-     * @property {number} AddFriendReq=3 AddFriendReq value
-     * @property {number} AddFriendRes=4 AddFriendRes value
-     * @property {number} AgreeAddFriendReq=5 AgreeAddFriendReq value
-     * @property {number} AgreeAddFriendRes=6 AgreeAddFriendRes value
-     * @property {number} RefuseAddFriendReq=7 RefuseAddFriendReq value
-     * @property {number} RefuseAddFriendRes=8 RefuseAddFriendRes value
-     * @property {number} DelFriendReq=9 DelFriendReq value
-     * @property {number} DelFriendRes=10 DelFriendRes value
-     * @property {number} AddReqListNotice=80 AddReqListNotice value
+     * @property {number} AddFriendReq=1 AddFriendReq value
+     * @property {number} AddFriendRes=2 AddFriendRes value
+     * @property {number} AgreeAddFriendReq=3 AgreeAddFriendReq value
+     * @property {number} AgreeAddFriendRes=4 AgreeAddFriendRes value
+     * @property {number} RefuseAddFriendReq=5 RefuseAddFriendReq value
+     * @property {number} RefuseAddFriendRes=6 RefuseAddFriendRes value
+     * @property {number} DelFriendReq=7 DelFriendReq value
+     * @property {number} DelFriendRes=8 DelFriendRes value
+     * @property {number} FriendListNotice=81 FriendListNotice value
+     * @property {number} AddReqListNotice=82 AddReqListNotice value
+     * @property {number} AddReqNotice=83 AddReqNotice value
+     * @property {number} AddFriendNotice=84 AddFriendNotice value
+     * @property {number} DelFriendNotice=85 DelFriendNotice value
      */
     hallserver_friend.sub = (function() {
         var valuesById = {}, values = Object.create(valuesById);
-        values[valuesById[1] = "FriendListReq"] = 1;
-        values[valuesById[2] = "FriendListRes"] = 2;
-        values[valuesById[3] = "AddFriendReq"] = 3;
-        values[valuesById[4] = "AddFriendRes"] = 4;
-        values[valuesById[5] = "AgreeAddFriendReq"] = 5;
-        values[valuesById[6] = "AgreeAddFriendRes"] = 6;
-        values[valuesById[7] = "RefuseAddFriendReq"] = 7;
-        values[valuesById[8] = "RefuseAddFriendRes"] = 8;
-        values[valuesById[9] = "DelFriendReq"] = 9;
-        values[valuesById[10] = "DelFriendRes"] = 10;
-        values[valuesById[80] = "AddReqListNotice"] = 80;
+        values[valuesById[1] = "AddFriendReq"] = 1;
+        values[valuesById[2] = "AddFriendRes"] = 2;
+        values[valuesById[3] = "AgreeAddFriendReq"] = 3;
+        values[valuesById[4] = "AgreeAddFriendRes"] = 4;
+        values[valuesById[5] = "RefuseAddFriendReq"] = 5;
+        values[valuesById[6] = "RefuseAddFriendRes"] = 6;
+        values[valuesById[7] = "DelFriendReq"] = 7;
+        values[valuesById[8] = "DelFriendRes"] = 8;
+        values[valuesById[81] = "FriendListNotice"] = 81;
+        values[valuesById[82] = "AddReqListNotice"] = 82;
+        values[valuesById[83] = "AddReqNotice"] = 83;
+        values[valuesById[84] = "AddFriendNotice"] = 84;
+        values[valuesById[85] = "DelFriendNotice"] = 85;
         return values;
     })();
 
@@ -10295,254 +10299,24 @@ $root.hallserver_friend = (function() {
         return OneFriend;
     })();
 
-    hallserver_friend.FriendListReq = (function() {
+    hallserver_friend.FriendListNotice = (function() {
 
         /**
-         * Properties of a FriendListReq.
+         * Properties of a FriendListNotice.
          * @memberof hallserver_friend
-         * @interface IFriendListReq
-         * @property {number|null} [pageageNum] FriendListReq pageageNum
-         * @property {number|null} [pageageCount] FriendListReq pageageCount
+         * @interface IFriendListNotice
+         * @property {Array.<hallserver_friend.IOneFriend>|null} [friendList] FriendListNotice friendList
          */
 
         /**
-         * Constructs a new FriendListReq.
+         * Constructs a new FriendListNotice.
          * @memberof hallserver_friend
-         * @classdesc Represents a FriendListReq.
-         * @implements IFriendListReq
+         * @classdesc Represents a FriendListNotice.
+         * @implements IFriendListNotice
          * @constructor
-         * @param {hallserver_friend.IFriendListReq=} [properties] Properties to set
+         * @param {hallserver_friend.IFriendListNotice=} [properties] Properties to set
          */
-        function FriendListReq(properties) {
-            if (properties)
-                for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-                    if (properties[keys[i]] != null)
-                        this[keys[i]] = properties[keys[i]];
-        }
-
-        /**
-         * FriendListReq pageageNum.
-         * @member {number} pageageNum
-         * @memberof hallserver_friend.FriendListReq
-         * @instance
-         */
-        FriendListReq.prototype.pageageNum = 0;
-
-        /**
-         * FriendListReq pageageCount.
-         * @member {number} pageageCount
-         * @memberof hallserver_friend.FriendListReq
-         * @instance
-         */
-        FriendListReq.prototype.pageageCount = 0;
-
-        /**
-         * Creates a new FriendListReq instance using the specified properties.
-         * @function create
-         * @memberof hallserver_friend.FriendListReq
-         * @static
-         * @param {hallserver_friend.IFriendListReq=} [properties] Properties to set
-         * @returns {hallserver_friend.FriendListReq} FriendListReq instance
-         */
-        FriendListReq.create = function create(properties) {
-            return new FriendListReq(properties);
-        };
-
-        /**
-         * Encodes the specified FriendListReq message. Does not implicitly {@link hallserver_friend.FriendListReq.verify|verify} messages.
-         * @function encode
-         * @memberof hallserver_friend.FriendListReq
-         * @static
-         * @param {hallserver_friend.IFriendListReq} message FriendListReq message or plain object to encode
-         * @param {$protobuf.Writer} [writer] Writer to encode to
-         * @returns {$protobuf.Writer} Writer
-         */
-        FriendListReq.encode = function encode(message, writer) {
-            if (!writer)
-                writer = $Writer.create();
-            if (message.pageageNum != null && Object.hasOwnProperty.call(message, "pageageNum"))
-                writer.uint32(/* id 1, wireType 0 =*/8).uint32(message.pageageNum);
-            if (message.pageageCount != null && Object.hasOwnProperty.call(message, "pageageCount"))
-                writer.uint32(/* id 2, wireType 0 =*/16).uint32(message.pageageCount);
-            return writer;
-        };
-
-        /**
-         * Encodes the specified FriendListReq message, length delimited. Does not implicitly {@link hallserver_friend.FriendListReq.verify|verify} messages.
-         * @function encodeDelimited
-         * @memberof hallserver_friend.FriendListReq
-         * @static
-         * @param {hallserver_friend.IFriendListReq} message FriendListReq message or plain object to encode
-         * @param {$protobuf.Writer} [writer] Writer to encode to
-         * @returns {$protobuf.Writer} Writer
-         */
-        FriendListReq.encodeDelimited = function encodeDelimited(message, writer) {
-            return this.encode(message, writer).ldelim();
-        };
-
-        /**
-         * Decodes a FriendListReq message from the specified reader or buffer.
-         * @function decode
-         * @memberof hallserver_friend.FriendListReq
-         * @static
-         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-         * @param {number} [length] Message length if known beforehand
-         * @returns {hallserver_friend.FriendListReq} FriendListReq
-         * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {$protobuf.util.ProtocolError} If required fields are missing
-         */
-        FriendListReq.decode = function decode(reader, length) {
-            if (!(reader instanceof $Reader))
-                reader = $Reader.create(reader);
-            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.hallserver_friend.FriendListReq();
-            while (reader.pos < end) {
-                var tag = reader.uint32();
-                switch (tag >>> 3) {
-                case 1: {
-                        message.pageageNum = reader.uint32();
-                        break;
-                    }
-                case 2: {
-                        message.pageageCount = reader.uint32();
-                        break;
-                    }
-                default:
-                    reader.skipType(tag & 7);
-                    break;
-                }
-            }
-            return message;
-        };
-
-        /**
-         * Decodes a FriendListReq message from the specified reader or buffer, length delimited.
-         * @function decodeDelimited
-         * @memberof hallserver_friend.FriendListReq
-         * @static
-         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-         * @returns {hallserver_friend.FriendListReq} FriendListReq
-         * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {$protobuf.util.ProtocolError} If required fields are missing
-         */
-        FriendListReq.decodeDelimited = function decodeDelimited(reader) {
-            if (!(reader instanceof $Reader))
-                reader = new $Reader(reader);
-            return this.decode(reader, reader.uint32());
-        };
-
-        /**
-         * Verifies a FriendListReq message.
-         * @function verify
-         * @memberof hallserver_friend.FriendListReq
-         * @static
-         * @param {Object.<string,*>} message Plain object to verify
-         * @returns {string|null} `null` if valid, otherwise the reason why it is not
-         */
-        FriendListReq.verify = function verify(message) {
-            if (typeof message !== "object" || message === null)
-                return "object expected";
-            if (message.pageageNum != null && message.hasOwnProperty("pageageNum"))
-                if (!$util.isInteger(message.pageageNum))
-                    return "pageageNum: integer expected";
-            if (message.pageageCount != null && message.hasOwnProperty("pageageCount"))
-                if (!$util.isInteger(message.pageageCount))
-                    return "pageageCount: integer expected";
-            return null;
-        };
-
-        /**
-         * Creates a FriendListReq message from a plain object. Also converts values to their respective internal types.
-         * @function fromObject
-         * @memberof hallserver_friend.FriendListReq
-         * @static
-         * @param {Object.<string,*>} object Plain object
-         * @returns {hallserver_friend.FriendListReq} FriendListReq
-         */
-        FriendListReq.fromObject = function fromObject(object) {
-            if (object instanceof $root.hallserver_friend.FriendListReq)
-                return object;
-            var message = new $root.hallserver_friend.FriendListReq();
-            if (object.pageageNum != null)
-                message.pageageNum = object.pageageNum >>> 0;
-            if (object.pageageCount != null)
-                message.pageageCount = object.pageageCount >>> 0;
-            return message;
-        };
-
-        /**
-         * Creates a plain object from a FriendListReq message. Also converts values to other types if specified.
-         * @function toObject
-         * @memberof hallserver_friend.FriendListReq
-         * @static
-         * @param {hallserver_friend.FriendListReq} message FriendListReq
-         * @param {$protobuf.IConversionOptions} [options] Conversion options
-         * @returns {Object.<string,*>} Plain object
-         */
-        FriendListReq.toObject = function toObject(message, options) {
-            if (!options)
-                options = {};
-            var object = {};
-            if (options.defaults) {
-                object.pageageNum = 0;
-                object.pageageCount = 0;
-            }
-            if (message.pageageNum != null && message.hasOwnProperty("pageageNum"))
-                object.pageageNum = message.pageageNum;
-            if (message.pageageCount != null && message.hasOwnProperty("pageageCount"))
-                object.pageageCount = message.pageageCount;
-            return object;
-        };
-
-        /**
-         * Converts this FriendListReq to JSON.
-         * @function toJSON
-         * @memberof hallserver_friend.FriendListReq
-         * @instance
-         * @returns {Object.<string,*>} JSON object
-         */
-        FriendListReq.prototype.toJSON = function toJSON() {
-            return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
-        };
-
-        /**
-         * Gets the default type url for FriendListReq
-         * @function getTypeUrl
-         * @memberof hallserver_friend.FriendListReq
-         * @static
-         * @param {string} [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
-         * @returns {string} The default type url
-         */
-        FriendListReq.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
-            if (typeUrlPrefix === undefined) {
-                typeUrlPrefix = "type.googleapis.com";
-            }
-            return typeUrlPrefix + "/hallserver_friend.FriendListReq";
-        };
-
-        return FriendListReq;
-    })();
-
-    hallserver_friend.FriendListRes = (function() {
-
-        /**
-         * Properties of a FriendListRes.
-         * @memberof hallserver_friend
-         * @interface IFriendListRes
-         * @property {number|null} [pageageNum] FriendListRes pageageNum
-         * @property {number|null} [pageageCount] FriendListRes pageageCount
-         * @property {number|null} [totalCount] FriendListRes totalCount
-         * @property {Array.<hallserver_friend.IOneFriend>|null} [friendList] FriendListRes friendList
-         */
-
-        /**
-         * Constructs a new FriendListRes.
-         * @memberof hallserver_friend
-         * @classdesc Represents a FriendListRes.
-         * @implements IFriendListRes
-         * @constructor
-         * @param {hallserver_friend.IFriendListRes=} [properties] Properties to set
-         */
-        function FriendListRes(properties) {
+        function FriendListNotice(properties) {
             this.friendList = [];
             if (properties)
                 for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
@@ -10551,117 +10325,75 @@ $root.hallserver_friend = (function() {
         }
 
         /**
-         * FriendListRes pageageNum.
-         * @member {number} pageageNum
-         * @memberof hallserver_friend.FriendListRes
-         * @instance
-         */
-        FriendListRes.prototype.pageageNum = 0;
-
-        /**
-         * FriendListRes pageageCount.
-         * @member {number} pageageCount
-         * @memberof hallserver_friend.FriendListRes
-         * @instance
-         */
-        FriendListRes.prototype.pageageCount = 0;
-
-        /**
-         * FriendListRes totalCount.
-         * @member {number} totalCount
-         * @memberof hallserver_friend.FriendListRes
-         * @instance
-         */
-        FriendListRes.prototype.totalCount = 0;
-
-        /**
-         * FriendListRes friendList.
+         * FriendListNotice friendList.
          * @member {Array.<hallserver_friend.IOneFriend>} friendList
-         * @memberof hallserver_friend.FriendListRes
+         * @memberof hallserver_friend.FriendListNotice
          * @instance
          */
-        FriendListRes.prototype.friendList = $util.emptyArray;
+        FriendListNotice.prototype.friendList = $util.emptyArray;
 
         /**
-         * Creates a new FriendListRes instance using the specified properties.
+         * Creates a new FriendListNotice instance using the specified properties.
          * @function create
-         * @memberof hallserver_friend.FriendListRes
+         * @memberof hallserver_friend.FriendListNotice
          * @static
-         * @param {hallserver_friend.IFriendListRes=} [properties] Properties to set
-         * @returns {hallserver_friend.FriendListRes} FriendListRes instance
+         * @param {hallserver_friend.IFriendListNotice=} [properties] Properties to set
+         * @returns {hallserver_friend.FriendListNotice} FriendListNotice instance
          */
-        FriendListRes.create = function create(properties) {
-            return new FriendListRes(properties);
+        FriendListNotice.create = function create(properties) {
+            return new FriendListNotice(properties);
         };
 
         /**
-         * Encodes the specified FriendListRes message. Does not implicitly {@link hallserver_friend.FriendListRes.verify|verify} messages.
+         * Encodes the specified FriendListNotice message. Does not implicitly {@link hallserver_friend.FriendListNotice.verify|verify} messages.
          * @function encode
-         * @memberof hallserver_friend.FriendListRes
+         * @memberof hallserver_friend.FriendListNotice
          * @static
-         * @param {hallserver_friend.IFriendListRes} message FriendListRes message or plain object to encode
+         * @param {hallserver_friend.IFriendListNotice} message FriendListNotice message or plain object to encode
          * @param {$protobuf.Writer} [writer] Writer to encode to
          * @returns {$protobuf.Writer} Writer
          */
-        FriendListRes.encode = function encode(message, writer) {
+        FriendListNotice.encode = function encode(message, writer) {
             if (!writer)
                 writer = $Writer.create();
-            if (message.pageageNum != null && Object.hasOwnProperty.call(message, "pageageNum"))
-                writer.uint32(/* id 1, wireType 0 =*/8).uint32(message.pageageNum);
-            if (message.pageageCount != null && Object.hasOwnProperty.call(message, "pageageCount"))
-                writer.uint32(/* id 2, wireType 0 =*/16).uint32(message.pageageCount);
-            if (message.totalCount != null && Object.hasOwnProperty.call(message, "totalCount"))
-                writer.uint32(/* id 3, wireType 0 =*/24).uint32(message.totalCount);
             if (message.friendList != null && message.friendList.length)
                 for (var i = 0; i < message.friendList.length; ++i)
-                    $root.hallserver_friend.OneFriend.encode(message.friendList[i], writer.uint32(/* id 4, wireType 2 =*/34).fork()).ldelim();
+                    $root.hallserver_friend.OneFriend.encode(message.friendList[i], writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
             return writer;
         };
 
         /**
-         * Encodes the specified FriendListRes message, length delimited. Does not implicitly {@link hallserver_friend.FriendListRes.verify|verify} messages.
+         * Encodes the specified FriendListNotice message, length delimited. Does not implicitly {@link hallserver_friend.FriendListNotice.verify|verify} messages.
          * @function encodeDelimited
-         * @memberof hallserver_friend.FriendListRes
+         * @memberof hallserver_friend.FriendListNotice
          * @static
-         * @param {hallserver_friend.IFriendListRes} message FriendListRes message or plain object to encode
+         * @param {hallserver_friend.IFriendListNotice} message FriendListNotice message or plain object to encode
          * @param {$protobuf.Writer} [writer] Writer to encode to
          * @returns {$protobuf.Writer} Writer
          */
-        FriendListRes.encodeDelimited = function encodeDelimited(message, writer) {
+        FriendListNotice.encodeDelimited = function encodeDelimited(message, writer) {
             return this.encode(message, writer).ldelim();
         };
 
         /**
-         * Decodes a FriendListRes message from the specified reader or buffer.
+         * Decodes a FriendListNotice message from the specified reader or buffer.
          * @function decode
-         * @memberof hallserver_friend.FriendListRes
+         * @memberof hallserver_friend.FriendListNotice
          * @static
          * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
          * @param {number} [length] Message length if known beforehand
-         * @returns {hallserver_friend.FriendListRes} FriendListRes
+         * @returns {hallserver_friend.FriendListNotice} FriendListNotice
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        FriendListRes.decode = function decode(reader, length) {
+        FriendListNotice.decode = function decode(reader, length) {
             if (!(reader instanceof $Reader))
                 reader = $Reader.create(reader);
-            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.hallserver_friend.FriendListRes();
+            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.hallserver_friend.FriendListNotice();
             while (reader.pos < end) {
                 var tag = reader.uint32();
                 switch (tag >>> 3) {
                 case 1: {
-                        message.pageageNum = reader.uint32();
-                        break;
-                    }
-                case 2: {
-                        message.pageageCount = reader.uint32();
-                        break;
-                    }
-                case 3: {
-                        message.totalCount = reader.uint32();
-                        break;
-                    }
-                case 4: {
                         if (!(message.friendList && message.friendList.length))
                             message.friendList = [];
                         message.friendList.push($root.hallserver_friend.OneFriend.decode(reader, reader.uint32()));
@@ -10676,41 +10408,32 @@ $root.hallserver_friend = (function() {
         };
 
         /**
-         * Decodes a FriendListRes message from the specified reader or buffer, length delimited.
+         * Decodes a FriendListNotice message from the specified reader or buffer, length delimited.
          * @function decodeDelimited
-         * @memberof hallserver_friend.FriendListRes
+         * @memberof hallserver_friend.FriendListNotice
          * @static
          * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-         * @returns {hallserver_friend.FriendListRes} FriendListRes
+         * @returns {hallserver_friend.FriendListNotice} FriendListNotice
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        FriendListRes.decodeDelimited = function decodeDelimited(reader) {
+        FriendListNotice.decodeDelimited = function decodeDelimited(reader) {
             if (!(reader instanceof $Reader))
                 reader = new $Reader(reader);
             return this.decode(reader, reader.uint32());
         };
 
         /**
-         * Verifies a FriendListRes message.
+         * Verifies a FriendListNotice message.
          * @function verify
-         * @memberof hallserver_friend.FriendListRes
+         * @memberof hallserver_friend.FriendListNotice
          * @static
          * @param {Object.<string,*>} message Plain object to verify
          * @returns {string|null} `null` if valid, otherwise the reason why it is not
          */
-        FriendListRes.verify = function verify(message) {
+        FriendListNotice.verify = function verify(message) {
             if (typeof message !== "object" || message === null)
                 return "object expected";
-            if (message.pageageNum != null && message.hasOwnProperty("pageageNum"))
-                if (!$util.isInteger(message.pageageNum))
-                    return "pageageNum: integer expected";
-            if (message.pageageCount != null && message.hasOwnProperty("pageageCount"))
-                if (!$util.isInteger(message.pageageCount))
-                    return "pageageCount: integer expected";
-            if (message.totalCount != null && message.hasOwnProperty("totalCount"))
-                if (!$util.isInteger(message.totalCount))
-                    return "totalCount: integer expected";
             if (message.friendList != null && message.hasOwnProperty("friendList")) {
                 if (!Array.isArray(message.friendList))
                     return "friendList: array expected";
@@ -10724,30 +10447,24 @@ $root.hallserver_friend = (function() {
         };
 
         /**
-         * Creates a FriendListRes message from a plain object. Also converts values to their respective internal types.
+         * Creates a FriendListNotice message from a plain object. Also converts values to their respective internal types.
          * @function fromObject
-         * @memberof hallserver_friend.FriendListRes
+         * @memberof hallserver_friend.FriendListNotice
          * @static
          * @param {Object.<string,*>} object Plain object
-         * @returns {hallserver_friend.FriendListRes} FriendListRes
+         * @returns {hallserver_friend.FriendListNotice} FriendListNotice
          */
-        FriendListRes.fromObject = function fromObject(object) {
-            if (object instanceof $root.hallserver_friend.FriendListRes)
+        FriendListNotice.fromObject = function fromObject(object) {
+            if (object instanceof $root.hallserver_friend.FriendListNotice)
                 return object;
-            var message = new $root.hallserver_friend.FriendListRes();
-            if (object.pageageNum != null)
-                message.pageageNum = object.pageageNum >>> 0;
-            if (object.pageageCount != null)
-                message.pageageCount = object.pageageCount >>> 0;
-            if (object.totalCount != null)
-                message.totalCount = object.totalCount >>> 0;
+            var message = new $root.hallserver_friend.FriendListNotice();
             if (object.friendList) {
                 if (!Array.isArray(object.friendList))
-                    throw TypeError(".hallserver_friend.FriendListRes.friendList: array expected");
+                    throw TypeError(".hallserver_friend.FriendListNotice.friendList: array expected");
                 message.friendList = [];
                 for (var i = 0; i < object.friendList.length; ++i) {
                     if (typeof object.friendList[i] !== "object")
-                        throw TypeError(".hallserver_friend.FriendListRes.friendList: object expected");
+                        throw TypeError(".hallserver_friend.FriendListNotice.friendList: object expected");
                     message.friendList[i] = $root.hallserver_friend.OneFriend.fromObject(object.friendList[i]);
                 }
             }
@@ -10755,31 +10472,20 @@ $root.hallserver_friend = (function() {
         };
 
         /**
-         * Creates a plain object from a FriendListRes message. Also converts values to other types if specified.
+         * Creates a plain object from a FriendListNotice message. Also converts values to other types if specified.
          * @function toObject
-         * @memberof hallserver_friend.FriendListRes
+         * @memberof hallserver_friend.FriendListNotice
          * @static
-         * @param {hallserver_friend.FriendListRes} message FriendListRes
+         * @param {hallserver_friend.FriendListNotice} message FriendListNotice
          * @param {$protobuf.IConversionOptions} [options] Conversion options
          * @returns {Object.<string,*>} Plain object
          */
-        FriendListRes.toObject = function toObject(message, options) {
+        FriendListNotice.toObject = function toObject(message, options) {
             if (!options)
                 options = {};
             var object = {};
             if (options.arrays || options.defaults)
                 object.friendList = [];
-            if (options.defaults) {
-                object.pageageNum = 0;
-                object.pageageCount = 0;
-                object.totalCount = 0;
-            }
-            if (message.pageageNum != null && message.hasOwnProperty("pageageNum"))
-                object.pageageNum = message.pageageNum;
-            if (message.pageageCount != null && message.hasOwnProperty("pageageCount"))
-                object.pageageCount = message.pageageCount;
-            if (message.totalCount != null && message.hasOwnProperty("totalCount"))
-                object.totalCount = message.totalCount;
             if (message.friendList && message.friendList.length) {
                 object.friendList = [];
                 for (var j = 0; j < message.friendList.length; ++j)
@@ -10789,32 +10495,32 @@ $root.hallserver_friend = (function() {
         };
 
         /**
-         * Converts this FriendListRes to JSON.
+         * Converts this FriendListNotice to JSON.
          * @function toJSON
-         * @memberof hallserver_friend.FriendListRes
+         * @memberof hallserver_friend.FriendListNotice
          * @instance
          * @returns {Object.<string,*>} JSON object
          */
-        FriendListRes.prototype.toJSON = function toJSON() {
+        FriendListNotice.prototype.toJSON = function toJSON() {
             return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
         };
 
         /**
-         * Gets the default type url for FriendListRes
+         * Gets the default type url for FriendListNotice
          * @function getTypeUrl
-         * @memberof hallserver_friend.FriendListRes
+         * @memberof hallserver_friend.FriendListNotice
          * @static
          * @param {string} [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
          * @returns {string} The default type url
          */
-        FriendListRes.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
+        FriendListNotice.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
             if (typeUrlPrefix === undefined) {
                 typeUrlPrefix = "type.googleapis.com";
             }
-            return typeUrlPrefix + "/hallserver_friend.FriendListRes";
+            return typeUrlPrefix + "/hallserver_friend.FriendListNotice";
         };
 
-        return FriendListRes;
+        return FriendListNotice;
     })();
 
     hallserver_friend.AddFriendReq = (function() {
@@ -12825,6 +12531,672 @@ $root.hallserver_friend = (function() {
         };
 
         return DelFriendRes;
+    })();
+
+    hallserver_friend.AddReqNotice = (function() {
+
+        /**
+         * Properties of an AddReqNotice.
+         * @memberof hallserver_friend
+         * @interface IAddReqNotice
+         * @property {number|Long|null} [playerId] AddReqNotice playerId
+         * @property {string|null} [nickname] AddReqNotice nickname
+         */
+
+        /**
+         * Constructs a new AddReqNotice.
+         * @memberof hallserver_friend
+         * @classdesc Represents an AddReqNotice.
+         * @implements IAddReqNotice
+         * @constructor
+         * @param {hallserver_friend.IAddReqNotice=} [properties] Properties to set
+         */
+        function AddReqNotice(properties) {
+            if (properties)
+                for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                    if (properties[keys[i]] != null)
+                        this[keys[i]] = properties[keys[i]];
+        }
+
+        /**
+         * AddReqNotice playerId.
+         * @member {number|Long} playerId
+         * @memberof hallserver_friend.AddReqNotice
+         * @instance
+         */
+        AddReqNotice.prototype.playerId = $util.Long ? $util.Long.fromBits(0,0,false) : 0;
+
+        /**
+         * AddReqNotice nickname.
+         * @member {string} nickname
+         * @memberof hallserver_friend.AddReqNotice
+         * @instance
+         */
+        AddReqNotice.prototype.nickname = "";
+
+        /**
+         * Creates a new AddReqNotice instance using the specified properties.
+         * @function create
+         * @memberof hallserver_friend.AddReqNotice
+         * @static
+         * @param {hallserver_friend.IAddReqNotice=} [properties] Properties to set
+         * @returns {hallserver_friend.AddReqNotice} AddReqNotice instance
+         */
+        AddReqNotice.create = function create(properties) {
+            return new AddReqNotice(properties);
+        };
+
+        /**
+         * Encodes the specified AddReqNotice message. Does not implicitly {@link hallserver_friend.AddReqNotice.verify|verify} messages.
+         * @function encode
+         * @memberof hallserver_friend.AddReqNotice
+         * @static
+         * @param {hallserver_friend.IAddReqNotice} message AddReqNotice message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        AddReqNotice.encode = function encode(message, writer) {
+            if (!writer)
+                writer = $Writer.create();
+            if (message.playerId != null && Object.hasOwnProperty.call(message, "playerId"))
+                writer.uint32(/* id 1, wireType 0 =*/8).int64(message.playerId);
+            if (message.nickname != null && Object.hasOwnProperty.call(message, "nickname"))
+                writer.uint32(/* id 2, wireType 2 =*/18).string(message.nickname);
+            return writer;
+        };
+
+        /**
+         * Encodes the specified AddReqNotice message, length delimited. Does not implicitly {@link hallserver_friend.AddReqNotice.verify|verify} messages.
+         * @function encodeDelimited
+         * @memberof hallserver_friend.AddReqNotice
+         * @static
+         * @param {hallserver_friend.IAddReqNotice} message AddReqNotice message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        AddReqNotice.encodeDelimited = function encodeDelimited(message, writer) {
+            return this.encode(message, writer).ldelim();
+        };
+
+        /**
+         * Decodes an AddReqNotice message from the specified reader or buffer.
+         * @function decode
+         * @memberof hallserver_friend.AddReqNotice
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @param {number} [length] Message length if known beforehand
+         * @returns {hallserver_friend.AddReqNotice} AddReqNotice
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        AddReqNotice.decode = function decode(reader, length) {
+            if (!(reader instanceof $Reader))
+                reader = $Reader.create(reader);
+            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.hallserver_friend.AddReqNotice();
+            while (reader.pos < end) {
+                var tag = reader.uint32();
+                switch (tag >>> 3) {
+                case 1: {
+                        message.playerId = reader.int64();
+                        break;
+                    }
+                case 2: {
+                        message.nickname = reader.string();
+                        break;
+                    }
+                default:
+                    reader.skipType(tag & 7);
+                    break;
+                }
+            }
+            return message;
+        };
+
+        /**
+         * Decodes an AddReqNotice message from the specified reader or buffer, length delimited.
+         * @function decodeDelimited
+         * @memberof hallserver_friend.AddReqNotice
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @returns {hallserver_friend.AddReqNotice} AddReqNotice
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        AddReqNotice.decodeDelimited = function decodeDelimited(reader) {
+            if (!(reader instanceof $Reader))
+                reader = new $Reader(reader);
+            return this.decode(reader, reader.uint32());
+        };
+
+        /**
+         * Verifies an AddReqNotice message.
+         * @function verify
+         * @memberof hallserver_friend.AddReqNotice
+         * @static
+         * @param {Object.<string,*>} message Plain object to verify
+         * @returns {string|null} `null` if valid, otherwise the reason why it is not
+         */
+        AddReqNotice.verify = function verify(message) {
+            if (typeof message !== "object" || message === null)
+                return "object expected";
+            if (message.playerId != null && message.hasOwnProperty("playerId"))
+                if (!$util.isInteger(message.playerId) && !(message.playerId && $util.isInteger(message.playerId.low) && $util.isInteger(message.playerId.high)))
+                    return "playerId: integer|Long expected";
+            if (message.nickname != null && message.hasOwnProperty("nickname"))
+                if (!$util.isString(message.nickname))
+                    return "nickname: string expected";
+            return null;
+        };
+
+        /**
+         * Creates an AddReqNotice message from a plain object. Also converts values to their respective internal types.
+         * @function fromObject
+         * @memberof hallserver_friend.AddReqNotice
+         * @static
+         * @param {Object.<string,*>} object Plain object
+         * @returns {hallserver_friend.AddReqNotice} AddReqNotice
+         */
+        AddReqNotice.fromObject = function fromObject(object) {
+            if (object instanceof $root.hallserver_friend.AddReqNotice)
+                return object;
+            var message = new $root.hallserver_friend.AddReqNotice();
+            if (object.playerId != null)
+                if ($util.Long)
+                    (message.playerId = $util.Long.fromValue(object.playerId)).unsigned = false;
+                else if (typeof object.playerId === "string")
+                    message.playerId = parseInt(object.playerId, 10);
+                else if (typeof object.playerId === "number")
+                    message.playerId = object.playerId;
+                else if (typeof object.playerId === "object")
+                    message.playerId = new $util.LongBits(object.playerId.low >>> 0, object.playerId.high >>> 0).toNumber();
+            if (object.nickname != null)
+                message.nickname = String(object.nickname);
+            return message;
+        };
+
+        /**
+         * Creates a plain object from an AddReqNotice message. Also converts values to other types if specified.
+         * @function toObject
+         * @memberof hallserver_friend.AddReqNotice
+         * @static
+         * @param {hallserver_friend.AddReqNotice} message AddReqNotice
+         * @param {$protobuf.IConversionOptions} [options] Conversion options
+         * @returns {Object.<string,*>} Plain object
+         */
+        AddReqNotice.toObject = function toObject(message, options) {
+            if (!options)
+                options = {};
+            var object = {};
+            if (options.defaults) {
+                if ($util.Long) {
+                    var long = new $util.Long(0, 0, false);
+                    object.playerId = options.longs === String ? long.toString() : options.longs === Number ? long.toNumber() : long;
+                } else
+                    object.playerId = options.longs === String ? "0" : 0;
+                object.nickname = "";
+            }
+            if (message.playerId != null && message.hasOwnProperty("playerId"))
+                if (typeof message.playerId === "number")
+                    object.playerId = options.longs === String ? String(message.playerId) : message.playerId;
+                else
+                    object.playerId = options.longs === String ? $util.Long.prototype.toString.call(message.playerId) : options.longs === Number ? new $util.LongBits(message.playerId.low >>> 0, message.playerId.high >>> 0).toNumber() : message.playerId;
+            if (message.nickname != null && message.hasOwnProperty("nickname"))
+                object.nickname = message.nickname;
+            return object;
+        };
+
+        /**
+         * Converts this AddReqNotice to JSON.
+         * @function toJSON
+         * @memberof hallserver_friend.AddReqNotice
+         * @instance
+         * @returns {Object.<string,*>} JSON object
+         */
+        AddReqNotice.prototype.toJSON = function toJSON() {
+            return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
+        };
+
+        /**
+         * Gets the default type url for AddReqNotice
+         * @function getTypeUrl
+         * @memberof hallserver_friend.AddReqNotice
+         * @static
+         * @param {string} [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+         * @returns {string} The default type url
+         */
+        AddReqNotice.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
+            if (typeUrlPrefix === undefined) {
+                typeUrlPrefix = "type.googleapis.com";
+            }
+            return typeUrlPrefix + "/hallserver_friend.AddReqNotice";
+        };
+
+        return AddReqNotice;
+    })();
+
+    hallserver_friend.AddFriendNotice = (function() {
+
+        /**
+         * Properties of an AddFriendNotice.
+         * @memberof hallserver_friend
+         * @interface IAddFriendNotice
+         * @property {hallserver_friend.IOneFriend|null} [friendInfo] AddFriendNotice friendInfo
+         */
+
+        /**
+         * Constructs a new AddFriendNotice.
+         * @memberof hallserver_friend
+         * @classdesc Represents an AddFriendNotice.
+         * @implements IAddFriendNotice
+         * @constructor
+         * @param {hallserver_friend.IAddFriendNotice=} [properties] Properties to set
+         */
+        function AddFriendNotice(properties) {
+            if (properties)
+                for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                    if (properties[keys[i]] != null)
+                        this[keys[i]] = properties[keys[i]];
+        }
+
+        /**
+         * AddFriendNotice friendInfo.
+         * @member {hallserver_friend.IOneFriend|null|undefined} friendInfo
+         * @memberof hallserver_friend.AddFriendNotice
+         * @instance
+         */
+        AddFriendNotice.prototype.friendInfo = null;
+
+        /**
+         * Creates a new AddFriendNotice instance using the specified properties.
+         * @function create
+         * @memberof hallserver_friend.AddFriendNotice
+         * @static
+         * @param {hallserver_friend.IAddFriendNotice=} [properties] Properties to set
+         * @returns {hallserver_friend.AddFriendNotice} AddFriendNotice instance
+         */
+        AddFriendNotice.create = function create(properties) {
+            return new AddFriendNotice(properties);
+        };
+
+        /**
+         * Encodes the specified AddFriendNotice message. Does not implicitly {@link hallserver_friend.AddFriendNotice.verify|verify} messages.
+         * @function encode
+         * @memberof hallserver_friend.AddFriendNotice
+         * @static
+         * @param {hallserver_friend.IAddFriendNotice} message AddFriendNotice message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        AddFriendNotice.encode = function encode(message, writer) {
+            if (!writer)
+                writer = $Writer.create();
+            if (message.friendInfo != null && Object.hasOwnProperty.call(message, "friendInfo"))
+                $root.hallserver_friend.OneFriend.encode(message.friendInfo, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
+            return writer;
+        };
+
+        /**
+         * Encodes the specified AddFriendNotice message, length delimited. Does not implicitly {@link hallserver_friend.AddFriendNotice.verify|verify} messages.
+         * @function encodeDelimited
+         * @memberof hallserver_friend.AddFriendNotice
+         * @static
+         * @param {hallserver_friend.IAddFriendNotice} message AddFriendNotice message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        AddFriendNotice.encodeDelimited = function encodeDelimited(message, writer) {
+            return this.encode(message, writer).ldelim();
+        };
+
+        /**
+         * Decodes an AddFriendNotice message from the specified reader or buffer.
+         * @function decode
+         * @memberof hallserver_friend.AddFriendNotice
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @param {number} [length] Message length if known beforehand
+         * @returns {hallserver_friend.AddFriendNotice} AddFriendNotice
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        AddFriendNotice.decode = function decode(reader, length) {
+            if (!(reader instanceof $Reader))
+                reader = $Reader.create(reader);
+            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.hallserver_friend.AddFriendNotice();
+            while (reader.pos < end) {
+                var tag = reader.uint32();
+                switch (tag >>> 3) {
+                case 1: {
+                        message.friendInfo = $root.hallserver_friend.OneFriend.decode(reader, reader.uint32());
+                        break;
+                    }
+                default:
+                    reader.skipType(tag & 7);
+                    break;
+                }
+            }
+            return message;
+        };
+
+        /**
+         * Decodes an AddFriendNotice message from the specified reader or buffer, length delimited.
+         * @function decodeDelimited
+         * @memberof hallserver_friend.AddFriendNotice
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @returns {hallserver_friend.AddFriendNotice} AddFriendNotice
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        AddFriendNotice.decodeDelimited = function decodeDelimited(reader) {
+            if (!(reader instanceof $Reader))
+                reader = new $Reader(reader);
+            return this.decode(reader, reader.uint32());
+        };
+
+        /**
+         * Verifies an AddFriendNotice message.
+         * @function verify
+         * @memberof hallserver_friend.AddFriendNotice
+         * @static
+         * @param {Object.<string,*>} message Plain object to verify
+         * @returns {string|null} `null` if valid, otherwise the reason why it is not
+         */
+        AddFriendNotice.verify = function verify(message) {
+            if (typeof message !== "object" || message === null)
+                return "object expected";
+            if (message.friendInfo != null && message.hasOwnProperty("friendInfo")) {
+                var error = $root.hallserver_friend.OneFriend.verify(message.friendInfo);
+                if (error)
+                    return "friendInfo." + error;
+            }
+            return null;
+        };
+
+        /**
+         * Creates an AddFriendNotice message from a plain object. Also converts values to their respective internal types.
+         * @function fromObject
+         * @memberof hallserver_friend.AddFriendNotice
+         * @static
+         * @param {Object.<string,*>} object Plain object
+         * @returns {hallserver_friend.AddFriendNotice} AddFriendNotice
+         */
+        AddFriendNotice.fromObject = function fromObject(object) {
+            if (object instanceof $root.hallserver_friend.AddFriendNotice)
+                return object;
+            var message = new $root.hallserver_friend.AddFriendNotice();
+            if (object.friendInfo != null) {
+                if (typeof object.friendInfo !== "object")
+                    throw TypeError(".hallserver_friend.AddFriendNotice.friendInfo: object expected");
+                message.friendInfo = $root.hallserver_friend.OneFriend.fromObject(object.friendInfo);
+            }
+            return message;
+        };
+
+        /**
+         * Creates a plain object from an AddFriendNotice message. Also converts values to other types if specified.
+         * @function toObject
+         * @memberof hallserver_friend.AddFriendNotice
+         * @static
+         * @param {hallserver_friend.AddFriendNotice} message AddFriendNotice
+         * @param {$protobuf.IConversionOptions} [options] Conversion options
+         * @returns {Object.<string,*>} Plain object
+         */
+        AddFriendNotice.toObject = function toObject(message, options) {
+            if (!options)
+                options = {};
+            var object = {};
+            if (options.defaults)
+                object.friendInfo = null;
+            if (message.friendInfo != null && message.hasOwnProperty("friendInfo"))
+                object.friendInfo = $root.hallserver_friend.OneFriend.toObject(message.friendInfo, options);
+            return object;
+        };
+
+        /**
+         * Converts this AddFriendNotice to JSON.
+         * @function toJSON
+         * @memberof hallserver_friend.AddFriendNotice
+         * @instance
+         * @returns {Object.<string,*>} JSON object
+         */
+        AddFriendNotice.prototype.toJSON = function toJSON() {
+            return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
+        };
+
+        /**
+         * Gets the default type url for AddFriendNotice
+         * @function getTypeUrl
+         * @memberof hallserver_friend.AddFriendNotice
+         * @static
+         * @param {string} [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+         * @returns {string} The default type url
+         */
+        AddFriendNotice.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
+            if (typeUrlPrefix === undefined) {
+                typeUrlPrefix = "type.googleapis.com";
+            }
+            return typeUrlPrefix + "/hallserver_friend.AddFriendNotice";
+        };
+
+        return AddFriendNotice;
+    })();
+
+    hallserver_friend.DelFriendNotice = (function() {
+
+        /**
+         * Properties of a DelFriendNotice.
+         * @memberof hallserver_friend
+         * @interface IDelFriendNotice
+         * @property {number|Long|null} [playerId] DelFriendNotice playerId
+         */
+
+        /**
+         * Constructs a new DelFriendNotice.
+         * @memberof hallserver_friend
+         * @classdesc Represents a DelFriendNotice.
+         * @implements IDelFriendNotice
+         * @constructor
+         * @param {hallserver_friend.IDelFriendNotice=} [properties] Properties to set
+         */
+        function DelFriendNotice(properties) {
+            if (properties)
+                for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                    if (properties[keys[i]] != null)
+                        this[keys[i]] = properties[keys[i]];
+        }
+
+        /**
+         * DelFriendNotice playerId.
+         * @member {number|Long} playerId
+         * @memberof hallserver_friend.DelFriendNotice
+         * @instance
+         */
+        DelFriendNotice.prototype.playerId = $util.Long ? $util.Long.fromBits(0,0,false) : 0;
+
+        /**
+         * Creates a new DelFriendNotice instance using the specified properties.
+         * @function create
+         * @memberof hallserver_friend.DelFriendNotice
+         * @static
+         * @param {hallserver_friend.IDelFriendNotice=} [properties] Properties to set
+         * @returns {hallserver_friend.DelFriendNotice} DelFriendNotice instance
+         */
+        DelFriendNotice.create = function create(properties) {
+            return new DelFriendNotice(properties);
+        };
+
+        /**
+         * Encodes the specified DelFriendNotice message. Does not implicitly {@link hallserver_friend.DelFriendNotice.verify|verify} messages.
+         * @function encode
+         * @memberof hallserver_friend.DelFriendNotice
+         * @static
+         * @param {hallserver_friend.IDelFriendNotice} message DelFriendNotice message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        DelFriendNotice.encode = function encode(message, writer) {
+            if (!writer)
+                writer = $Writer.create();
+            if (message.playerId != null && Object.hasOwnProperty.call(message, "playerId"))
+                writer.uint32(/* id 1, wireType 0 =*/8).int64(message.playerId);
+            return writer;
+        };
+
+        /**
+         * Encodes the specified DelFriendNotice message, length delimited. Does not implicitly {@link hallserver_friend.DelFriendNotice.verify|verify} messages.
+         * @function encodeDelimited
+         * @memberof hallserver_friend.DelFriendNotice
+         * @static
+         * @param {hallserver_friend.IDelFriendNotice} message DelFriendNotice message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        DelFriendNotice.encodeDelimited = function encodeDelimited(message, writer) {
+            return this.encode(message, writer).ldelim();
+        };
+
+        /**
+         * Decodes a DelFriendNotice message from the specified reader or buffer.
+         * @function decode
+         * @memberof hallserver_friend.DelFriendNotice
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @param {number} [length] Message length if known beforehand
+         * @returns {hallserver_friend.DelFriendNotice} DelFriendNotice
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        DelFriendNotice.decode = function decode(reader, length) {
+            if (!(reader instanceof $Reader))
+                reader = $Reader.create(reader);
+            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.hallserver_friend.DelFriendNotice();
+            while (reader.pos < end) {
+                var tag = reader.uint32();
+                switch (tag >>> 3) {
+                case 1: {
+                        message.playerId = reader.int64();
+                        break;
+                    }
+                default:
+                    reader.skipType(tag & 7);
+                    break;
+                }
+            }
+            return message;
+        };
+
+        /**
+         * Decodes a DelFriendNotice message from the specified reader or buffer, length delimited.
+         * @function decodeDelimited
+         * @memberof hallserver_friend.DelFriendNotice
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @returns {hallserver_friend.DelFriendNotice} DelFriendNotice
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        DelFriendNotice.decodeDelimited = function decodeDelimited(reader) {
+            if (!(reader instanceof $Reader))
+                reader = new $Reader(reader);
+            return this.decode(reader, reader.uint32());
+        };
+
+        /**
+         * Verifies a DelFriendNotice message.
+         * @function verify
+         * @memberof hallserver_friend.DelFriendNotice
+         * @static
+         * @param {Object.<string,*>} message Plain object to verify
+         * @returns {string|null} `null` if valid, otherwise the reason why it is not
+         */
+        DelFriendNotice.verify = function verify(message) {
+            if (typeof message !== "object" || message === null)
+                return "object expected";
+            if (message.playerId != null && message.hasOwnProperty("playerId"))
+                if (!$util.isInteger(message.playerId) && !(message.playerId && $util.isInteger(message.playerId.low) && $util.isInteger(message.playerId.high)))
+                    return "playerId: integer|Long expected";
+            return null;
+        };
+
+        /**
+         * Creates a DelFriendNotice message from a plain object. Also converts values to their respective internal types.
+         * @function fromObject
+         * @memberof hallserver_friend.DelFriendNotice
+         * @static
+         * @param {Object.<string,*>} object Plain object
+         * @returns {hallserver_friend.DelFriendNotice} DelFriendNotice
+         */
+        DelFriendNotice.fromObject = function fromObject(object) {
+            if (object instanceof $root.hallserver_friend.DelFriendNotice)
+                return object;
+            var message = new $root.hallserver_friend.DelFriendNotice();
+            if (object.playerId != null)
+                if ($util.Long)
+                    (message.playerId = $util.Long.fromValue(object.playerId)).unsigned = false;
+                else if (typeof object.playerId === "string")
+                    message.playerId = parseInt(object.playerId, 10);
+                else if (typeof object.playerId === "number")
+                    message.playerId = object.playerId;
+                else if (typeof object.playerId === "object")
+                    message.playerId = new $util.LongBits(object.playerId.low >>> 0, object.playerId.high >>> 0).toNumber();
+            return message;
+        };
+
+        /**
+         * Creates a plain object from a DelFriendNotice message. Also converts values to other types if specified.
+         * @function toObject
+         * @memberof hallserver_friend.DelFriendNotice
+         * @static
+         * @param {hallserver_friend.DelFriendNotice} message DelFriendNotice
+         * @param {$protobuf.IConversionOptions} [options] Conversion options
+         * @returns {Object.<string,*>} Plain object
+         */
+        DelFriendNotice.toObject = function toObject(message, options) {
+            if (!options)
+                options = {};
+            var object = {};
+            if (options.defaults)
+                if ($util.Long) {
+                    var long = new $util.Long(0, 0, false);
+                    object.playerId = options.longs === String ? long.toString() : options.longs === Number ? long.toNumber() : long;
+                } else
+                    object.playerId = options.longs === String ? "0" : 0;
+            if (message.playerId != null && message.hasOwnProperty("playerId"))
+                if (typeof message.playerId === "number")
+                    object.playerId = options.longs === String ? String(message.playerId) : message.playerId;
+                else
+                    object.playerId = options.longs === String ? $util.Long.prototype.toString.call(message.playerId) : options.longs === Number ? new $util.LongBits(message.playerId.low >>> 0, message.playerId.high >>> 0).toNumber() : message.playerId;
+            return object;
+        };
+
+        /**
+         * Converts this DelFriendNotice to JSON.
+         * @function toJSON
+         * @memberof hallserver_friend.DelFriendNotice
+         * @instance
+         * @returns {Object.<string,*>} JSON object
+         */
+        DelFriendNotice.prototype.toJSON = function toJSON() {
+            return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
+        };
+
+        /**
+         * Gets the default type url for DelFriendNotice
+         * @function getTypeUrl
+         * @memberof hallserver_friend.DelFriendNotice
+         * @static
+         * @param {string} [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+         * @returns {string} The default type url
+         */
+        DelFriendNotice.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
+            if (typeUrlPrefix === undefined) {
+                typeUrlPrefix = "type.googleapis.com";
+            }
+            return typeUrlPrefix + "/hallserver_friend.DelFriendNotice";
+        };
+
+        return DelFriendNotice;
     })();
 
     return hallserver_friend;

@@ -35,6 +35,20 @@ function M.init()
     return g_ormobj
 end
 
+function handle.get_player_info(player_id, field_map)
+    local entry = g_ormobj:get_one_entry(player_id)
+    if entry then
+        local entry_data = entry:get_entry_data()
+
+        local info = {}
+        for field in pairs(field_map) do
+            assert(entry_data[field], "get_player_info field not exists :" .. field)
+            info[field] = entry_data[field]
+        end
+        return info
+    end
+end
+
 function handle.get_players_info(player_list, field_map)
     local ret_map = {}
     for i = 1, #player_list do

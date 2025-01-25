@@ -13,29 +13,30 @@ function M:new(interface_mgr)
 	return t
 end
 
---好友列表
-function M:friend_list_res(player_id, res)
-    self.interface_mgr:send_msg(player_id, PACK.hallserver_friend.FriendListRes, res)
+--通知好友列表
+function M:friend_list_notice(player_id, res)
+	self.interface_mgr:rpc_push_msg(player_id, PACK.hallserver_friend.FriendListNotice, res)
 end
 
---请求加好友
-function M:add_friend_res(player_id, res)
-	self.interface_mgr:send_msg(player_id, PACK.hallserver_friend.AddFriendRes, res)
+--通知好友请求列表
+function M:add_req_list_notice(player_id, res)
+	self.interface_mgr:rpc_push_msg(player_id, PACK.hallserver_friend.AddReqListNotice, res)
 end
 
---同意加好友
-function M:agree_friend_res(player_id, res)
-	self.interface_mgr:send_msg(player_id, PACK.hallserver_friend.AgreeAddFriendRes, res)
+--通知添加好友请求
+function M:add_req_notice(player_id, res)
+	if not self.interface_mgr:is_online(player_id) then return end
+	self.interface_mgr:rpc_push_msg(player_id, PACK.hallserver_friend.AddReqNotice, res)
 end
 
---拒绝加好友
-function M:refuse_friend_res(player_id, res)
-	self.interface_mgr:send_msg(player_id, PACK.hallserver_friend.RefuseAddFriendRes, res)
+--通知添加好友
+function M:add_friend_notice(player_id, res)
+	self.interface_mgr:rpc_push_msg(player_id, PACK.hallserver_friend.AddFriendNotice, res)
 end
 
---删除好友
-function M:del_friend_res(player_id, res)
-	self.interface_mgr:send_msg(player_id, PACK.hallserver_friend.DelFriendReq, res)
+--通知删除好友
+function M:del_friend_notice(player_id, res)
+	self.interface_mgr:rpc_push_msg(player_id, PACK.hallserver_friend.DelFriendNotice, res)
 end
 
 return M

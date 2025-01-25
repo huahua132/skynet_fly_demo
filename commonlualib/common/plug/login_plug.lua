@@ -42,6 +42,8 @@ M.jump_inval_time = 5
 --rpc打包工具
 M.rpc_pack = require "skynet-fly.utils.net.rpc_server"
 
+local g_online_map = {}
+
 function M.init(interface_mgr)
 	rsp_msg = rsp_msg:new(interface_mgr)
 	errors_msg = errors_msg:new(interface_mgr)
@@ -85,11 +87,13 @@ end
 --登录成功
 function M.login_succ(player_id, login_res, packid, rsp_session)
 	--log.info("login_succ:",player_id, login_res)
+	g_online_map[player_id] = true
 	rsp_msg:rsp_msg(player_id, packid, login_res, rsp_session)
 end
 
 --登出回调
 function M.login_out(player_id)
+	g_online_map[player_id] = nil
 	--log.info("login_out ",player_id)
 end
 
@@ -108,5 +112,32 @@ end
 function M.repeat_login(player_id, packid, rsp_session)
 	errors_msg:errors(player_id, errorcode.REPAET_LOGIN, "repeat_login", packid, rsp_session)
 end
+
+local CMD = {}
+
+--查询玩家是否在线
+function CMD.is_onlines(player_list)
+	local ret_map = {}
+	for i = 1,#player_list do
+		local player_id = player_list[i]
+		if g_online_map[player_id] then
+			ret_map[player_id] = true
+		end
+	end
+
+	return ret_map
+end
+
+--查询单个玩家是否在线
+function CMD.is_online(player_id)
+	return g_online_map[player_id]
+end
+
+--获取在线表
+function CMD.get_online_map()
+	return g_online_map
+end
+
+M.register_cmd = CMD
 
 return M

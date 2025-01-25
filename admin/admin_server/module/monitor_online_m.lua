@@ -15,6 +15,7 @@ local regiter = require "common.redis.count.regiter"
 local tti = require "skynet-fly.cache.tti"
 local file_util = require "skynet-fly.utils.file_util"
 local skynet_util = require "skynet-fly.utils.skynet_util"
+local player_rpc = require "common.rpc.hallserver.player"
 
 local g_file_cache = tti:new(time_util.DAY, function(key, file)
     file:flush()
@@ -106,8 +107,7 @@ EXCUTE_LOOP['online'] = function(svr_name, tag)
     end
 
     local cur_date = os.date("%H:%M:%S", time_util.time())
-    local player_cli = frpc_client:instance(svr_name, "room_game_hall_m")
-    local ret = player_cli:all_broadcast_call("get_all_online")
+    local ret = player_rpc.get_all_online()
     if not ret then return end
     
     local info = {
@@ -117,25 +117,23 @@ EXCUTE_LOOP['online'] = function(svr_name, tag)
     for _,v in ipairs(ret) do
         local cluster_name = v.cluster_name
         local svr_id = string_util.split(cluster_name, ':')[2]
-        local result = v.result
-        for server_id, retlist in pairs(result) do
-            local player_list = retlist[1]
-            info.total = info.total + #player_list
+        local online_map = v.result[1]
+        local count = 0
+        for player_id in pairs(online_map) do
+            count = count + 1
+            local channel = player_util.get_channel_id_by_player_id(player_id)
 
-            if not info['server-' .. svr_id] then
-                info['server-' .. svr_id] = 0
+            if not info['channel-' .. channel] then
+                info['channel-' .. channel] = 0
             end
-            info['server-' .. svr_id] = info['server-' .. svr_id] + #player_list
-
-            for _, player_id in ipairs(player_list) do
-                local channel = player_util.get_channel_id_by_player_id(player_id)
-
-                if not info['channel-' .. channel] then
-                    info['channel-' .. channel] = 0
-                end
-                info['channel-' .. channel] = info['channel-' .. channel] + 1
-            end
+            info['channel-' .. channel] = info['channel-' .. channel] + 1
         end
+
+        info.total = info.total + count
+        if not info['server-' .. svr_id] then
+            info['server-' .. svr_id] = 0
+        end
+        info['server-' .. svr_id] = info['server-' .. svr_id] + count
     end
 
     --log.info("monitor:", info)

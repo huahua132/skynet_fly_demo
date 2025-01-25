@@ -6,18 +6,22 @@ enum main {
 }
 //协议子码 req res 占用1-80  通知占用80-100
 enum sub {
-    FriendListReq      = 1;       //请求好友列表
-    FriendListRes      = 2;       //回复好友列表
-    AddFriendReq       = 3;       //请求添加好友
-    AddFriendRes       = 4;       //回复添加好友
-    AgreeAddFriendReq  = 5;       //同意添加好友请求
-    AgreeAddFriendRes  = 6;       //同意添加好友回复
-    RefuseAddFriendReq = 7;       //拒绝添加好友请求
-    RefuseAddFriendRes = 8;       //拒绝添加好友回复
-    DelFriendReq       = 9;       //删除好友请求
-    DelFriendRes       = 10;      //删除好友回复
+    AddFriendReq           = 1;       //请求添加好友
+    AddFriendRes           = 2;       //回复添加好友
+    AgreeAddFriendReq      = 3;       //同意添加好友请求
+    AgreeAddFriendRes      = 4;       //同意添加好友回复
+    RefuseAddFriendReq     = 5;       //拒绝添加好友请求
+    RefuseAddFriendRes     = 6;       //拒绝添加好友回复
+    DelFriendReq           = 7;       //删除好友请求
+    DelFriendRes           = 8;       //删除好友回复
+    FriendSugReq           = 9;       //请求好友推荐
+    FriendSugRes           = 10;      //回复好友推荐
 
-    AddReqListNotice   = 80;      //通知请求添加好友列表
+    FriendListNotice       = 81;      //通知好友列表
+    AddReqListNotice       = 82;      //通知请求添加好友列表
+    AddReqNotice           = 83;      //通知请求添加好友
+    AddFriendNotice        = 84;      //通知添加好友
+    DelFriendNotice        = 85;      //通知删除好友
 }
 
 message OneFriend {
@@ -27,18 +31,9 @@ message OneFriend {
     optional int32 is_online = 4;           //是否在线
 }
 
-//请求好友列表
-message FriendListReq {
-    optional uint32 pageage_num = 1;        //第几页
-    optional uint32 pageage_count = 2;      //多少数量
-}
-
-//回复好友列表
-message FriendListRes {
-    optional uint32 pageage_num = 1;        //第几页
-    optional uint32 pageage_count = 2;      //多少数量
-    optional uint32 total_count = 3;        //总数量
-    repeated OneFriend friend_list = 4;     //好友列表
+//通知好友列表
+message FriendListNotice {
+    repeated OneFriend friend_list = 1;     //好友列表
 }
 
 //请求添加好友
@@ -85,4 +80,31 @@ message DelFriendReq {
 //删除好友回复
 message DelFriendRes {
     optional int64 player_id = 1;           //玩家ID
+}
+
+//通知请求添加好友
+message AddReqNotice {
+    optional int64 player_id = 1;           //玩家ID
+    optional string nickname = 2;           //昵称
+}
+
+//通知添加好友
+message AddFriendNotice {
+    optional OneFriend friend_info = 1;     //好友信息
+}
+
+//通知删除好友
+message DelFriendNotice {
+    optional int64 player_id = 1;           //玩家ID
+}
+
+//请求好友推荐
+message FriendSugReq {
+    optional int64 player_id = 1;           //玩家ID
+}
+
+//回复好友推荐
+message FriendSugRes {
+    repeated int64 player_id_list = 1;      //玩家ID列表
+    repeated string nickname_list = 2;      //玩家昵称列表
 }

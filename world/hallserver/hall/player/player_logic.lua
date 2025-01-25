@@ -211,11 +211,25 @@ function M.do_change_nickname(player_id, pack_body)
 end
 ---------------------------CMD--------------------------------------------
 --获取玩家信息
-function M.cmd_get_info(player_id)
-    if g_p_info_map[player_id] then
-        return g_p_info_map[player_id]
+function M.cmd_get_info(player_id, field_map)
+    --拿玩家所有信息
+    if not field_map then
+        if g_p_info_map[player_id] then
+            return g_p_info_map[player_id]
+        end
+        return g_player_entity:get_one_entry(player_id)
+    else
+        --拿玩家部分信息 
+        local player_info = g_p_info_map[player_id]
+        if not player_info then
+            player_info = g_player_entity:get_player_info(player_id, field_map)
+            if not player_info then
+                return nil
+            end
+        end
+
+        return get_field_value(player_info, field_map)
     end
-    return g_player_entity:get_one_entry(player_id)
 end
 
 --获取所有在线玩家ID
@@ -224,33 +238,6 @@ function M.cmd_get_all_online()
 end
 
 function M.cmd_get_players_info(player_list, field_map)
-    local cli = contriner_client:instance("room_game_hall_m")
-    local self_address = skynet.self()
-    local server_id_map = {}
-    for i = 1, #player_list do
-        local player_id = player_list[i]
-        cli:set_mod_num(player_id)
-        local server_id = cli:get_mod_server_id()
-        if not server_id_map[server_id] then
-            server_id_map[server_id] = {}
-        end
-        tinsert(server_id_map[server_id], player_id)
-    end
-
-    local res_map = {}
-    for server_id, list in pairs(server_id_map) do
-        if server_id ~= self_address then
-            local ret_map = skynet.call(server_id, 'lua', 'player_get_players_info_by_local', list, field_map)
-            table_util.merge(res_map, ret_map)
-        else
-            local ret_map = interface.get_players_info(list, field_map)
-            table_util.merge(res_map, ret_map)
-        end
-    end
-    return res_map
-end
-
-function M.cmd_get_players_info_by_local(player_list, field_map)
     return interface.get_players_info(player_list, field_map)
 end
 
@@ -269,7 +256,7 @@ function M.cmd_change_rank_score(player_id, score)
 end
 
 -----------------------------interface------------------------------------
---获取所有在线玩家ID列表
+--获取在线玩家列表
 function interface.get_online_list()
     return g_player_list
 end
