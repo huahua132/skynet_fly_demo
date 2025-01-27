@@ -84,7 +84,7 @@ function M:on_connect(player_id, table_id, token, game_rpc)
             heart_req.time = time_util.time()
             local packid = game_rpc:req(PACK.login.HeartReq, heart_req)
             if not packid or packid == PACK.errors.Error then
-                break
+                return
             end
         end)
 

@@ -50,6 +50,10 @@ M.handle = {
     --删除好友
     [PACK.hallserver_friend.DelFriendReq] = function(player_id, pack_id, pack_body)
         return friend_logic.do_del_friend_req(player_id, pack_body)
+    end,
+    --好友推荐
+    [PACK.hallserver_friend.FriendSugReq] = function(player_id, pack_id, pack_body)
+        return friend_logic.do_friend_sug_req(player_id, pack_body)
     end
 }
 

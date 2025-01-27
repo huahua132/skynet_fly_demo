@@ -7,7 +7,7 @@ local M = {}
 
 --获取好友推荐
 function M.sug_friend()
-    local ret = frpc_client:instance("matchserver", "firend_sug"):one_balance_call_by_name("sug_friend")
+    local ret = frpc_client:instance("matchserver", "friend_sug_m"):one_balance_call("sug_friend")
     if not ret then
         log.error("sug_friend failed")    
         return {}

@@ -8,6 +8,7 @@ local player_rpc = require "common.rpc.hallserver.player"
 local player_util = require "common.utils.player"
 local env_util = require "skynet-fly.utils.env_util"
 local friend_rpc = require "common.rpc.hallserver.friend"
+local friend_sug_rpc = require "common.rpc.matchserver.friend_sug"
 
 local tinsert = table.insert
 local pairs = pairs
@@ -193,6 +194,27 @@ function M.do_del_friend_req(player_id, pack_body)
     return {
         player_id = del_player_id,
     }
+end
+
+--请求好友推荐
+function M.do_friend_sug_req(player_id, pack_body)
+    local sug_list = friend_sug_rpc.sug_friend()
+    if #sug_list <= 0 then return {} end
+    local player_info_map = player_rpc.get_players_info(sug_list, {['nickname'] = true})
+    local nickname_list = {}
+    for i = 1, #sug_list do
+        local player_info = player_info_map[sug_list[i]]
+        if player_info then
+            tinsert(nickname_list, player_info.nickname)
+        else
+            tinsert(nickname_list, "")
+        end
+    end
+    local msg_body = {
+        player_id_list = sug_list,
+        nickname_list = nickname_list,
+    }
+    return msg_body
 end
 
 --------------------------------------CMD-----------------------------------

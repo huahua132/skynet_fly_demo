@@ -4261,6 +4261,8 @@ export namespace hallserver_friend {
         RefuseAddFriendRes = 6,
         DelFriendReq = 7,
         DelFriendRes = 8,
+        FriendSugReq = 9,
+        FriendSugRes = 10,
         FriendListNotice = 81,
         AddReqListNotice = 82,
         AddReqNotice = 83,
@@ -5650,6 +5652,206 @@ export namespace hallserver_friend {
 
         /**
          * Gets the default type url for DelFriendNotice
+         * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+         * @returns The default type url
+         */
+        public static getTypeUrl(typeUrlPrefix?: string): string;
+    }
+
+    /** Properties of a FriendSugReq. */
+    interface IFriendSugReq {
+
+        /** FriendSugReq playerId */
+        playerId?: (number|Long|null);
+    }
+
+    /** Represents a FriendSugReq. */
+    class FriendSugReq implements IFriendSugReq {
+
+        /**
+         * Constructs a new FriendSugReq.
+         * @param [properties] Properties to set
+         */
+        constructor(properties?: hallserver_friend.IFriendSugReq);
+
+        /** FriendSugReq playerId. */
+        public playerId: (number|Long);
+
+        /**
+         * Creates a new FriendSugReq instance using the specified properties.
+         * @param [properties] Properties to set
+         * @returns FriendSugReq instance
+         */
+        public static create(properties?: hallserver_friend.IFriendSugReq): hallserver_friend.FriendSugReq;
+
+        /**
+         * Encodes the specified FriendSugReq message. Does not implicitly {@link hallserver_friend.FriendSugReq.verify|verify} messages.
+         * @param message FriendSugReq message or plain object to encode
+         * @param [writer] Writer to encode to
+         * @returns Writer
+         */
+        public static encode(message: hallserver_friend.IFriendSugReq, writer?: $protobuf.Writer): $protobuf.Writer;
+
+        /**
+         * Encodes the specified FriendSugReq message, length delimited. Does not implicitly {@link hallserver_friend.FriendSugReq.verify|verify} messages.
+         * @param message FriendSugReq message or plain object to encode
+         * @param [writer] Writer to encode to
+         * @returns Writer
+         */
+        public static encodeDelimited(message: hallserver_friend.IFriendSugReq, writer?: $protobuf.Writer): $protobuf.Writer;
+
+        /**
+         * Decodes a FriendSugReq message from the specified reader or buffer.
+         * @param reader Reader or buffer to decode from
+         * @param [length] Message length if known beforehand
+         * @returns FriendSugReq
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): hallserver_friend.FriendSugReq;
+
+        /**
+         * Decodes a FriendSugReq message from the specified reader or buffer, length delimited.
+         * @param reader Reader or buffer to decode from
+         * @returns FriendSugReq
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): hallserver_friend.FriendSugReq;
+
+        /**
+         * Verifies a FriendSugReq message.
+         * @param message Plain object to verify
+         * @returns `null` if valid, otherwise the reason why it is not
+         */
+        public static verify(message: { [k: string]: any }): (string|null);
+
+        /**
+         * Creates a FriendSugReq message from a plain object. Also converts values to their respective internal types.
+         * @param object Plain object
+         * @returns FriendSugReq
+         */
+        public static fromObject(object: { [k: string]: any }): hallserver_friend.FriendSugReq;
+
+        /**
+         * Creates a plain object from a FriendSugReq message. Also converts values to other types if specified.
+         * @param message FriendSugReq
+         * @param [options] Conversion options
+         * @returns Plain object
+         */
+        public static toObject(message: hallserver_friend.FriendSugReq, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+        /**
+         * Converts this FriendSugReq to JSON.
+         * @returns JSON object
+         */
+        public toJSON(): { [k: string]: any };
+
+        /**
+         * Gets the default type url for FriendSugReq
+         * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+         * @returns The default type url
+         */
+        public static getTypeUrl(typeUrlPrefix?: string): string;
+    }
+
+    /** Properties of a FriendSugRes. */
+    interface IFriendSugRes {
+
+        /** FriendSugRes playerIdList */
+        playerIdList?: ((number|Long)[]|null);
+
+        /** FriendSugRes nicknameList */
+        nicknameList?: (string[]|null);
+    }
+
+    /** Represents a FriendSugRes. */
+    class FriendSugRes implements IFriendSugRes {
+
+        /**
+         * Constructs a new FriendSugRes.
+         * @param [properties] Properties to set
+         */
+        constructor(properties?: hallserver_friend.IFriendSugRes);
+
+        /** FriendSugRes playerIdList. */
+        public playerIdList: (number|Long)[];
+
+        /** FriendSugRes nicknameList. */
+        public nicknameList: string[];
+
+        /**
+         * Creates a new FriendSugRes instance using the specified properties.
+         * @param [properties] Properties to set
+         * @returns FriendSugRes instance
+         */
+        public static create(properties?: hallserver_friend.IFriendSugRes): hallserver_friend.FriendSugRes;
+
+        /**
+         * Encodes the specified FriendSugRes message. Does not implicitly {@link hallserver_friend.FriendSugRes.verify|verify} messages.
+         * @param message FriendSugRes message or plain object to encode
+         * @param [writer] Writer to encode to
+         * @returns Writer
+         */
+        public static encode(message: hallserver_friend.IFriendSugRes, writer?: $protobuf.Writer): $protobuf.Writer;
+
+        /**
+         * Encodes the specified FriendSugRes message, length delimited. Does not implicitly {@link hallserver_friend.FriendSugRes.verify|verify} messages.
+         * @param message FriendSugRes message or plain object to encode
+         * @param [writer] Writer to encode to
+         * @returns Writer
+         */
+        public static encodeDelimited(message: hallserver_friend.IFriendSugRes, writer?: $protobuf.Writer): $protobuf.Writer;
+
+        /**
+         * Decodes a FriendSugRes message from the specified reader or buffer.
+         * @param reader Reader or buffer to decode from
+         * @param [length] Message length if known beforehand
+         * @returns FriendSugRes
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): hallserver_friend.FriendSugRes;
+
+        /**
+         * Decodes a FriendSugRes message from the specified reader or buffer, length delimited.
+         * @param reader Reader or buffer to decode from
+         * @returns FriendSugRes
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): hallserver_friend.FriendSugRes;
+
+        /**
+         * Verifies a FriendSugRes message.
+         * @param message Plain object to verify
+         * @returns `null` if valid, otherwise the reason why it is not
+         */
+        public static verify(message: { [k: string]: any }): (string|null);
+
+        /**
+         * Creates a FriendSugRes message from a plain object. Also converts values to their respective internal types.
+         * @param object Plain object
+         * @returns FriendSugRes
+         */
+        public static fromObject(object: { [k: string]: any }): hallserver_friend.FriendSugRes;
+
+        /**
+         * Creates a plain object from a FriendSugRes message. Also converts values to other types if specified.
+         * @param message FriendSugRes
+         * @param [options] Conversion options
+         * @returns Plain object
+         */
+        public static toObject(message: hallserver_friend.FriendSugRes, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+        /**
+         * Converts this FriendSugRes to JSON.
+         * @returns JSON object
+         */
+        public toJSON(): { [k: string]: any };
+
+        /**
+         * Gets the default type url for FriendSugRes
          * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
          * @returns The default type url
          */

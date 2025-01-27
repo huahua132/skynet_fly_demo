@@ -5,6 +5,7 @@ import { ModuleUtil } from "../../../../../extensions/oops-plugin-framework/asse
 import { smc } from "../../../common/SingletonModuleComp";
 import { UIID } from "../../../common/enum/UIConfig";
 import {hallserver_friend} from "../../../../../protos-js/proto"
+import { oops } from "db://oops-framework/core/Oops";
 
 /** 业务输入参数 */
 @ecs.register('FirendBll')
@@ -88,8 +89,16 @@ export class FirendBllSystem extends ecs.ComblockSystem implements ecs.IEntityEn
     }
 
     //点击好友推荐
-    btnFind(entity: FirendEntity) {
-        
+    async btnFind(entity: FirendEntity) {
+        let FriendSugReq: hallserver_friend.IFriendSugReq = {
+            playerId : smc.hall.HallModel.PlayerId
+        }
+        let rsp = await smc.net.GetNode("hall").AsyncReq("hallserver_friend", "FriendSugReq", FriendSugReq)
+        if (rsp.isErr) {
+            oops.gui.toast("获取好友推荐失败 ");
+        } else {
+            console.log("好友推荐 >>> ", rsp)
+        }
     }
 
     //点击好友申请

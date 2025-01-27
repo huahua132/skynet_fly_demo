@@ -14,6 +14,7 @@ local g_online_list = {}
 
 local function sys_online_player()
     local ret = player_rpc.get_all_online()
+    log.info(">>>>", ret)
     if not ret then
         log.error("sys_online_player get_all_online failed")
         return
@@ -33,7 +34,7 @@ local CMD = {}
 -- 获取推荐好友
 function CMD.sug_friend()
     local sug_list = {}
-
+    if #g_online_list <= 0 then return sug_list end
     for i = 1, 10 do
         local index = math.random(1, #g_online_list)
         tinsert(sug_list, g_online_list[index])

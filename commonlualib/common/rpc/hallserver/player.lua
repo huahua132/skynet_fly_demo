@@ -79,11 +79,11 @@ function M.get_players_info(player_list, field_map)
             table_util.merge(res, ret_map)
         else
             --其他服
-            local ret_map = frpc_client:instance("hallserver", "room_game_hall_m"):set_svr_id(svr_id):byid_balance_call("player_get_players_info", list, field_map)
-            if not ret_map then
+            local ret = frpc_client:instance("hallserver", "room_game_hall_m"):set_svr_id(svr_id):byid_balance_call("player_get_players_info", list, field_map)
+            if not ret or not ret.result[1] then
                 log.error_fmt("get_players_info call err svr_id = %s", svr_id)
             else
-                table_util.merge(res, ret_map)
+                table_util.merge(res, ret.result[1])
             end
         end
     end
@@ -118,11 +118,11 @@ function M.is_onlines(player_list)
             table_util.merge(res, ret_map)
         else
             --其他服
-            local ret_map = frpc_client:instance("hallserver", ".room_game_login"):set_svr_id(svr_id):byid_call_by_name("is_onlines", list)
-            if not ret_map then
+            local ret = frpc_client:instance("hallserver", ".room_game_login"):set_svr_id(svr_id):byid_call_by_name("is_onlines", list)
+            if not ret or not ret.result[1] then
                 log.error_fmt("is_onlines call err svr_id = %s", svr_id)
             else
-                table_util.merge(res, ret_map)
+                table_util.merge(res, ret.result[1])
             end
         end
     end
@@ -136,7 +136,13 @@ function M.is_online(player_id)
     if g_svr_name == "hallserver" and svr_id == g_svr_id then
         return skynet.call(".room_game_login", "lua", "is_online", player_id)
     else
-        return frpc_client:instance("hallserver", ".room_game_login"):set_svr_id(svr_id):byid_call_by_name("is_online", player_id)
+        local ret = frpc_client:instance("hallserver", ".room_game_login"):set_svr_id(svr_id):byid_call_by_name("is_online", player_id)
+        if not ret then
+            log.error("is_online err ", svr_id, player_id)
+            return
+        end
+
+        return ret.result[1]
     end
 end
 
@@ -158,7 +164,12 @@ function M.call_player_hall(player_id, ...)
         return skynet.call(".room_game_login", "lua", "call_player_hall", player_id, ...)
     else
         local cli = base.hallserver_room_game_login(player_id)
-        return cli:byid_call_by_name("call_player_hall", player_id, ...)
+        local ret = cli:byid_call_by_name("call_player_hall", player_id, ...)
+        if not ret then
+            log.error("call_player_hall err ", player_id)
+            return
+        end
+        return table.unpack(ret.result)
     end
 end
 
@@ -166,6 +177,7 @@ end
 function M.change_rank_score(player_id, score)
     local ret = M.call_player_hall(player_id, "player_change_rank_score", player_id, score)
     if not ret then
+        log.error("change_rank_score err ", player_id, score)
         return nil
     end
 

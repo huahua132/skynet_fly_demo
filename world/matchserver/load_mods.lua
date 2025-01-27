@@ -67,4 +67,10 @@ return {
             {instance_name = "digitalbomb"},
         }
     },
+
+    --好友推荐
+    friend_sug_m = {
+        launch_seq = 1,
+        launch_num = 1,
+    }
 }

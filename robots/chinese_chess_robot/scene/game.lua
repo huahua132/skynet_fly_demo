@@ -86,7 +86,7 @@ function M:on_connect(player_id, table_id, token, game_rpc)
             local pre_time = skynet.now()
             local packid = game_rpc:req(PACK.login.HeartReq, heart_req)
             if not packid or packid == PACK.errors.Error then
-                break
+                return
             else
                 local now_time = skynet.now()
                 local use_time = now_time - pre_time

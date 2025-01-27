@@ -9974,6 +9974,8 @@ $root.hallserver_friend = (function() {
      * @property {number} RefuseAddFriendRes=6 RefuseAddFriendRes value
      * @property {number} DelFriendReq=7 DelFriendReq value
      * @property {number} DelFriendRes=8 DelFriendRes value
+     * @property {number} FriendSugReq=9 FriendSugReq value
+     * @property {number} FriendSugRes=10 FriendSugRes value
      * @property {number} FriendListNotice=81 FriendListNotice value
      * @property {number} AddReqListNotice=82 AddReqListNotice value
      * @property {number} AddReqNotice=83 AddReqNotice value
@@ -9990,6 +9992,8 @@ $root.hallserver_friend = (function() {
         values[valuesById[6] = "RefuseAddFriendRes"] = 6;
         values[valuesById[7] = "DelFriendReq"] = 7;
         values[valuesById[8] = "DelFriendRes"] = 8;
+        values[valuesById[9] = "FriendSugReq"] = 9;
+        values[valuesById[10] = "FriendSugRes"] = 10;
         values[valuesById[81] = "FriendListNotice"] = 81;
         values[valuesById[82] = "AddReqListNotice"] = 82;
         values[valuesById[83] = "AddReqNotice"] = 83;
@@ -13197,6 +13201,497 @@ $root.hallserver_friend = (function() {
         };
 
         return DelFriendNotice;
+    })();
+
+    hallserver_friend.FriendSugReq = (function() {
+
+        /**
+         * Properties of a FriendSugReq.
+         * @memberof hallserver_friend
+         * @interface IFriendSugReq
+         * @property {number|Long|null} [playerId] FriendSugReq playerId
+         */
+
+        /**
+         * Constructs a new FriendSugReq.
+         * @memberof hallserver_friend
+         * @classdesc Represents a FriendSugReq.
+         * @implements IFriendSugReq
+         * @constructor
+         * @param {hallserver_friend.IFriendSugReq=} [properties] Properties to set
+         */
+        function FriendSugReq(properties) {
+            if (properties)
+                for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                    if (properties[keys[i]] != null)
+                        this[keys[i]] = properties[keys[i]];
+        }
+
+        /**
+         * FriendSugReq playerId.
+         * @member {number|Long} playerId
+         * @memberof hallserver_friend.FriendSugReq
+         * @instance
+         */
+        FriendSugReq.prototype.playerId = $util.Long ? $util.Long.fromBits(0,0,false) : 0;
+
+        /**
+         * Creates a new FriendSugReq instance using the specified properties.
+         * @function create
+         * @memberof hallserver_friend.FriendSugReq
+         * @static
+         * @param {hallserver_friend.IFriendSugReq=} [properties] Properties to set
+         * @returns {hallserver_friend.FriendSugReq} FriendSugReq instance
+         */
+        FriendSugReq.create = function create(properties) {
+            return new FriendSugReq(properties);
+        };
+
+        /**
+         * Encodes the specified FriendSugReq message. Does not implicitly {@link hallserver_friend.FriendSugReq.verify|verify} messages.
+         * @function encode
+         * @memberof hallserver_friend.FriendSugReq
+         * @static
+         * @param {hallserver_friend.IFriendSugReq} message FriendSugReq message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        FriendSugReq.encode = function encode(message, writer) {
+            if (!writer)
+                writer = $Writer.create();
+            if (message.playerId != null && Object.hasOwnProperty.call(message, "playerId"))
+                writer.uint32(/* id 1, wireType 0 =*/8).int64(message.playerId);
+            return writer;
+        };
+
+        /**
+         * Encodes the specified FriendSugReq message, length delimited. Does not implicitly {@link hallserver_friend.FriendSugReq.verify|verify} messages.
+         * @function encodeDelimited
+         * @memberof hallserver_friend.FriendSugReq
+         * @static
+         * @param {hallserver_friend.IFriendSugReq} message FriendSugReq message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        FriendSugReq.encodeDelimited = function encodeDelimited(message, writer) {
+            return this.encode(message, writer).ldelim();
+        };
+
+        /**
+         * Decodes a FriendSugReq message from the specified reader or buffer.
+         * @function decode
+         * @memberof hallserver_friend.FriendSugReq
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @param {number} [length] Message length if known beforehand
+         * @returns {hallserver_friend.FriendSugReq} FriendSugReq
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        FriendSugReq.decode = function decode(reader, length) {
+            if (!(reader instanceof $Reader))
+                reader = $Reader.create(reader);
+            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.hallserver_friend.FriendSugReq();
+            while (reader.pos < end) {
+                var tag = reader.uint32();
+                switch (tag >>> 3) {
+                case 1: {
+                        message.playerId = reader.int64();
+                        break;
+                    }
+                default:
+                    reader.skipType(tag & 7);
+                    break;
+                }
+            }
+            return message;
+        };
+
+        /**
+         * Decodes a FriendSugReq message from the specified reader or buffer, length delimited.
+         * @function decodeDelimited
+         * @memberof hallserver_friend.FriendSugReq
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @returns {hallserver_friend.FriendSugReq} FriendSugReq
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        FriendSugReq.decodeDelimited = function decodeDelimited(reader) {
+            if (!(reader instanceof $Reader))
+                reader = new $Reader(reader);
+            return this.decode(reader, reader.uint32());
+        };
+
+        /**
+         * Verifies a FriendSugReq message.
+         * @function verify
+         * @memberof hallserver_friend.FriendSugReq
+         * @static
+         * @param {Object.<string,*>} message Plain object to verify
+         * @returns {string|null} `null` if valid, otherwise the reason why it is not
+         */
+        FriendSugReq.verify = function verify(message) {
+            if (typeof message !== "object" || message === null)
+                return "object expected";
+            if (message.playerId != null && message.hasOwnProperty("playerId"))
+                if (!$util.isInteger(message.playerId) && !(message.playerId && $util.isInteger(message.playerId.low) && $util.isInteger(message.playerId.high)))
+                    return "playerId: integer|Long expected";
+            return null;
+        };
+
+        /**
+         * Creates a FriendSugReq message from a plain object. Also converts values to their respective internal types.
+         * @function fromObject
+         * @memberof hallserver_friend.FriendSugReq
+         * @static
+         * @param {Object.<string,*>} object Plain object
+         * @returns {hallserver_friend.FriendSugReq} FriendSugReq
+         */
+        FriendSugReq.fromObject = function fromObject(object) {
+            if (object instanceof $root.hallserver_friend.FriendSugReq)
+                return object;
+            var message = new $root.hallserver_friend.FriendSugReq();
+            if (object.playerId != null)
+                if ($util.Long)
+                    (message.playerId = $util.Long.fromValue(object.playerId)).unsigned = false;
+                else if (typeof object.playerId === "string")
+                    message.playerId = parseInt(object.playerId, 10);
+                else if (typeof object.playerId === "number")
+                    message.playerId = object.playerId;
+                else if (typeof object.playerId === "object")
+                    message.playerId = new $util.LongBits(object.playerId.low >>> 0, object.playerId.high >>> 0).toNumber();
+            return message;
+        };
+
+        /**
+         * Creates a plain object from a FriendSugReq message. Also converts values to other types if specified.
+         * @function toObject
+         * @memberof hallserver_friend.FriendSugReq
+         * @static
+         * @param {hallserver_friend.FriendSugReq} message FriendSugReq
+         * @param {$protobuf.IConversionOptions} [options] Conversion options
+         * @returns {Object.<string,*>} Plain object
+         */
+        FriendSugReq.toObject = function toObject(message, options) {
+            if (!options)
+                options = {};
+            var object = {};
+            if (options.defaults)
+                if ($util.Long) {
+                    var long = new $util.Long(0, 0, false);
+                    object.playerId = options.longs === String ? long.toString() : options.longs === Number ? long.toNumber() : long;
+                } else
+                    object.playerId = options.longs === String ? "0" : 0;
+            if (message.playerId != null && message.hasOwnProperty("playerId"))
+                if (typeof message.playerId === "number")
+                    object.playerId = options.longs === String ? String(message.playerId) : message.playerId;
+                else
+                    object.playerId = options.longs === String ? $util.Long.prototype.toString.call(message.playerId) : options.longs === Number ? new $util.LongBits(message.playerId.low >>> 0, message.playerId.high >>> 0).toNumber() : message.playerId;
+            return object;
+        };
+
+        /**
+         * Converts this FriendSugReq to JSON.
+         * @function toJSON
+         * @memberof hallserver_friend.FriendSugReq
+         * @instance
+         * @returns {Object.<string,*>} JSON object
+         */
+        FriendSugReq.prototype.toJSON = function toJSON() {
+            return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
+        };
+
+        /**
+         * Gets the default type url for FriendSugReq
+         * @function getTypeUrl
+         * @memberof hallserver_friend.FriendSugReq
+         * @static
+         * @param {string} [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+         * @returns {string} The default type url
+         */
+        FriendSugReq.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
+            if (typeUrlPrefix === undefined) {
+                typeUrlPrefix = "type.googleapis.com";
+            }
+            return typeUrlPrefix + "/hallserver_friend.FriendSugReq";
+        };
+
+        return FriendSugReq;
+    })();
+
+    hallserver_friend.FriendSugRes = (function() {
+
+        /**
+         * Properties of a FriendSugRes.
+         * @memberof hallserver_friend
+         * @interface IFriendSugRes
+         * @property {Array.<number|Long>|null} [playerIdList] FriendSugRes playerIdList
+         * @property {Array.<string>|null} [nicknameList] FriendSugRes nicknameList
+         */
+
+        /**
+         * Constructs a new FriendSugRes.
+         * @memberof hallserver_friend
+         * @classdesc Represents a FriendSugRes.
+         * @implements IFriendSugRes
+         * @constructor
+         * @param {hallserver_friend.IFriendSugRes=} [properties] Properties to set
+         */
+        function FriendSugRes(properties) {
+            this.playerIdList = [];
+            this.nicknameList = [];
+            if (properties)
+                for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                    if (properties[keys[i]] != null)
+                        this[keys[i]] = properties[keys[i]];
+        }
+
+        /**
+         * FriendSugRes playerIdList.
+         * @member {Array.<number|Long>} playerIdList
+         * @memberof hallserver_friend.FriendSugRes
+         * @instance
+         */
+        FriendSugRes.prototype.playerIdList = $util.emptyArray;
+
+        /**
+         * FriendSugRes nicknameList.
+         * @member {Array.<string>} nicknameList
+         * @memberof hallserver_friend.FriendSugRes
+         * @instance
+         */
+        FriendSugRes.prototype.nicknameList = $util.emptyArray;
+
+        /**
+         * Creates a new FriendSugRes instance using the specified properties.
+         * @function create
+         * @memberof hallserver_friend.FriendSugRes
+         * @static
+         * @param {hallserver_friend.IFriendSugRes=} [properties] Properties to set
+         * @returns {hallserver_friend.FriendSugRes} FriendSugRes instance
+         */
+        FriendSugRes.create = function create(properties) {
+            return new FriendSugRes(properties);
+        };
+
+        /**
+         * Encodes the specified FriendSugRes message. Does not implicitly {@link hallserver_friend.FriendSugRes.verify|verify} messages.
+         * @function encode
+         * @memberof hallserver_friend.FriendSugRes
+         * @static
+         * @param {hallserver_friend.IFriendSugRes} message FriendSugRes message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        FriendSugRes.encode = function encode(message, writer) {
+            if (!writer)
+                writer = $Writer.create();
+            if (message.playerIdList != null && message.playerIdList.length)
+                for (var i = 0; i < message.playerIdList.length; ++i)
+                    writer.uint32(/* id 1, wireType 0 =*/8).int64(message.playerIdList[i]);
+            if (message.nicknameList != null && message.nicknameList.length)
+                for (var i = 0; i < message.nicknameList.length; ++i)
+                    writer.uint32(/* id 2, wireType 2 =*/18).string(message.nicknameList[i]);
+            return writer;
+        };
+
+        /**
+         * Encodes the specified FriendSugRes message, length delimited. Does not implicitly {@link hallserver_friend.FriendSugRes.verify|verify} messages.
+         * @function encodeDelimited
+         * @memberof hallserver_friend.FriendSugRes
+         * @static
+         * @param {hallserver_friend.IFriendSugRes} message FriendSugRes message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        FriendSugRes.encodeDelimited = function encodeDelimited(message, writer) {
+            return this.encode(message, writer).ldelim();
+        };
+
+        /**
+         * Decodes a FriendSugRes message from the specified reader or buffer.
+         * @function decode
+         * @memberof hallserver_friend.FriendSugRes
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @param {number} [length] Message length if known beforehand
+         * @returns {hallserver_friend.FriendSugRes} FriendSugRes
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        FriendSugRes.decode = function decode(reader, length) {
+            if (!(reader instanceof $Reader))
+                reader = $Reader.create(reader);
+            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.hallserver_friend.FriendSugRes();
+            while (reader.pos < end) {
+                var tag = reader.uint32();
+                switch (tag >>> 3) {
+                case 1: {
+                        if (!(message.playerIdList && message.playerIdList.length))
+                            message.playerIdList = [];
+                        if ((tag & 7) === 2) {
+                            var end2 = reader.uint32() + reader.pos;
+                            while (reader.pos < end2)
+                                message.playerIdList.push(reader.int64());
+                        } else
+                            message.playerIdList.push(reader.int64());
+                        break;
+                    }
+                case 2: {
+                        if (!(message.nicknameList && message.nicknameList.length))
+                            message.nicknameList = [];
+                        message.nicknameList.push(reader.string());
+                        break;
+                    }
+                default:
+                    reader.skipType(tag & 7);
+                    break;
+                }
+            }
+            return message;
+        };
+
+        /**
+         * Decodes a FriendSugRes message from the specified reader or buffer, length delimited.
+         * @function decodeDelimited
+         * @memberof hallserver_friend.FriendSugRes
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @returns {hallserver_friend.FriendSugRes} FriendSugRes
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        FriendSugRes.decodeDelimited = function decodeDelimited(reader) {
+            if (!(reader instanceof $Reader))
+                reader = new $Reader(reader);
+            return this.decode(reader, reader.uint32());
+        };
+
+        /**
+         * Verifies a FriendSugRes message.
+         * @function verify
+         * @memberof hallserver_friend.FriendSugRes
+         * @static
+         * @param {Object.<string,*>} message Plain object to verify
+         * @returns {string|null} `null` if valid, otherwise the reason why it is not
+         */
+        FriendSugRes.verify = function verify(message) {
+            if (typeof message !== "object" || message === null)
+                return "object expected";
+            if (message.playerIdList != null && message.hasOwnProperty("playerIdList")) {
+                if (!Array.isArray(message.playerIdList))
+                    return "playerIdList: array expected";
+                for (var i = 0; i < message.playerIdList.length; ++i)
+                    if (!$util.isInteger(message.playerIdList[i]) && !(message.playerIdList[i] && $util.isInteger(message.playerIdList[i].low) && $util.isInteger(message.playerIdList[i].high)))
+                        return "playerIdList: integer|Long[] expected";
+            }
+            if (message.nicknameList != null && message.hasOwnProperty("nicknameList")) {
+                if (!Array.isArray(message.nicknameList))
+                    return "nicknameList: array expected";
+                for (var i = 0; i < message.nicknameList.length; ++i)
+                    if (!$util.isString(message.nicknameList[i]))
+                        return "nicknameList: string[] expected";
+            }
+            return null;
+        };
+
+        /**
+         * Creates a FriendSugRes message from a plain object. Also converts values to their respective internal types.
+         * @function fromObject
+         * @memberof hallserver_friend.FriendSugRes
+         * @static
+         * @param {Object.<string,*>} object Plain object
+         * @returns {hallserver_friend.FriendSugRes} FriendSugRes
+         */
+        FriendSugRes.fromObject = function fromObject(object) {
+            if (object instanceof $root.hallserver_friend.FriendSugRes)
+                return object;
+            var message = new $root.hallserver_friend.FriendSugRes();
+            if (object.playerIdList) {
+                if (!Array.isArray(object.playerIdList))
+                    throw TypeError(".hallserver_friend.FriendSugRes.playerIdList: array expected");
+                message.playerIdList = [];
+                for (var i = 0; i < object.playerIdList.length; ++i)
+                    if ($util.Long)
+                        (message.playerIdList[i] = $util.Long.fromValue(object.playerIdList[i])).unsigned = false;
+                    else if (typeof object.playerIdList[i] === "string")
+                        message.playerIdList[i] = parseInt(object.playerIdList[i], 10);
+                    else if (typeof object.playerIdList[i] === "number")
+                        message.playerIdList[i] = object.playerIdList[i];
+                    else if (typeof object.playerIdList[i] === "object")
+                        message.playerIdList[i] = new $util.LongBits(object.playerIdList[i].low >>> 0, object.playerIdList[i].high >>> 0).toNumber();
+            }
+            if (object.nicknameList) {
+                if (!Array.isArray(object.nicknameList))
+                    throw TypeError(".hallserver_friend.FriendSugRes.nicknameList: array expected");
+                message.nicknameList = [];
+                for (var i = 0; i < object.nicknameList.length; ++i)
+                    message.nicknameList[i] = String(object.nicknameList[i]);
+            }
+            return message;
+        };
+
+        /**
+         * Creates a plain object from a FriendSugRes message. Also converts values to other types if specified.
+         * @function toObject
+         * @memberof hallserver_friend.FriendSugRes
+         * @static
+         * @param {hallserver_friend.FriendSugRes} message FriendSugRes
+         * @param {$protobuf.IConversionOptions} [options] Conversion options
+         * @returns {Object.<string,*>} Plain object
+         */
+        FriendSugRes.toObject = function toObject(message, options) {
+            if (!options)
+                options = {};
+            var object = {};
+            if (options.arrays || options.defaults) {
+                object.playerIdList = [];
+                object.nicknameList = [];
+            }
+            if (message.playerIdList && message.playerIdList.length) {
+                object.playerIdList = [];
+                for (var j = 0; j < message.playerIdList.length; ++j)
+                    if (typeof message.playerIdList[j] === "number")
+                        object.playerIdList[j] = options.longs === String ? String(message.playerIdList[j]) : message.playerIdList[j];
+                    else
+                        object.playerIdList[j] = options.longs === String ? $util.Long.prototype.toString.call(message.playerIdList[j]) : options.longs === Number ? new $util.LongBits(message.playerIdList[j].low >>> 0, message.playerIdList[j].high >>> 0).toNumber() : message.playerIdList[j];
+            }
+            if (message.nicknameList && message.nicknameList.length) {
+                object.nicknameList = [];
+                for (var j = 0; j < message.nicknameList.length; ++j)
+                    object.nicknameList[j] = message.nicknameList[j];
+            }
+            return object;
+        };
+
+        /**
+         * Converts this FriendSugRes to JSON.
+         * @function toJSON
+         * @memberof hallserver_friend.FriendSugRes
+         * @instance
+         * @returns {Object.<string,*>} JSON object
+         */
+        FriendSugRes.prototype.toJSON = function toJSON() {
+            return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
+        };
+
+        /**
+         * Gets the default type url for FriendSugRes
+         * @function getTypeUrl
+         * @memberof hallserver_friend.FriendSugRes
+         * @static
+         * @param {string} [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+         * @returns {string} The default type url
+         */
+        FriendSugRes.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
+            if (typeUrlPrefix === undefined) {
+                typeUrlPrefix = "type.googleapis.com";
+            }
+            return typeUrlPrefix + "/hallserver_friend.FriendSugRes";
+        };
+
+        return FriendSugRes;
     })();
 
     return hallserver_friend;
