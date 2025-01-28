@@ -14,7 +14,6 @@ local g_online_list = {}
 
 local function sys_online_player()
     local ret = player_rpc.get_all_online()
-    log.info(">>>>", ret)
     if not ret then
         log.error("sys_online_player get_all_online failed")
         return
@@ -45,7 +44,7 @@ end
 
 function CMD.start()
     skynet.fork(sys_online_player)
-    g_time_obj = timer:new(timer.minute * 5, 0, sys_online_player)
+    g_time_obj = timer:new(timer.minute * 1, 0, sys_online_player)
     return true
 end
 

@@ -9,6 +9,7 @@ local player_util = require "common.utils.player"
 local env_util = require "skynet-fly.utils.env_util"
 local friend_rpc = require "common.rpc.hallserver.friend"
 local friend_sug_rpc = require "common.rpc.matchserver.friend_sug"
+local time_util = require "skynet-fly.utils.time_util"
 
 local tinsert = table.insert
 local pairs = pairs
@@ -63,7 +64,7 @@ function M.on_login(player_id)
 
     --下发好友列表
     g_local_info.friend_msg:friend_list_notice(player_id, msg_body)
-    log.info("friend_list_notice", player_id, msg_body)
+    --log.info("friend_list_notice", player_id, msg_body)
     local friend_req_list = g_friend_req_cli:get_entry(player_id)
     local req_player_list = {}
     for i = 1, #friend_req_list do
@@ -71,17 +72,18 @@ function M.on_login(player_id)
         tinsert(req_player_list, info.req_player_id)
     end
     
-    local msg_body = {friend_req_list = {player_id_list = req_player_list, nickname_list = {}}}
+    local msg_body = {player_id_list = req_player_list, nickname_list = {}}
     local info_map = player_rpc.get_players_info(req_player_list, g_get_field_map)
     for i = 1, #friend_req_list do
         local info = friend_req_list[i]
         local player_info = info_map[info.req_player_id]
         if player_info then
-            tinsert(msg_body.friend_req_list.nickname_list, player_info.nickname)
+            tinsert(msg_body.nickname_list, player_info.nickname)
         else
-            tinsert(msg_body.friend_req_list.nickname_list, "棋友_" .. info.req_player_id)
+            tinsert(msg_body.nickname_list, "棋友_" .. info.req_player_id)
         end
     end
+    --log.info(">>>>> ", friend_req_list, msg_body)
     --下发好友请求列表
     g_local_info.friend_msg:add_req_list_notice(player_id, msg_body)
 end
@@ -110,7 +112,7 @@ function M.do_add_friend_req(player_id, pack_body)
         return nil, errorcode.UNKOWN_ERR, "repeat add friend"
     end
 
-    local ret, errno, errmsg = friend_rpc.req_add_friend(player_id, add_player_id)
+    local ret, errno, errmsg = friend_rpc.req_add_friend(add_player_id, player_id)
     if not ret then
         return ret, errno, errmsg
     end
@@ -123,17 +125,21 @@ end
 --同意添加好友
 function M.do_agree_add_friend_req(player_id, pack_body)
     local add_player_id = pack_body.player_id or 0
-    if g_friend_req_cli:get_one_entry(player_id, add_player_id) then
+    if not g_friend_req_cli:get_one_entry(player_id, add_player_id) then
         --没有发起过请求
         return nil, errorcode.UNKOWN_ERR, "not add req"
     end
 
-    if not g_friend_req_cli:delete_one_entry(player_id, add_player_id) then
+    if not g_friend_req_cli:delete_entry(player_id, add_player_id) then
         return nil, errorcode.UNKOWN_ERR, "server err"
     end
 
+    if g_friend_cli:get_one_entry(player_id, add_player_id) then
+        return nil, errorcode.UNKOWN_ERR, "repeat add"
+    end
+
     --添加为好友
-    if not g_friend_cli:create_one_entry(player_id, add_player_id) then
+    if not g_friend_cli:create_one_entry({player_id = player_id, friend_id = add_player_id, create_time = time_util.time()}) then
         return nil, errorcode.UNKOWN_ERR, "server err"
     end
 
@@ -146,7 +152,7 @@ function M.do_agree_add_friend_req(player_id, pack_body)
     end
 
     --对方也把你加入好友列表
-    local ret, errno, errmsg = friend_rpc.req_agree_friend(player_id, add_player_id)
+    local ret, errno, errmsg = friend_rpc.req_agree_friend(add_player_id, player_id)
     if not ret then
         return ret,errno, errmsg
     end
@@ -158,17 +164,12 @@ end
 --拒绝添加好友
 function M.do_refuse_add_friend_req(player_id, pack_body)
     local add_player_id = pack_body.player_id or 0
-    local add_svr_id = player_util.get_svr_id_by_player_id(add_player_id)
-    if add_svr_id <= 0 then
-        return nil, errorcode.REQ_PARAM_ERR, "invaild player_id:" .. add_player_id
-    end
-
-    if g_friend_req_cli:get_one_entry(player_id, add_player_id) then
+    if not g_friend_req_cli:get_one_entry(player_id, add_player_id) then
         --没有发起过请求
         return nil, errorcode.UNKOWN_ERR, "not add req"
     end
 
-    if not g_friend_req_cli:delete_one_entry(player_id, add_player_id) then
+    if not g_friend_req_cli:delete_entry(player_id, add_player_id) then
         return nil, errorcode.UNKOWN_ERR, "server err"
     end
 
@@ -184,12 +185,12 @@ function M.do_del_friend_req(player_id, pack_body)
         return nil, errorcode.UNKOWN_ERR, "not friend"
     end
 
-    if not g_friend_cli:delete_one_entry(player_id, del_player_id) then
+    if not g_friend_cli:delete_entry(player_id, del_player_id) then
         return nil, errorcode.UNKOWN_ERR, "server err"
     end
 
     --对方也删除你
-    friend_rpc.req_del_friend(player_id, del_player_id)
+    friend_rpc.req_del_friend(del_player_id, player_id)
 
     return {
         player_id = del_player_id,
@@ -218,58 +219,57 @@ function M.do_friend_sug_req(player_id, pack_body)
 end
 
 --------------------------------------CMD-----------------------------------
-function M.cmd_add_req(player_id, add_player_id)
-    if g_friend_req_cli:get_one_entry(add_player_id, player_id) then
+function M.cmd_add_req(player_id, do_player_id)
+    if g_friend_req_cli:get_one_entry(player_id, do_player_id) then
         --已经发起请求了
         return nil, errorcode.UNKOWN_ERR, "repeat add req"    
     end
 
-    if not g_friend_req_cli:create_one_entry({req_player_id = player_id, player_id = add_player_id}) then
+    if not g_friend_req_cli:create_one_entry({player_id = player_id, req_player_id = do_player_id, create_time = time_util.time()}) then
         return nil, errorcode.UNKOWN_ERR, "server err"
     end
-
+    local friend_info = player_rpc.get_player_info(do_player_id, g_get_field_map)
     --推送玩家被加好友了
-    g_local_info.friend_msg:add_req_notice(add_player_id, {player_id = player_id})
+    g_local_info.friend_msg:add_req_notice(player_id, {player_id = do_player_id, nickname = friend_info.nickname})
     return true
 end
 
-function M.cmd_agree_req(player_id, add_player_id)
-    if g_friend_cli:get_one_entry(add_player_id, player_id) then
+function M.cmd_agree_req(player_id, do_player_id)
+    if g_friend_cli:get_one_entry(player_id, do_player_id) then
         return true
     end
 
-    if not g_friend_cli:create_one_entry(add_player_id, player_id) then
+    if not g_friend_cli:create_one_entry({player_id = player_id, friend_id = do_player_id, create_time = time_util.time()}) then
         return nil, errorcode.UNKOWN_ERR, "server err"
     end
 
     --不在线就不用发了
-    if not g_local_info.interface_mgr:is_online(add_player_id) then
+    if not g_local_info.interface_mgr:is_online(player_id) then
         return
     end
 
     --通知添加好友
-    local friend_info = player_rpc.get_player_info(player_id, g_get_field_map)
+    local friend_info = player_rpc.get_player_info(do_player_id, g_get_field_map)
     if friend_info then
-        friend_info.is_online = player_rpc.is_online(player_id) and 1 or 0
-        g_local_info.friend_msg:add_friend_notice(add_player_id, {friend_info = friend_info})
+        friend_info.is_online = player_rpc.is_online(do_player_id) and 1 or 0
+        g_local_info.friend_msg:add_friend_notice(player_id, {friend_info = friend_info})
     else
-        log.error("get_player_info err ", player_id)
+        log.error("get_player_info err ", do_player_id)
     end
 
     return true
 end
 
-function M.cmd_del_req(player_id, del_player_id)
-    if g_friend_cli:get_one_entry(del_player_id, player_id) then
-        g_friend_cli:delete_one_entry(del_player_id, player_id)
+function M.cmd_del_req(player_id, do_player_id)
+    if g_friend_cli:get_one_entry(player_id, do_player_id) then
+        g_friend_cli:delete_entry(player_id, do_player_id)
     end
     --不在线就不用发了
-    if not g_local_info.interface_mgr:is_online(del_player_id) then
+    if not g_local_info.interface_mgr:is_online(player_id) then
         return
     end
-
     --通知删除好友
-    g_local_info.friend_msg:del_friend_notice(del_player_id, {player_id = player_id})
+    g_local_info.friend_msg:del_friend_notice(player_id, {player_id = do_player_id})
     return true
 end
 

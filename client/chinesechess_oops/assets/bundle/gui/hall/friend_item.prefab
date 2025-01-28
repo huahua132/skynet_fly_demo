@@ -1,7 +1,7 @@
 [
   {
     "__type__": "cc.Prefab",
-    "_name": "firend_item",
+    "_name": "friend_item",
     "_objFlags": 0,
     "__editorExtras__": {},
     "_native": "",
@@ -13,7 +13,7 @@
   },
   {
     "__type__": "cc.Node",
-    "_name": "firend_item",
+    "_name": "friend_item",
     "_objFlags": 0,
     "__editorExtras__": {},
     "_parent": null,

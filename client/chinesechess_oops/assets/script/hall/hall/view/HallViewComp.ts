@@ -9,8 +9,8 @@ import { EmailViewComp } from "../../email/view/EmailViewComp";
 import { smc } from "../../../common/SingletonModuleComp";
 import {UIID} from "../../../common/enum/UIConfig";
 import {EmailBllComp} from "../../email/bll/EmailBll"
-import {FirendBllComp} from "../../firend/bll/FirendBll"
-import {FirendViewComp} from "../../firend/view/FirendViewComp"
+import {FriendBllComp} from "../../friend/bll/FriendBll"
+import {FriendViewComp} from "../../friend/view/FriendViewComp"
 
 const { ccclass, property } = _decorator;
 
@@ -19,7 +19,10 @@ const { ccclass, property } = _decorator;
 @ecs.register('HallView', false)
 export class HallViewComp extends CCComp {
     /** 视图层逻辑代码分离演示 */
+    isInit = false;
     start() {
+        this.isInit = true;
+        console.log("HallViewComp init")
         const entity = this.ent as HallEntity;
         entity.HallView = this;
         this.setButton();
@@ -48,8 +51,10 @@ export class HallViewComp extends CCComp {
 
     //刷新玩家信息
     RefreshPlayerInfo() {
+        if (!this.isInit) {
+            return;
+        }
         const entity = this.ent as HallEntity;
-        console.log("RefreshPlayerInfo >>> ", this.getNode("playerId"), entity.HallModel.PlayerId);
         this.getNode("playerId")!.getComponent(Label)!.string = "ID:" + entity.HallModel.PlayerId.toString();
         this.getNode("nickName")!.getComponent(Label)!.string = entity.HallModel.NickName;
         this.getNode("rank")!.getComponent(Label)!.string = entity.HallModel.RankScore.toString();
@@ -58,6 +63,9 @@ export class HallViewComp extends CCComp {
 
     //刷新道具显示
     RefreshItems() {
+        if (!this.isInit) {
+            return;
+        }
         const entity = this.ent as HallEntity;
         let coinNum = 0;
         if (entity.HallModel.ItemNumMap[10000002]) {
@@ -85,10 +93,10 @@ export class HallViewComp extends CCComp {
     }
 
     //好友
-    firendBtn() {
-        console.log("firendBtn >>> ")
-        smc.friend.addComponents<ecs.Comp>(FirendBllComp);
-        ModuleUtil.addViewUi(smc.friend, FirendViewComp, UIID.Firend);
+    friendBtn() {
+        console.log("friendBtn >>> ")
+        smc.friend.addComponents<ecs.Comp>(FriendBllComp);
+        ModuleUtil.addViewUi(smc.friend, FriendViewComp, UIID.Friend);
     }
 
     //匹配按钮

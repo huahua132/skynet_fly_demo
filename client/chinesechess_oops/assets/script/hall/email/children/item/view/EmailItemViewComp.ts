@@ -3,7 +3,6 @@ import { ecs } from "db://oops-framework/libs/ecs/ECS";
 import { CCComp } from "db://oops-framework/module/common/CCComp";
 import { EmailItemEntity } from "../EmailItemEntity";
 import { EmailEntity } from "../../../EmailEntity";
-import { config } from "../../../../../../../extensions/oops-plugin-excel-to-json/src/main";
 
 const { ccclass, property } = _decorator;
 

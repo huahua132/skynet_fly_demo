@@ -21,7 +21,7 @@ export enum UIID {
     /** 邮件界面 */
     Email,
     /** 好友界面 */
-    Firend,
+    Friend,
 }
 
 /** 打开界面方式的配置数据 */
@@ -35,5 +35,5 @@ export const UIConfigData: { [key: number]: UIConfig } = {
     [UIID.Board] : {layer: LayerType.UI, prefab: "gui/game/board"},
     [UIID.Over] : {layer: LayerType.PopUp, prefab: "gui/game/over"},
     [UIID.Email] : {layer: LayerType.UI, prefab: "gui/hall/email"},
-    [UIID.Firend] : {layer: LayerType.UI, prefab: "gui/hall/firend"},
+    [UIID.Friend] : {layer: LayerType.UI, prefab: "gui/hall/friend"},
 }

@@ -1,6 +1,7 @@
 local setmetatable = setmetatable
 
 local PACK = require "common.pack_helper".PACK
+local log = require "skynet-fly.log"
 
 local M = {}
 local meta = {__index = M}

@@ -60,18 +60,18 @@ M.handle = {
 local CMD = {}
 
 --请求加好友
-function CMD.friend_add_req(player_id, add_player_id)
-    return friend_logic.cmd_add_req(player_id, add_player_id)
+function CMD.friend_add_req(player_id, do_player_id)
+    return friend_logic.cmd_add_req(player_id, do_player_id)
 end
 
 --同意加好友
-function CMD.friend_agree_req(player_id, add_player_id)
-    return friend_logic.cmd_agree_req(player_id, add_player_id)
+function CMD.friend_agree_req(player_id, do_player_id)
+    return friend_logic.cmd_agree_req(player_id, do_player_id)
 end
 
 --删除好友
-function CMD.friend_del_req(player_id, del_player_id)
-    return friend_logic.cmd_del_req(player_id, del_player_id)
+function CMD.friend_del_req(player_id, do_player_id)
+    return friend_logic.cmd_del_req(player_id, do_player_id)
 end
 
 M.register_cmd = CMD
