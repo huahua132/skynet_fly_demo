@@ -46,6 +46,8 @@ export class FriendViewComp extends CCComp {
     //好友列表
     private btnList() {
         console.log("btnList");
+        let entity = this.ent as FriendEntity;
+        entity.FriendSys.btnList(entity);
         this.showList("friendScroll");
     }
 
