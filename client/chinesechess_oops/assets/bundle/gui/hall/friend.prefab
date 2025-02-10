@@ -2963,7 +2963,7 @@
     "node": {
       "__id__": 111
     },
-    "_enabled": false,
+    "_enabled": true,
     "__prefab": {
       "__id__": 123
     },

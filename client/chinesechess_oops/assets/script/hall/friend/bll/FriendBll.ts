@@ -12,6 +12,9 @@ import { FriendSugViewComp } from "../view/FriendSugViewComp"
 import { FriendReqEntity } from "../FriendReqEntity";
 import { FriendReqBllComp } from "./FriendReqBll";
 import { FriendReqViewComp } from "../view/FriendReqViewComp"
+import { FriendInfoEntity } from "../FriendInfoEntity";
+import { FriendInfoViewComp } from "../view/FriendInfoViewComp";
+import { FriendInfoBllComp } from "./FriendInfoBll";
 
 /** 业务输入参数 */
 @ecs.register('FriendBll')
@@ -19,9 +22,11 @@ export class FriendBllComp extends ecs.Comp {
     /** 业务层组件移除时，重置所有数据为默认值 */
     sugEntityList: any = [];
     reqEntityList: any = [];
+    friendEntityList : any = [];
     reset() {
         this.sugEntityList = [];
         this.reqEntityList = [];
+        this.friendEntityList = [];
     }
 }
 
@@ -40,6 +45,11 @@ export class FriendBllSystem extends ecs.ComblockSystem implements ecs.IEntityEn
             });
 
             smc.friend.FriendModel.friendList = friendList;
+            for (let i = 0; i < friendList.length; i++) {
+                let friend = friendList[i];
+                let playerId = friend.playerId;
+                smc.friend.FriendModel.friendMap[playerId] = friend;
+            }
         });
 
         smc.net.GetNode("hall").RegPushHandle("hallserver_friend", "AddFriendNotice", function(msgBody: hallserver_friend.IAddFriendNotice){
@@ -51,6 +61,9 @@ export class FriendBllSystem extends ecs.ComblockSystem implements ecs.IEntityEn
             friendList!.sort((a,b) => {
                 return a.lastLogoutTime - b.lastLogoutTime;
             });
+
+            let playerId = friend.playerId;
+            smc.friend.FriendModel.friendMap[playerId] = friend;
         });
 
         smc.net.GetNode("hall").RegPushHandle("hallserver_friend", "DelFriendNotice", function(msgBody: hallserver_friend.IDelFriendNotice){
@@ -64,7 +77,8 @@ export class FriendBllSystem extends ecs.ComblockSystem implements ecs.IEntityEn
             if (index >= 0) {
                 friendList.splice(index, 1);
             }
-        });
+            delete smc.friend.FriendModel.friendMap[playerId];
+        });    
 
         //通知请求添加好友列表
         smc.net.GetNode("hall").RegPushHandle("hallserver_friend", "AddReqListNotice", function(msgBody: hallserver_friend.IAddReqListNotice){
@@ -107,6 +121,14 @@ export class FriendBllSystem extends ecs.ComblockSystem implements ecs.IEntityEn
         }
     }
 
+    clearFriendList(entity: FriendEntity) {
+        for (let i = entity.FriendBll.friendEntityList.length - 1; i >= 0; i--) {
+            let friendEnt = entity.FriendBll.friendEntityList[i];
+            friendEnt.destroy();
+            entity.FriendBll.friendEntityList.splice(i, 1);
+        }
+    }
+
     delReqList(entity: FriendEntity, delPlayerId: number) {
         let playerIdList = entity.FriendModel.addReqList.playerIdList
         let nicknameList = entity.FriendModel.addReqList.nicknameList
@@ -131,8 +153,9 @@ export class FriendBllSystem extends ecs.ComblockSystem implements ecs.IEntityEn
 
     //点击返回大厅
     bkBtn(entity: FriendEntity) {
-        this.clearSugList(entity)
-        this.clearReqList(entity)
+        this.clearSugList(entity);
+        this.clearReqList(entity);
+        this.clearFriendList(entity);
         entity.remove(FriendBllComp);
         ModuleUtil.removeViewUi(smc.friend, FriendViewComp, UIID.Friend);
     }
@@ -179,5 +202,25 @@ export class FriendBllSystem extends ecs.ComblockSystem implements ecs.IEntityEn
             ModuleUtil.addView(friendReqEntity!, FriendReqViewComp, contentNode!, "gui/hall/friend_req_item");
             entity.FriendBll.reqEntityList.push(friendReqEntity);
         }
+    }
+
+    btnList(entity: FriendEntity) {
+        this.clearFriendList(entity);
+        let contentNode = entity.FriendView.GetFriendListContent()
+        console.log("好友列表 >>> ", entity.FriendModel.friendList.length);
+        for (let i = 0; i < entity.FriendModel.friendList.length; i++) {
+            let playerId = entity.FriendModel.friendList[i].playerId
+            let friendEnt = ecs.getEntity(FriendInfoEntity);
+            friendEnt.addComponents<ecs.Comp>(FriendInfoBllComp);
+            friendEnt.FriendInfoBll.playerId = playerId;
+            entity.addChild(friendEnt);
+            ModuleUtil.addView(friendEnt!, FriendInfoViewComp, contentNode!, "gui/hall/friend_item");
+            entity.FriendBll.friendEntityList.push(friendEnt);
+        }
+    }
+
+    //获取玩家信息
+    getFriendInfo(entity: FriendEntity, playerId: number) {
+        return entity.FriendModel.friendMap[playerId];
     }
 }
