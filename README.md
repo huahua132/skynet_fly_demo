@@ -63,3 +63,6 @@ npm install
 1. 本项目使用了ubuntu最新版本已编译的`skynet_fly`，实际项目部署开发，请自行编译。
 
 2. `redis`需配置 `notify-keyspace-events "KA"`， 否则无法触发服务发现。
+
+# mysql redis 配置文件位置
+`commonlualib\common\etc`文件夹下。
