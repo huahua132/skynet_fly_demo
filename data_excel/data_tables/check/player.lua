@@ -1,9 +1,7 @@
 local player_level = require "lua.player_level"
 
 return {
-    export = {
-        ["player_level"] = {EXPORT_TARGET.hallserver},
-    },
+    export = {"player_level"},
     check_func = function()
         for i, cfg in pairs(player_level) do
             assert(cfg.level >= 0, "等级配置不能小于 0  i = " .. i)

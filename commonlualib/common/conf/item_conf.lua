@@ -8,7 +8,7 @@ local table = table
 local g_item_info 
 
 local function init()
-    g_item_info = share_data:new("./data_tables/item_info.lua", share_data.enum.sharedata)
+    g_item_info = share_data:new("../../commonlualib/data_tables/item_info.lua", share_data.enum.sharedata)
     :set_map("item_idx", "item_id")
     :builder()
 end

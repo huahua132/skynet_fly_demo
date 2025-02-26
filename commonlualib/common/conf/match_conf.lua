@@ -9,7 +9,7 @@ local tinsert = table.insert
 local g_match_game = nil
 
 local function init()
-    g_match_game = sharedata:new("./data_tables/match_game.lua", sharedata.enum.sharedata)
+    g_match_game = sharedata:new("../../commonlualib/data_tables/match_game.lua", sharedata.enum.sharedata)
     :set_map("idx", "game_type", "play_type")
     :builder()
 end

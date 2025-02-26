@@ -8,12 +8,6 @@ local log = require "skynet-fly.log"
 skynet.start(function()
 	skynet.call('.logger','lua','add_hook','common.log_hook')
 	skynet.error("start admin server !!!>>>>>>>>>>>>>>>>>")
-
-	sharedata.load({
-        "../../commonlualib/common/data_tables",    --公共的
-        "./data_tables"                             --本服独有的
-    }, sharedata.enum.sharedata)
-
 	contriner_launcher.run()
 
 	--启动集群连接入口

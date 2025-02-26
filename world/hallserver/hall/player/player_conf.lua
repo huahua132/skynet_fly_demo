@@ -9,7 +9,7 @@ local g_player_level = nil
 local g_max_level = 0
 
 local function init()
-    g_player_level = sharedata:new("./data_tables/player_level.lua", sharedata.enum.sharedata)
+    g_player_level = sharedata:new("../../commonlualib/data_tables/player_level.lua", sharedata.enum.sharedata)
                        :set_map("level_idx", "level")
                        :builder()
 

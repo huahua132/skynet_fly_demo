@@ -5,7 +5,7 @@ local g_email_sys
 
 
 local function init()
-    g_email_sys = sharedata:new("./data_tables/email_sys.lua", sharedata.enum.sharedata)
+    g_email_sys = sharedata:new("../../commonlualib/data_tables/email_sys.lua", sharedata.enum.sharedata)
     :set_map("id_idx", "id")
     :builder()
 end
