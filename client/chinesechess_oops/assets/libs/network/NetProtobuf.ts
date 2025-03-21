@@ -1,4 +1,4 @@
-import { Logger } from "../../../extensions/oops-plugin-framework/assets/core/common/log/Logger";
+import {oops} from "db://oops-framework/core/Oops"
 import {Iprotocode} from "./NetInterface"
 
 interface msgMap {
@@ -53,13 +53,13 @@ export class NetProtobuf implements Iprotocode {
                 }
             }
         }
-        Logger.logNet({name : name, PACK : this._PACK, PACKNAME : this._PACKNAME}, "初始化协议码映射")
+        oops.log.logNet({name : name, PACK : this._PACK, PACKNAME : this._PACKNAME}, "初始化协议码映射")
     }
 
     //编码
     Encode(packid: number, msgBody: any) {
         if (!this._PACKNAME[packid]) {
-            Logger.logNet(`Encode not exists packid:${packid}`)
+            oops.log.logNet(`Encode not exists packid:${packid}`)
             return;
         }
         const info = this._PACKNAME[packid];
@@ -70,7 +70,7 @@ export class NetProtobuf implements Iprotocode {
     //解码
     Decode(packid: number, buffer: Uint8Array) {
         if (!this._PACKNAME[packid]) {
-            Logger.logNet(`Decode not exists packid:${packid}`)
+            oops.log.logNet(`Decode not exists packid:${packid}`)
             return;
         }
         const info = this._PACKNAME[packid];
@@ -81,11 +81,11 @@ export class NetProtobuf implements Iprotocode {
     //获取packid
     GetPackId(packname: string, msgname: string) {
         if (!this._PACK[packname]) {
-            Logger.logNet(`GetPackId not exists packname:${packname}`)
+            oops.log.logNet(`GetPackId not exists packname:${packname}`)
             return;
         }
         if (!this._PACK[packname][msgname]) {
-            Logger.logNet(`GetPackId not exists msgname:${msgname}`)
+            oops.log.logNet(`GetPackId not exists msgname:${msgname}`)
             return;
         }
 

@@ -1,4 +1,4 @@
-import { Logger } from "../../../extensions/oops-plugin-framework/assets/core/common/log/Logger";
+import {oops} from "db://oops-framework/core/Oops"
 
 const MAX_UINT32: number = 2 ** 32 - 1;
 const MAX_UINT16: number = 2 ** 16 - 1;
@@ -30,23 +30,23 @@ export interface Body {
 export class NetProtocol {
     pack(msgType: MSG_TYPE, session: number, packid: number, msgbuffer: Uint8Array) {
         if (session < 0 || session > MAX_UINT32) {
-            Logger.logNet(`invalid session:${session}`)
+            oops.log.logNet(`invalid session:${session}`)
             return;
         }
 
         if (packid < 0 || packid > MAX_UINT16) {
-            Logger.logNet(`invalid packid:${packid}`)
+            oops.log.logNet(`invalid packid:${packid}`)
             return;
         }
 
         let totalLen = 8 + msgbuffer.length;
         if (totalLen > MAX_UINT16) {
-            Logger.logNet(`buffer len cannot be greater than ${MAX_UINT32 - 8}`)
+            oops.log.logNet(`buffer len cannot be greater than ${MAX_UINT32 - 8}`)
             return;
         }
 
         if (msgType != MSG_TYPE.CLIENT_PUSH && msgType != MSG_TYPE.CLIENT_REQ) {
-            Logger.logNet(`msg type err ${msgType}`)
+            oops.log.logNet(`msg type err ${msgType}`)
             return;
         }
 
@@ -79,7 +79,7 @@ export class NetProtocol {
         };
         // 检查字节流是否足够长
         if (arrayBuffer.byteLength != totalLength + 2) {
-            Logger.logNet(`Buffer is not long enough to contain the specified package.`)
+            oops.log.logNet(`Buffer is not long enough to contain the specified package.`)
             return body;
         }
         

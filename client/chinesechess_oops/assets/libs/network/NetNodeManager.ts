@@ -1,7 +1,7 @@
 import {WebSock} from "../../../extensions/oops-plugin-framework/assets/libs/network/WebSock"
 import { NetNode, NetNodeOpt, connectCb } from "../../libs/network/NetNode";
 import { INetworkTips } from "../../../extensions/oops-plugin-framework/assets/libs/network/NetInterface";
-import { Logger } from "../../../extensions/oops-plugin-framework/assets/core/common/log/Logger";
+import {oops} from "db://oops-framework/core/Oops"
 import { NetProtobuf } from "../../libs/network/NetProtobuf";
 import proto from "../../../protos-js/proto.js"
 
@@ -127,7 +127,7 @@ export class NetNodeManager {
     TryConnect(name: string, connOpt :connectOpt) {
         let node = this.GetNode(name)
         if (!node) {
-            Logger.logNet(`TryConnect node not exists name[${name}]`)
+            oops.log.logNet(`TryConnect node not exists name[${name}]`)
             return;
         }
         this._nodeConnOptMap[name] = connOpt

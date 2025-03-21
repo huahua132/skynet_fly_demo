@@ -1,6 +1,6 @@
 import { error, warn } from "cc";
 import { ISocket, INetworkTips } from "../../../extensions/oops-plugin-framework/assets/libs/network/NetInterface";
-import { Logger } from "../../../extensions/oops-plugin-framework/assets/core/common/log/Logger";
+import {oops} from "db://oops-framework/core/Oops"
 import { NetProtocol, PACK_TYPE, MSG_TYPE } from "./NetProtocol";
 import { Iprotocode } from "./NetInterface";
 
@@ -132,7 +132,7 @@ export class NetNode {
         }
         this._heartTimeOutTimer = setTimeout(() => {
             warn(`心跳超时 关闭网络连接 nodename[${this._name}]`)
-            Logger.logNet(`心跳超时 关闭网络连接 nodename[${this._name}]`)
+            oops.log.logNet(`心跳超时 关闭网络连接 nodename[${this._name}]`)
             this.Close()
         }, this._heartTimeOut)
     }
@@ -190,7 +190,7 @@ export class NetNode {
     }
 
     protected onChecked() {
-        Logger.logNet(`连接验证成功，进入工作状态 name[${this._name}]`);
+        oops.log.logNet(`连接验证成功，进入工作状态 name[${this._name}]`);
         this._state = NetNodeState.Working;
         // 关闭连接或重连中的状态显示
         this.updateNetTips(NetTipsType.Connecting, false);
@@ -208,7 +208,7 @@ export class NetNode {
     }
 
     protected onConnected(event: any) {
-        Logger.logNet(`socket 连接成功 name[${this._name}]`)
+        oops.log.logNet(`socket 连接成功 name[${this._name}]`)
         this._isSocketOpen = true;
         if (this._connectedCb) {
             this._connectedCb(this._name);
@@ -220,17 +220,17 @@ export class NetNode {
             .then(ret => {
                 if (!ret) {
                     this._isAuthFail = true
-                    Logger.logNet(`连接验证失败，关闭连接 name[${this._name}]`);
+                    oops.log.logNet(`连接验证失败，关闭连接 name[${this._name}]`);
                     this._socket?.close()
                     return;
                 } else {
                     this.onChecked()
-                    Logger.logNet(`网络已连接当前状态为name[${this._name}] 【${NetNodeStateStrs[this._state]}】`);
+                    oops.log.logNet(`网络已连接当前状态为name[${this._name}] 【${NetNodeStateStrs[this._state]}】`);
                 }
             })
             .catch(err => {
                 this._isAuthFail = true
-                Logger.logNet(err, `catch 连接验证失败，关闭连接 name[${this._name}]`);
+                oops.log.logNet(err, `catch 连接验证失败，关闭连接 name[${this._name}]`);
                 this._socket?.close()
                 return;
             })
@@ -245,20 +245,20 @@ export class NetNode {
         let session = body.session;
         let msgbuffer = body.msgbuffer;
         if (msgtype == MSG_TYPE.CLIENT_PUSH || msgtype == MSG_TYPE.CLIENT_REQ) {
-            Logger.logNet(`invalid req nodename[${this._name}] packid[${packid}] msgtype[${msgtype}]`)
+            oops.log.logNet(`invalid req nodename[${this._name}] packid[${packid}] msgtype[${msgtype}]`)
             return;
         }
 
         let reqSession = null;
         if (msgtype != MSG_TYPE.SERVER_PUSH) {
             if (session % 2 != 0) {
-                Logger.logNet(`invalid req nodename[${this._name}] packid[${packid}] session[${session}]`)
+                oops.log.logNet(`invalid req nodename[${this._name}] packid[${packid}] session[${session}]`)
                 return;
             }
             reqSession = session - 1;
         } else {
             if (session <= 0 || session > MAX_UINT32) {
-                Logger.logNet(`invalid push nodename[${this._name}] packid[${packid}] session[${session}]`)
+                oops.log.logNet(`invalid push nodename[${this._name}] packid[${packid}] session[${session}]`)
                 return;
             }
         }
@@ -268,7 +268,7 @@ export class NetNode {
             //rpc 回复
             if (reqSession) {
                 if (!this._waitResultMap[reqSession]) {
-                    Logger.logNet(`invalid rsp nodename[${this._name}] packid[${packid}] session[${session}]`)
+                    oops.log.logNet(`invalid rsp nodename[${this._name}] packid[${packid}] session[${session}]`)
                     return;
                 }
                 let resultObj = this._waitResultMap[reqSession]
@@ -278,7 +278,7 @@ export class NetNode {
                     errmsg : "",
                 }
                 if (msgtype == MSG_TYPE.SERVER_ERR) {
-                    Logger.logNet(msgBody, `rsp error msg nodename[${this._name}] packid[${packid}]`)
+                    oops.log.logNet(msgBody, `rsp error msg nodename[${this._name}] packid[${packid}]`)
                 }
                 resultObj.resolve(rsp);
                 return;
@@ -286,11 +286,11 @@ export class NetNode {
                 let handle = this._pushHandles[packid];
                 if (handle) {
                     if (msgtype == MSG_TYPE.SERVER_ERR) {
-                        Logger.logNet(msgBody, `push error msg nodename[${this._name}] packid[${packid}]`)
+                        oops.log.logNet(msgBody, `push error msg nodename[${this._name}] packid[${packid}]`)
                     }
                     handle(msgBody);
                 } else {
-                    Logger.logNet(`drop package nodename[${this._name}] packid[${packid}]`);
+                    oops.log.logNet(`drop package nodename[${this._name}] packid[${packid}]`);
                 }
                 return;
             }
@@ -305,7 +305,7 @@ export class NetNode {
 
         if (packtype == PACK_TYPE.HEAD) {
             if (msgMap[session]) {
-                Logger.logNet(`repeat session nodename[${this._name}] packid[${packid}] session[${session}]`)
+                oops.log.logNet(`repeat session nodename[${this._name}] packid[${packid}] session[${session}]`)
                 return;
             }
             let msgsz : number = body.msgsz || 0
@@ -313,7 +313,7 @@ export class NetNode {
                 msgsz : msgsz,
                 msgbuffer : new Uint8Array(msgsz),
                 timer : setTimeout(() => {
-                    Logger.logNet(`pack time out nodename[${this._name}] packid[${packid} msgsz[${msgsz}]]`)
+                    oops.log.logNet(`pack time out nodename[${this._name}] packid[${packid} msgsz[${msgsz}]]`)
                     delete msgMap[session];
                 }, this._packTimeOut),
                 recvsz : 0,
@@ -321,11 +321,11 @@ export class NetNode {
         } else if (packtype == PACK_TYPE.BODY) {
             let oneMsg = msgMap[session];
             if (!oneMsg || !msgbuffer) {
-                Logger.logNet(`invalid BODY msg nodename[${this._name}] packid[${packid}] session[${session}] msgbuffer[${msgbuffer}]`)
+                oops.log.logNet(`invalid BODY msg nodename[${this._name}] packid[${packid}] session[${session}] msgbuffer[${msgbuffer}]`)
                 return;
             }
             if (oneMsg.recvsz + msgbuffer.length > oneMsg.msgsz) {
-                Logger.logNet(`invalid BODY msg msgsz err nodename[${this._name}] packid[${packid}] session[${session}] recvsz[${oneMsg.recvsz + msgbuffer.length}] msgsz[${oneMsg.msgsz}]`)
+                oops.log.logNet(`invalid BODY msg msgsz err nodename[${this._name}] packid[${packid}] session[${session}] recvsz[${oneMsg.recvsz + msgbuffer.length}] msgsz[${oneMsg.msgsz}]`)
                 return;
             }
             oneMsg.msgbuffer.set(msgbuffer, oneMsg.recvsz);
@@ -333,11 +333,11 @@ export class NetNode {
         } else if (packtype == PACK_TYPE.TAIL) {
             let oneMsg = msgMap[session];
             if (!oneMsg || !msgbuffer) {
-                Logger.logNet(`invalid TAIL msg nodename[${this._name}] packid[${packid}] session[${session}] msgbuffer[${msgbuffer}]`)
+                oops.log.logNet(`invalid TAIL msg nodename[${this._name}] packid[${packid}] session[${session}] msgbuffer[${msgbuffer}]`)
                 return;
             }
             if (oneMsg.recvsz + msgbuffer.length != oneMsg.msgsz) {
-                Logger.logNet(`invalid TAIL msg msgsz err nodename[${this._name}] packid[${packid}] session[${session}] recvsz[${oneMsg.recvsz + msgbuffer.length}] msgsz[${oneMsg.msgsz}]`)
+                oops.log.logNet(`invalid TAIL msg msgsz err nodename[${this._name}] packid[${packid}] session[${session}] recvsz[${oneMsg.recvsz + msgbuffer.length}] msgsz[${oneMsg.msgsz}]`)
                 return;
             }
             oneMsg.msgbuffer.set(msgbuffer, oneMsg.recvsz);
@@ -347,7 +347,7 @@ export class NetNode {
             //rpc 回复
             if (reqSession) {
                 if (!this._waitResultMap[reqSession]) {
-                    Logger.logNet(`invalid rsp nodename[${this._name}] packid[${packid}] session[${session}]`)
+                    oops.log.logNet(`invalid rsp nodename[${this._name}] packid[${packid}] session[${session}]`)
                     return;
                 }
                 let resultObj = this._waitResultMap[reqSession];
@@ -357,7 +357,7 @@ export class NetNode {
                     errmsg : "",
                 }
                 if (msgtype == MSG_TYPE.SERVER_ERR) {
-                    Logger.logNet(msgBody, `rsp error msg nodename[${this._name}] packid[${packid}]`)
+                    oops.log.logNet(msgBody, `rsp error msg nodename[${this._name}] packid[${packid}]`)
                 }
                 resultObj.resolve(rsp);
                 return;
@@ -365,27 +365,27 @@ export class NetNode {
                 let handle = this._pushHandles[packid];
                 if (handle) {
                     if (msgtype == MSG_TYPE.SERVER_ERR) {
-                        Logger.logNet(msgBody, `push error msg nodename[${this._name}] packid[${packid}]`)
+                        oops.log.logNet(msgBody, `push error msg nodename[${this._name}] packid[${packid}]`)
                     }
                     handle(msgBody);
                 } else {
-                    Logger.logNet(`drop package nodename[${this._name}] packid[${packid}]`);
+                    oops.log.logNet(`drop package nodename[${this._name}] packid[${packid}]`);
                 }
                 return;
             }
         } else {
-            Logger.logNet(`invalid nodename[${this._name}] packid[${packid}] packtype[${packtype}]`)
+            oops.log.logNet(`invalid nodename[${this._name}] packid[${packid}] packtype[${packtype}]`)
             return;
         }
     }
 
     protected onError(event: any) {
-        Logger.logNet(event, `onError nodename[${this._name}]`);
+        oops.log.logNet(event, `onError nodename[${this._name}]`);
         error(event);
     }
 
     protected onClosed(event: any) {
-        Logger.logNet(event, `onClosed nodename[${this._name}]`);
+        oops.log.logNet(event, `onClosed nodename[${this._name}]`);
         this._state = NetNodeState.Closed;
        
         //重置一些数据
@@ -490,7 +490,7 @@ export class NetNode {
     RegPushHandle(packname: string, msgname: string, callback: Function) {
         const packId = this._protoCode?.GetPackId(packname, msgname);
         if (this._pushHandles[packId]) {
-            Logger.logNet(`exists pushHandle packname[${packname}] msgname[${msgname}]`)
+            oops.log.logNet(`exists pushHandle packname[${packname}] msgname[${msgname}]`)
             return;
         }
         this._pushHandles[packId] = callback;
