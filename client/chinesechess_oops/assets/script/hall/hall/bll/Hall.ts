@@ -13,7 +13,6 @@ import { EVENT } from "../../../common/enum/EVENT";
 import {connectOpt} from "../../../../libs/network/NetNodeManager"
 import { BoardBllComp } from "../../../game/board/bll/BoardBll";
 import { BoardViewComp } from "../../../game/board/view/BoardViewComp";
-import { HallViewComp } from "../view/HallViewComp";
 
 let MATCH_STATE = {
     NOT_MATCHING : 0,
@@ -71,8 +70,8 @@ export class HallSystem extends ecs.ComblockSystem implements ecs.IEntityEnterSy
 
         //收到通知进入游戏
         smc.net.GetNode("hall").RegPushHandle("hallserver_match", "JoinGameNotice", (msgbody: hallserver_match.IJoinGameNotice)=> {
-            console.log("收到通知进入游戏 >>> ", msgbody, smc.hall.HallBll.IsMatchBtn);
-            smc.hall.remove(HallBllComp);
+            console.log("收到通知进入游戏 >>> ", msgbody);
+            smc.hall.HallBll.reset();
             let opt :connectOpt = {
                 host : msgbody.gamehost!,
                 token : msgbody.gametoken!,
@@ -87,7 +86,6 @@ export class HallSystem extends ecs.ComblockSystem implements ecs.IEntityEnterSy
                     smc.game.BoardBll.tableId = msgbody.tableId!;
                     await ModuleUtil.addViewUiAsync(smc.game, BoardViewComp, UIID.Board);
                     ModuleUtil.removeViewUi(matchEntity, MatchViewComp, UIID.Match);
-                    ModuleUtil.removeViewUi(smc.hall, HallViewComp, UIID.Hall);
                 }
             }
             smc.net.TryConnect("game", opt)
@@ -95,7 +93,7 @@ export class HallSystem extends ecs.ComblockSystem implements ecs.IEntityEnterSy
 
         //收到道具数据
         smc.net.GetNode("hall").RegPushHandle("hallserver_item", "ItemListNotice", (msgbody: hallserver_item.IItemListNotice) => {
-            console.log("收到道具数据 >>> ", msgbody, smc.hall.HallBll.IsMatchBtn);
+            console.log("收到道具数据 >>> ", msgbody);
             for(let i = 0; i < msgbody.itemList!.length; i++) {
                 let oneItem = msgbody.itemList![i];
                 let itemId = oneItem.id

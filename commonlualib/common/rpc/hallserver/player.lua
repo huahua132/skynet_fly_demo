@@ -175,13 +175,7 @@ end
 
 --改变玩家段位积分
 function M.change_rank_score(player_id, score)
-    local ret = M.call_player_hall(player_id, "player_change_rank_score", player_id, score)
-    if not ret then
-        log.error("change_rank_score err ", player_id, score)
-        return nil
-    end
-
-    return table.unpack(ret.result)
+    return M.call_player_hall(player_id, "player_change_rank_score", player_id, score)
 end
 
 --获取全部在线列表

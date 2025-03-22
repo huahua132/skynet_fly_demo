@@ -8,8 +8,6 @@ import { BoardViewComp } from "../view/BoardViewComp";
 import { PosEntity } from "../../pos/PosEntity";
 import { PosViewComp } from "../../pos/view/PosViewComp";
 import { ChessViewComp } from "../../chess/view/ChessViewComp";
-import { HallViewComp } from "../../../hall/hall/view/HallViewComp";
-import {HallBllComp} from "../../../hall/hall/bll/Hall"
 import { OverViewComp } from "../../over/view/OverViewComp";
 import { ChessBllComp } from "../../chess/bll/ChessBll";
 import { ChessEntity } from "../../chess/ChessEntity";
@@ -163,9 +161,6 @@ export class BoardBllSystem extends ecs.ComblockSystem implements ecs.IEntityEnt
         for (let [key, value] of smc.game.children) {
             smc.game.removeChild(value);
         }
-        //返回大厅
-        smc.hall.addComponents<ecs.Comp>(HallBllComp);
-        await ModuleUtil.addViewUiAsync(smc.hall, HallViewComp, UIID.Hall);
         ModuleUtil.removeViewUi(smc.game.BoardBll.overEntity!, OverViewComp, UIID.Over);
         //销毁over界面实体
         smc.game.BoardBll.overEntity!.destroy();

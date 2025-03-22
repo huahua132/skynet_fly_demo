@@ -4,6 +4,7 @@
     "version": "3.8.4"
   },
   "dependencies": {
+    "axios": "^1.8.4",
     "crypto-es": "^2.1.0",
     "protobufjs": "^7.4.0",
     "protobufjs-cli": "^1.1.3"
