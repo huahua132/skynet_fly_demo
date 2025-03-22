@@ -47,7 +47,7 @@ event_mgr.monitor(EVENT_ID.CROSS_DAY, function(player_id)
 
     local ret = g_email_entity:delete_entry_by_in(del_guid_list, player_id)
     if not ret then
-        log.error_fmt("cross del email err ", player_id, del_guid_list)
+        log.error("cross del email err ", player_id, del_guid_list)
     else
         g_logic_info.email_msg:del_email_notice(player_id, {
             guid_list = del_guid_list
