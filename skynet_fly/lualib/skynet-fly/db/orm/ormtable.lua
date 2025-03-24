@@ -17,6 +17,7 @@ local tti = require "skynet-fly.cache.tti"
 local timer = require "skynet-fly.timer"
 local skynet = require "skynet"
 local log = require "skynet-fly.log"
+local unique_index = require "skynet-fly.db.orm.unique_index"
 
 local setmetatable = setmetatable
 local assert = assert
@@ -55,9 +56,6 @@ local FIELD_TYPE = {
     table        = 53,
 }
 
-local INVALID_POINT = {count = 0, total_count = 0}  --无效叶点
-local VAILD_POINT = {count = 1, total_count = 1}    --有效叶点
-
 local FIELD_LUA_DEFAULT = {
     [FIELD_TYPE.int8] = 0,
     [FIELD_TYPE.int16] = 0,
@@ -80,6 +78,18 @@ local FIELD_LUA_DEFAULT = {
     [FIELD_TYPE.text] = "",
     [FIELD_TYPE.blob] = "",
     [FIELD_TYPE.table] = {},
+}
+
+--不能为index key的类型
+local CANT_INDEX_TYPE_MAP = {
+    [FIELD_TYPE.string1024] = true,
+    [FIELD_TYPE.string2048] = true,
+    [FIELD_TYPE.string4096] = true,
+    [FIELD_TYPE.string8192] = true,
+
+    [FIELD_TYPE.text] = true,
+    [FIELD_TYPE.blob] = true,
+    [FIELD_TYPE.table] = true,
 }
 
 local function create_check_str(len)
@@ -150,207 +160,45 @@ local function queue_doing(t, key1value, func, ...)
     end
 end
 
-local del_key_select = nil  --function
 local get_entry = nil       --function
 local save_entry = nil      --function
 
 -- 添加进key索引表
 local function add_key_select(t, entry, is_add)
     if not t._cache_time then return entry end
-    local key_select_map = t._key_select_map
-    local key_cache_num_map = t._key_cache_num_map                      --缓存数量
-    local key_list = t._keylist
+    local res_entry = t._main_index:add(entry, is_add)
 
-    local res_entry = entry
-    local invalid = entry:is_invalid()
-    local select_list = {}
-    local len = #key_list
-    for i = 1,len do
-        local field_name = key_list[i]
-        local field_value = entry:get(field_name)
-        assert(field_value, "not field_value")
-        
-        if i ~= len then
-            if not key_select_map[field_value] then
-                key_select_map[field_value] = {}
-                key_cache_num_map[field_value] = {count = 0, sub_map = {}}
-            end
-            local one_select = {k = field_value, pv = key_select_map, pc = key_cache_num_map}
-            tinsert(select_list, one_select)
-            key_cache_num_map = key_cache_num_map[field_value].sub_map
-            key_select_map = key_select_map[field_value]
+    if t._cache_map then
+        if res_entry ~= entry then
+            t._cache_map:update_cache(res_entry, t)
         else
-            if not key_select_map[field_value] then
-                if t._cache_map then
-                    t._cache_map:set_cache(entry,t)
-                end
-                if invalid then
-                    key_cache_num_map[field_value] = INVALID_POINT
-                else
-                    key_cache_num_map[field_value] = VAILD_POINT
-                end
-                
-                key_select_map[field_value] = entry
-                for i = #select_list, 1, -1 do
-                    local one_select = select_list[i]
-                    if not invalid then
-                        one_select.pc[one_select.k].count = one_select.pc[one_select.k].count + 1
-                    end
-
-                    if is_add and not invalid then
-                        --是添加跟着count 一起加一就行
-                        if one_select.pc[one_select.k].total_count then
-                            one_select.pc[one_select.k].total_count = one_select.pc[one_select.k].total_count + 1
-                        end
-                    end
-                end
-                if not invalid then
-                    t._key_cache_count = t._key_cache_count + 1
-                end
-
-                if is_add and not invalid then
-                    if t._key_cache_total_count then
-                        t._key_cache_total_count = t._key_cache_total_count + 1
-                    end
-                end
-            else
-                res_entry = key_select_map[field_value]
-                if is_add and not invalid and res_entry:is_invalid() then   --是添加并且是无效条目，替换掉
-                    del_key_select(t, res_entry, true)
-                    add_key_select(t, entry, true)
-                    res_entry = entry
-                else
-                    if t._cache_map then
-                        t._cache_map:update_cache(res_entry,t)
-                    end
-                end
-            end
+            t._cache_map:set_cache(res_entry, t)
         end
     end
 
-    --log.info("add_key_select:", invalid, is_add, t._key_cache_num_map, tostring(res_entry))
     return res_entry
 end
 
 -- 设置total_count
 local function set_total_count(t, key_values, total_count)
     if not t._cache_time then return end
-    local key_cache_num_map = t._key_cache_num_map                      --缓存数量
-    local len = #key_values
-    for i = 1, len do
-        local field_value = key_values[i]
-        if i ~= len then
-            key_cache_num_map = key_cache_num_map[field_value].sub_map
-        else
-            local cache = key_cache_num_map[field_value]
-            cache.total_count = total_count
-            return
-        end
-    end
-
-    t._key_cache_total_count = total_count
+    t._main_index:set_total_count(key_values, total_count)
 end
 
 -- 查询key索引表
 local function get_key_select(t, key_values)
     if not t._cache_time then return end
-    local key_select_map = t._key_select_map
-    local key_cache_num_map = t._key_cache_num_map                      --缓存数量
-    local len = #key_values
-    for i = 1, len do
-        local field_value = key_values[i]
-        if i ~= len then
-            if not key_select_map[field_value] then
-                return
-            end
-            key_select_map = key_select_map[field_value]
-            key_cache_num_map = key_cache_num_map[field_value].sub_map
-        else
-            local cache = key_cache_num_map[field_value]
-            if not cache then return end
-            if t._cache_time == 0 then      --永久缓存不需要对比total_count，数据全在
-                if key_select_map[field_value] then
-                    return key_select_map[field_value], true
-                else
-                    return
-                end
-            end
-            if not cache.total_count then return key_select_map[field_value] end
-            return key_select_map[field_value], cache.count == cache.total_count
-        end
-    end
-    
-    return key_select_map, t._key_cache_count == t._key_cache_total_count
+    return t._main_index:get(key_values)
 end
 
 -- 删除掉key索引表
-del_key_select = function(t, entry, is_del)
+local function del_key_select(t, entry, is_del)
     if not t._cache_time then return end
-    local key_select_map = t._key_select_map
-    local key_cache_num_map = t._key_cache_num_map                      --缓存数量
-    local key_list = t._keylist
-    local select_list = {}
-    local invalid = entry:is_invalid()
-    local len = #key_list
-    for i = 1,len do
-        local field_name = key_list[i]
-        local field_value = entry:get(field_name)
-        assert(field_value, "not field_value")
-
-        if i ~= len then
-            if not key_select_map[field_value] then
-                break
-            end
-            local one_select = {k = field_value, pv = key_select_map, pc = key_cache_num_map}
-            key_select_map = key_select_map[field_value]
-            key_cache_num_map = key_cache_num_map[field_value].sub_map
-            one_select.sv = key_select_map
-            tinsert(select_list, one_select)
-        else
-            if entry ~= key_select_map[field_value] then break end
-            key_select_map[field_value] = nil
-            key_cache_num_map[field_value] = nil
-            if not invalid then
-                t._key_cache_count = t._key_cache_count - 1
-            end
-            if is_del then
-                if not invalid and t._key_cache_total_count then
-                    t._key_cache_total_count = t._key_cache_total_count - 1
-                end
-            else
-                --仅仅是缓存过期了
-                t._key_cache_total_count = nil
-            end
-            local rm_k = nil
-            for i = #select_list, 1, -1 do
-                local one_select = select_list[i]
-                if not invalid then
-                    one_select.pc[one_select.k].count = one_select.pc[one_select.k].count - 1
-                end
-                if is_del then
-                    --是删除跟着count 一起减一就行
-                    if not invalid and one_select.pc[one_select.k].total_count then
-                        one_select.pc[one_select.k].total_count = one_select.pc[one_select.k].total_count - 1
-                    end
-                else
-                    one_select.pc[one_select.k].total_count = nil
-                end
-                
-                if not next(one_select.sv) then  --表空了父级表应该删掉自己
-                    rm_k = one_select.k
-                end
-                if rm_k then
-                    one_select.pv[rm_k] = nil
-                    one_select.pc[rm_k] = nil
-                end
-            end
-        end
-    end
+    t._main_index:del(entry, is_del)
 
     if t._cache_map then
         t._cache_map:del_cache(entry)
     end
-    --log.info("del_key_select:", invalid, is_del, t._key_cache_num_map)
 end
 
 local function init_entry_data(t, entry_data, is_old)
@@ -402,11 +250,7 @@ function M:new(tab_name)
         _keylist = {},                              --key列表
         _is_builder = false,
 
-        -- key索引表
-        _key_select_map = {},
-        _key_cache_num_map = {},                    --缓存数量
-        _key_cache_count = 0,                       --缓存总数
-        _key_cache_total_count = nil,               --实际总数
+        _main_index = nil,                          --主键索引
 
         -- 缓存时间
         _cache_time = nil,
@@ -445,6 +289,8 @@ function M:set_keys(...)
         local field_name = list[i]
         assert(self._field_map[field_name], "not exists: ".. field_name)
         assert(not self._key_map[field_name], "is exists: ".. field_name)
+        local field_type = self._field_map[field_name]
+        assert(not CANT_INDEX_TYPE_MAP[field_type], "can`t key type " .. field_name)
         tinsert(self._keylist, field_name)
         self._key_map[field_name] = true
     end
@@ -599,6 +445,8 @@ local function builder(t, adapterinterface)
     local field_map = t._field_map
     local field_list = t._field_list
     local key_list = t._keylist
+
+    t._main_index = unique_index:new("main_index", key_list, t._cache_time == 0)
     
     t._is_builder = true
 
@@ -917,10 +765,7 @@ local function save_one_entry(t, entry)
     return t._adapterinterface:save_one_entry(entry_data, change_map)
 end
 
-local function delete_entry(t, key_values)
-    local res = t._adapterinterface:delete_entry(key_values)
-    if not res then return end
-
+local function clear_cache_by_keyvalue(t, key_values)
     local change_flag_map = t._change_flag_map
     local key_list = t._keylist
     local entry_list = nil
@@ -941,6 +786,13 @@ local function delete_entry(t, key_values)
         entry:clear_change()
         del_key_select(t, entry, true)
     end
+end
+
+local function delete_entry(t, key_values)
+    local res = t._adapterinterface:delete_entry(key_values)
+    if not res then return end
+
+    clear_cache_by_keyvalue(t, key_values)
 
     return res
 end
@@ -966,10 +818,7 @@ local function compare_right(left, right, v)
     return false
 end
 
-local function delete_entry_by_range(t, left, right, key_values)
-    local res = t._adapterinterface:delete_entry_by_range(left, right, key_values)
-    if not res then return end
-
+local function clear_cache_by_range(t, key_values, left, right)
     local change_flag_map = t._change_flag_map
     local key_list = t._keylist
     local entry_list = nil
@@ -1004,6 +853,13 @@ local function delete_entry_by_range(t, left, right, key_values)
             del_key_select(t, entry, true)
         end
     end
+end
+
+local function delete_entry_by_range(t, left, right, key_values)
+    local res = t._adapterinterface:delete_entry_by_range(left, right, key_values)
+    if not res then return end
+
+    clear_cache_by_range(t, key_values, left, right)
 
     return res
 end
@@ -1041,6 +897,33 @@ local function delete_entry_by_in(t, in_values, key_values)
     return res
 end
 
+local function batch_delete_entry(t, keys_list)
+    local res = t._adapterinterface:batch_delete_entry(keys_list)
+    for i = 1, #res do
+        local key_values = keys_list[i]
+        if res[i] then
+            clear_cache_by_keyvalue(t, key_values)      --删除成功了，清理缓存
+        end
+    end
+
+    return res
+end
+
+local function batch_delete_entry_by_range(t, query_list)
+    local res = t._adapterinterface:batch_delete_entry_by_range(query_list)
+    for i = 1, #res do
+        if res[i] then
+            local query = query_list[i]
+            local key_values = query.key_values
+            local left = query.left
+            local right = query.right
+            clear_cache_by_range(t, key_values, left, right)
+        end
+    end
+
+    return res
+end
+
 ---#desc 批量创建新数据
 ---@param entry_data_list table 数据列表
 ---@return table obj
@@ -1059,7 +942,7 @@ function M:create_one_entry(entry_data)
     return queue_doing(self, key1value, create_one_entry, self, entry_data)
 end
 
----#desc 查询多条数据
+---#desc 查询多条数据  format`[select * from tab_name where key1 = ? and key2 = ?]`
 ---@param ... string[] 最左前缀的 key 列表
 ---@return table obj[](ormentry)
 function M:get_entry(...)
@@ -1071,7 +954,7 @@ function M:get_entry(...)
     return queue_doing(self, key1value, get_entry, self, key_values)
 end
 
----#desc 查询一条数据
+---#desc 查询一条数据 查询单条数据，必须提供所有主键 format`[select * from tab_name where key1 = ? and key2 = ?]`
 ---@param ... string[] 最左前缀的 key 列表
 ---@return table obj(ormentry)
 function M:get_one_entry(...)
@@ -1104,7 +987,7 @@ function M:save_one_entry(entry)
     return queue_doing(self, key1value, save_one_entry, self, entry)
 end
 
----#desc 删除数据
+---#desc 删除数据 format[delete * from tab_name where key1 = ? and key2 = ?]
 ---@param ... string[] 最左前缀的 key 列表
 ---@return boolean 成功true失败false
 function M:delete_entry(...)
@@ -1164,11 +1047,11 @@ function M:is_inval_save()
     return self._time_obj ~= nil
 end
 
----#desc 分页查询
+---#desc 分页查询 format`[select * from tab_name where key1 = ? and key2 > ? order by ? desc limit ?]`
 ---@param cursor number|string 游标
 ---@param limit number 数量限制
 ---@param sort number 1升序  -1降序
----@param ... string[] 最左前缀主键列表
+---@param ... string[] 最左前缀主键列表 key1 key2 ... 不填入的key作为游标
 ---@return table obj[](ormentry)
 function M:get_entry_by_limit(cursor, limit, sort, ...)
     assert(self._is_builder, "not builder can`t get_entry_by_limit")
@@ -1185,8 +1068,8 @@ function M:get_entry_by_limit(cursor, limit, sort, ...)
     return queue_doing(self, key1value, get_entry_by_limit, self, cursor, limit, sort, key_values)
 end
 
----#desc IN 查询
----@param in_values table in对应的值列表 select * from xxx where key1 = xxx and key2 = xxx and key3 in (xxx,xxx,xxx)
+---#desc IN 查询  format`[select * from tab_name where key1 = ? and key2 = ? and key3 in (?,?,?)]`
+---@param in_values table in对应的值列表
 ---@param ... string[] 最左前缀主键列表 无需填入in_values的key
 ---@return table obj[](ormentry)
 function M:get_entry_by_in(in_values, ...)
@@ -1211,12 +1094,12 @@ function M:get_entry_by_in(in_values, ...)
     return queue_doing(self, key1value, get_entry_by_in, self, in_values, key_values)
 end
 
--- 范围删除 包含left right
--- 可以有三种操作方式
--- [left, right] 范围删除  >= left <= right
--- [left, nil] 删除 >= left
--- [nil, right] 删除 <= right
-
+---#content 范围删除 包含left right
+---#content 可以有三种操作方式
+---#content [left, right] 范围删除  >= left <= right
+---#content [left, nil] 删除 >= left
+---#content [nil, right] 删除 <= right
+---#content format`[delete from player where key1=? and key2>=? and key2<=?;]`
 ---#desc 范围删除 包含left right 可以有三种操作方式 [left, right] 范围删除  >= left <= right  [left, nil] 删除 >= left [nil, right] 删除 <= right
 ---@param left string|number 左值
 ---@param right string|number 右值
@@ -1247,8 +1130,8 @@ function M:delete_entry_by_range(left, right, ...)
     return queue_doing(self, key1value, delete_entry_by_range, self, left, right, key_values)
 end
 
----#desc IN 删除
----@param in_values table in对应的值列表 delete from xxx where key1 = xxx and key2 = xxx and key3 in (xxx,xxx,xxx)
+---#desc IN 删除 format`[delete from tab_name where key1 = ? and key2 = ? and key3 in (?,?,?)]`
+---@param in_values table in对应的值列表 
 ---@param ... string[] 最左前缀主键列表 无需填入in_values的key
 ---@return boolean
 function M:delete_entry_by_in(in_values, ...)
@@ -1271,6 +1154,54 @@ function M:delete_entry_by_in(in_values, ...)
    
     local key1value = key_values[1]
     return queue_doing(self, key1value, delete_entry_by_in, self, in_values, key_values)
+end
+
+---#desc 批量删除 format `[delete from tab_name where (key1 = ? and key2 = ?) or (key1 = ? and key2 = ?)]`
+---@param keys_list table 最左前缀主键列表 `{{key1,key2,...},{key1,key2,...}}`
+---@return table boolean 执行结果
+function M:batch_delete_entry(keys_list)
+    assert(self._is_builder, "not builder can`t batch_delete_entry")
+    assert(#keys_list > 0, "keys_list can`t be empty")
+    local len = #keys_list[1]
+    assert(len > 0, "key_values can`t be empty")
+    for i = 1, #keys_list do
+        local key_values = keys_list[i]
+        assert(#key_values == len, sformat("key_values len mult same firstlen[%s] index[%s]len[%s]", len, i, #key_values))
+        check_key_values(self, key_values)
+    end
+
+    return queue_doing(self, nil, batch_delete_entry, self, keys_list)
+end
+
+--#desc 批量范围删除 format `[delete from tab_name where (key1 = ? and key2 >= ? and key2 <= ?) or (key1 = ? and key2 >= ? and key2 <= ?)]`  key长度必须一致， left,right 有无必须一致
+---@param query_list table `{{left = 1, right = 10, key_values = {10001, 10002}}, {left = 1, right = 10, key_values = {10001, 10002}}} key1[10001], key2[10002] key3[left, right]}}`
+---@return table boolean 执行结果
+function M:batch_delete_entry_by_range(query_list)
+    assert(self._is_builder, "not builder can`t batch_delete_entry_by_range")
+    assert(#query_list > 0, "query_list can`t be empty")
+    local first_query = query_list[1]
+    local first_key_values = first_query.key_values
+    local first_left = first_query.left
+    local first_right = first_query.right
+    assert(first_left or first_right, "not left or right")
+    assert(first_key_values and #first_key_values >= 1 and #first_key_values < #self._keylist, "kv len err")
+    for i = 1, #query_list do
+        local query = query_list[i]
+        assert(#query.key_values == #first_key_values, sformat("key_values len mult same firstlen[%s] index[%s]len[%s]", #first_key_values, i, #query.key_values))
+        if first_left then
+            assert(query.left, "left right mult same : " .. i)
+        else
+            assert(not query.left, "left right mult same : " .. i)
+        end
+        if first_right then
+            assert(query.right, "left right mult same : " .. i)
+        else
+            assert(not query.right, "left right mult same : " .. i)
+        end
+        check_key_values(self, query.key_values)
+    end
+
+    return queue_doing(self, nil, batch_delete_entry_by_range, self, query_list)
 end
 
 return M

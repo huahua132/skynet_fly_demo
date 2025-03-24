@@ -33,6 +33,8 @@ local tinsert = table.insert
 local tremove = table.remove
 local tsort = table.sort
 local pcall = pcall
+local math = math
+local schar = string.char
 
 local FIELD_TYPE_SQL_TYPE = {
     [FIELD_TYPE.int8] = "tinyint",
@@ -115,6 +117,7 @@ function M:new(db_name)
         _tab_decode = json.decode,
         batch_insert_num = 10,
         batch_update_num = 10,
+        batch_delete_num = 10,
     }
 
     setmetatable(t, mata)
@@ -137,6 +140,15 @@ end
 function M:set_batch_update_num(num)
     assert(num > 0)
     self.batch_update_num = num
+    return self
+end
+
+---#desc 设置单次整合批量删除的数量
+---@param num number 数量 默认10
+---@return table obj
+function M:set_batch_delete_num(num)
+    assert(num > 0)
+    self.batch_delete_num = num
     return self
 end
 
@@ -485,9 +497,22 @@ function M:builder(tab_name, field_list, field_map, key_list)
 
     --delete prepare
     local delete_prepare_list = {}
+    local batch_delete_prepare_list = {}
+    
     delete_prepare_list[0] = new_prepare_obj(delete_format_head)
     for i = 1, len do
-        delete_prepare_list[i] = new_prepare_obj(delete_format_head .. select_format_center .. select_format_end_list[i])
+        local one_str = delete_format_head .. select_format_center .. '(' .. select_format_end_list[i] .. ')'
+        delete_prepare_list[i] = new_prepare_obj(one_str)
+
+        if not batch_delete_prepare_list[i] then
+            batch_delete_prepare_list[i] = {}
+        end
+        batch_delete_prepare_list[i][1] = delete_prepare_list[i]
+        local batch_str = one_str
+        for j = 2, self.batch_delete_num do
+            batch_str = batch_str .. ' or ' .. '(' .. select_format_end_list[i] .. ')'
+            batch_delete_prepare_list[i][j] = new_prepare_obj(batch_str)
+        end
     end
 
     --delete byrange prepare
@@ -497,6 +522,10 @@ function M:builder(tab_name, field_list, field_map, key_list)
     local delete_range_prepare_list_b = {}          --大于等于
     local delete_range_prepare_list_s = {}          --小于等于
     local delete_range_prepare_list_c = {}          --大于等于 and 小于等于
+
+    local batch_delete_range_prepare_list_b = {}
+    local batch_delete_range_prepare_list_s = {}
+    local batch_delete_range_prepare_list_c = {}
     for i = 1, len do
         local end_field_name = key_list[i]
         if i == 1 then
@@ -507,6 +536,29 @@ function M:builder(tab_name, field_list, field_map, key_list)
             delete_range_prepare_list_b[i] = new_prepare_obj(sformat("%s%s%s and `%s`>=?", delete_format_head, select_format_center, select_format_end_list[i-1], end_field_name))
             delete_range_prepare_list_s[i] = new_prepare_obj(sformat("%s%s%s and `%s`<=?", delete_format_head, select_format_center, select_format_end_list[i-1], end_field_name))
             delete_range_prepare_list_c[i] = new_prepare_obj(sformat("%s%s%s and `%s`>=? and `%s` <=?", delete_format_head, select_format_center, select_format_end_list[i-1], end_field_name, end_field_name))
+
+            if not batch_delete_range_prepare_list_c[i] then
+                batch_delete_range_prepare_list_b[i] = {}
+                batch_delete_range_prepare_list_s[i] = {}
+                batch_delete_range_prepare_list_c[i] = {}
+            end
+
+            local batch_str_b = delete_format_head .. select_format_center
+            local batch_str_s = delete_format_head .. select_format_center
+            local batch_str_c = delete_format_head .. select_format_center
+            for j = 1, self.batch_delete_num do
+                batch_str_b = batch_str_b .. sformat("(%s and `%s`>=?)", select_format_end_list[i-1], end_field_name)
+                batch_delete_range_prepare_list_b[i][j] = new_prepare_obj(batch_str_b)
+                batch_str_b = batch_str_b .. ' or '
+
+                batch_str_s = batch_str_s .. sformat("(%s and `%s`<=?)", select_format_end_list[i-1], end_field_name)
+                batch_delete_range_prepare_list_s[i][j] = new_prepare_obj(batch_str_s)
+                batch_str_s = batch_str_s .. ' or '
+
+                batch_str_c = batch_str_c .. sformat("(%s and `%s`>=? and `%s`<=?)", select_format_end_list[i-1], end_field_name, end_field_name)
+                batch_delete_range_prepare_list_c[i][j] = new_prepare_obj(batch_str_c)
+                batch_str_c = batch_str_c .. ' or '
+            end
         end
     end
 
@@ -542,15 +594,6 @@ function M:builder(tab_name, field_list, field_map, key_list)
                 if v then
                     one_ret[fn] = tab_decode(v)
                 end
-            end
-        end
-    end
-    --防止sql注入
-    local function quete_key_values(key_values)
-        for i = 1, #key_values do
-            local v = key_values[i]
-            if type(v) == 'string' then
-                key_values[i] = string_util.quote_sql_str(v)
             end
         end
     end
@@ -966,6 +1009,109 @@ function M:builder(tab_name, field_list, field_map, key_list)
         return true
     end
 
+    self._batch_delete = function(keys_list)
+        local len = #keys_list[1]
+        local res_list = {}
+        local total_len = #keys_list
+        local batch = math.ceil(total_len / self.batch_delete_num)
+        for i = 1, batch do
+            local end_index = i * self.batch_delete_num
+            local start_index = end_index - self.batch_delete_num + 1
+
+            local args = {}
+            local count = 0
+            for j = start_index, end_index do
+                local key_values = keys_list[j]
+                if key_values then
+                    count = count + 1
+                    for i = 1, #key_values do
+                        tinsert(args, key_values[i])
+                    end
+                else
+                    break
+                end
+            end
+
+            if count <= 0 then break end
+
+            local prepare_obj = batch_delete_prepare_list[len][count]
+            local isok, ret = pcall(prepare_execute, self._db, prepare_obj, tunpack(args))
+            if isok and ret and not ret.err then
+                for i = 1, count do
+                    res_list[start_index + i - 1] = true
+                end
+            else
+                log.error("_batch_delete err ", self._tab_name, ret, args)
+                for i = 1, count do
+                    res_list[start_index + i - 1] = false
+                end
+            end
+        end
+
+        return res_list
+    end
+
+    self._batch_delete_by_range = function(query_list)
+        local first_query = query_list[1]
+        local first_left = first_query.left
+        local first_right = first_query.right
+        local prepare_list = nil
+        if first_left and first_right then
+            prepare_list = batch_delete_range_prepare_list_c
+        elseif first_left then
+            prepare_list = batch_delete_range_prepare_list_b
+        else
+            prepare_list = batch_delete_range_prepare_list_s
+        end
+        local len = #first_query.key_values + 1
+        local res_list = {}
+        local total_len = #query_list
+        local batch = math.ceil(total_len / self.batch_delete_num)
+        for i = 1, batch do
+            local end_index = i * self.batch_delete_num
+            local start_index = end_index - self.batch_delete_num + 1
+
+            local args = {}
+            local count = 0
+            for j = start_index, end_index do
+                local query = query_list[j]
+                if query then
+                    local key_values = query.key_values
+                    count = count + 1
+                    for i = 1, #key_values do
+                        tinsert(args, key_values[i])
+                    end
+                    if query.left then
+                        tinsert(args, query.left)
+                    end
+
+                    if query.right then
+                        tinsert(args, query.right)
+                    end
+                else
+                    break
+                end
+            end
+
+            if count <= 0 then break end
+
+            local prepare_obj = prepare_list[len][count]
+            local isok, ret = pcall(prepare_execute, self._db, prepare_obj, tunpack(args))
+            if isok and ret and not ret.err then
+                for i = 1, count do
+                    res_list[start_index + i - 1] = true
+                end
+            else
+                log.error("_batch_delete_by_range err ", self._tab_name, ret, args)
+                for i = 1, count do
+                    res_list[start_index + i - 1] = false
+                end
+            end
+        end
+
+        return res_list
+    end
+
     return self
 end
 
@@ -1022,6 +1168,16 @@ end
 -- IN 删除
 function M:delete_entry_by_in(in_values, key_values)
     return self._delete_in(in_values, key_values)
+end
+
+-- 批量删除
+function M:batch_delete_entry(keys_list)
+    return self._batch_delete(keys_list)
+end
+
+--批量范围删除
+function M:batch_delete_entry_by_range(query_list)
+    return self._batch_delete_by_range(query_list)
 end
 
 return M
