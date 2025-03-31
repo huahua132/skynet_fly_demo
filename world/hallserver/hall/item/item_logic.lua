@@ -8,6 +8,7 @@ local EVENT_ID = require "enum.EVENT_ID"
 local interface = require "hall.item.interface"
 local table_util = require "skynet-fly.utils.table_util"
 local item_conf = hotfix_require "common.conf.item_conf"
+local log_helper = require "common.log_helper"
 
 local assert = assert
 local tinsert = table.insert
@@ -19,10 +20,39 @@ local g_item_entity = orm_table_client:instance("item")
 
 local g_local_info = state_data.alloc_table("g_local_info")
 
+local function hotfix_init()
+    g_local_info.item_change_log = log_helper:new_user_log('item_change_log')
+    :int64("player_id")         --玩家ID
+    :int64("item_id")           --道具ID
+    :int64("change_num")        --改变值
+    :int64("cur_num")           --目前值
+    :uint32("source")           --变更来源
+    :set_index("item_index", "item_id", "change_num")
+    :set_index("player_index", "player_id")
+    :builder()
+
+    event_mgr.monitor(EVENT_ID.ITEM_CHANGE, function(player_id, id, num, count, source)
+        g_local_info.item_change_log:write_log({
+            player_id = player_id,
+            item_id = id,
+            change_num = num,
+            cur_num = count,
+            source = source or 0,
+        })
+    end)
+end
+
 local M = {}
 function M.init(interface_mgr)
     g_local_info.item_msg = item_msg:new(interface_mgr)
+    hotfix_init()
 end
+
+function M.hotfix()
+    hotfix_init()
+    --道具改变日志
+end
+
 ---------------------------其他逻辑------------------------------------
 local function player_item_notice(player_id)
     local item_list = g_item_entity:get_entry(player_id)
@@ -58,7 +88,7 @@ function M.cmd_get_item(player_id, id)
 end
 
 --增加道具
-function M.cmd_add_item(player_id, id, num)
+function M.cmd_add_item(player_id, id, num, source)
     local item_cfg = item_conf.get_item_info(id)
     assert(item_cfg, "not item_cfg " .. id)
     local count = g_item_entity:add_item(player_id, id, num)
@@ -66,17 +96,18 @@ function M.cmd_add_item(player_id, id, num)
         return nil
     end
 
+    local item_list = {{id = id, count = count}}
     --同步到客户端
     g_local_info.item_msg:item_list_notice(player_id, {
-        item_list = {{id = id, count = count}}
+        item_list = item_list
     })
 
-    event_mgr.publish(EVENT_ID.ITEM_CHANGE, player_id, id, num, count)
+    event_mgr.publish(EVENT_ID.ITEM_CHANGE, player_id, id, num, count, source)
     return count
 end
 
 --减少道具
-function M.cmd_reduce_item(player_id, id, num)
+function M.cmd_reduce_item(player_id, id, num, source)
     local item_cfg = item_conf.get_item_info(id)
     assert(item_cfg, "not item_cfg " .. id)
     local ret,count = g_item_entity:reduce_item(player_id, id, num)
@@ -88,7 +119,7 @@ function M.cmd_reduce_item(player_id, id, num)
     g_local_info.item_msg:item_list_notice(player_id, {
         item_list = {{id = id, count = count}}
     })
-    event_mgr.publish(EVENT_ID.ITEM_CHANGE, player_id, id, -num, count)
+    event_mgr.publish(EVENT_ID.ITEM_CHANGE, player_id, id, -num, count, source)
 
     return ret,count
 end
@@ -99,7 +130,7 @@ function M.cmd_get_item_map(player_id, id_list)
 end
 
 --批量增加道具
-function M.cmd_add_item_map(player_id, item_map)
+function M.cmd_add_item_map(player_id, item_map, source)
     if not next(item_map) then return item_map end
     for id, count in pairs(item_map) do
         local item_cfg = item_conf.get_item_info(id)
@@ -112,7 +143,7 @@ function M.cmd_add_item_map(player_id, item_map)
     for id, count in pairs(ret_map) do
         tinsert(item_list, {id = id, count = count})
         local num = item_map[id]
-        event_mgr.publish(EVENT_ID.ITEM_CHANGE, player_id, id, num, count)
+        event_mgr.publish(EVENT_ID.ITEM_CHANGE, player_id, id, num, count, source)
     end
     g_local_info.item_msg:item_list_notice(player_id, {item_list = item_list})
 
@@ -120,7 +151,7 @@ function M.cmd_add_item_map(player_id, item_map)
 end
 
 --批量增加道具
-function M.cmd_add_item_list(player_id, item_list)
+function M.cmd_add_item_list(player_id, item_list, source)
     if not next(item_list) then return item_list end
     
     local item_map = {}
@@ -142,7 +173,7 @@ function M.cmd_add_item_list(player_id, item_list)
     for id, count in pairs(ret_map) do
         tinsert(item_list, {id = id, count = count})
         local num = item_map[id]
-        event_mgr.publish(EVENT_ID.ITEM_CHANGE, player_id, id, num, count)
+        event_mgr.publish(EVENT_ID.ITEM_CHANGE, player_id, id, num, count, source)
     end
     g_local_info.item_msg:item_list_notice(player_id, {item_list = item_list})
 

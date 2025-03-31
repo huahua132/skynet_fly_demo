@@ -20,8 +20,11 @@ local M = {}
 -- 获取自增ID所属的模块ID
 function M.get_module_id()
     local cli = frpc_client:instance("hallserver", "player_m")
-    local ret = cli:one_balance_call("get_module_id")
-    if not ret then return end
+    local ret, code, msg = cli:one_balance_call("get_module_id")
+    if not ret then
+        log.error("get_module_id err ", code, msg)
+        return
+    end
 
     local cluster_name = ret.cluster_name
     local result = ret.result
@@ -33,8 +36,11 @@ end
 -- 获取host
 function M.get_host(player_id)
     local cli = base.hallserver_player_m(player_id)
-    local ret = cli:byid_mod_call("get_host")
-    if not ret then return end
+    local ret, code, msg = cli:byid_mod_call("get_host")
+    if not ret then
+        log.error("get_host err ", code, msg)
+        return
+    end
 
     return ret.result[1]
 end
@@ -42,8 +48,11 @@ end
 -- 注册
 function M.register(player_id, account)
     local cli = base.hallserver_player_m(player_id)
-    local ret = cli:byid_mod_call("register", player_id, account)
-    if not ret then return end
+    local ret, code, msg = cli:byid_mod_call("register", player_id, account)
+    if not ret then
+        log.error("register err ", code, msg)
+        return
+    end
 
     return table.unpack(ret.result)
 end
@@ -51,8 +60,11 @@ end
 -- 创建token
 function M.create_token(player_id, timeout)
     local cli = base.hallserver_token_m(player_id)
-    local ret = cli:byid_mod_call("create_token", {player_id}, timeout)
-    if not ret then return end
+    local ret, code, msg = cli:byid_mod_call("create_token", {player_id}, timeout)
+    if not ret then
+        log.error("create_token err ", code, msg)
+        return
+    end
     
     local token_list = ret.result[1]
     if not token_list then

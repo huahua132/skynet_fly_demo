@@ -13,9 +13,9 @@ local g_time_obj = nil
 local g_online_list = {}
 
 local function sys_online_player()
-    local ret = player_rpc.get_all_online()
+    local ret, code, msgerr = player_rpc.get_all_online()
     if not ret then
-        log.error("sys_online_player get_all_online failed")
+        log.error("sys_online_player get_all_online failed ", code, msgerr)
         return
     end
 

@@ -20,6 +20,7 @@ local type = type
 local tostring = tostring
 local tinsert = table.insert
 local collectgarbage = collectgarbage
+local rawget = rawget
 
 local M = {}
 local meta = {__index = M}
@@ -366,6 +367,16 @@ function M:add_updated_cb(module_name, func)
 	tinsert(g_updated_map[module_name], func)
 end
 
+---#desc 查询模块服务是否准备好了
+---@param module_name string 模块名
+---@return bool
+function M:is_ready(module_name)
+	local t = rawget(g_mod_svr_ids_map, module_name)
+	if not t then return false end
+
+	return true
+end
+
 ---#desc 监听所有服务地址
 function M:monitor_all()
 	assert(not is_monitor_all,"repeat monitor_all")
@@ -397,8 +408,8 @@ end
 ---@param can_switch_func function|nil 是否可以切服，当连接的模块服务地址更新后，是否要切换到新服务，每次发消息的时候都会检测是否切服,不传默认切
 ---@return table obj
 function M:new(module_name,instance_name,can_switch_func)
-	assert(g_register_map[module_name],tostring(module_name) .. " not register")
-	assert(is_ready,"not is ready")
+	assert(g_register_map[module_name], "not register visitor, please be loading code call contriner_client:register('" .. module_name .. "')")
+	assert(is_ready,"not ready, please be started call")
 	assert(module_name)
 	if not can_switch_func then
 		can_switch_func = default_can_switch

@@ -24,6 +24,7 @@ local assert = assert
 local tinsert = table.insert
 local tremote = table.remove
 local tsort = table.sort
+local tconcat = table.concat
 local pairs = pairs
 local type = type
 local ipairs = ipairs
@@ -248,6 +249,9 @@ function M:new(tab_name)
         _field_map = {},                            --所有字段
         _key_map = {},
         _keylist = {},                              --key列表
+        _index_list_map = {},                       --普通索引表
+        _indexs_list = {},                          --普通索引列表
+
         _is_builder = false,
 
         _main_index = nil,                          --主键索引
@@ -294,6 +298,37 @@ function M:set_keys(...)
         tinsert(self._keylist, field_name)
         self._key_map[field_name] = true
     end
+    return self
+end
+
+---#desc 设置普通索引
+---@param index_name string 索引名称
+---@param ... string[] 字段名列表 建立关联索引 填入遵从最左前缀原则
+---@return table obj
+function M:set_index(index_name, ...)
+    assert(not self._is_builder, "builded can`t set_index")
+    local list = {...}
+    local repeat_check = {}
+    for i = 1,#list do
+        local field_name = list[i]
+        assert(self._field_map[field_name], "not exists: ".. field_name)
+        local field_type = self._field_map[field_name]
+        assert(not CANT_INDEX_TYPE_MAP[field_type], "can`t key type " .. field_name)
+        assert(not repeat_check[field_name], "repeat field_name: " .. field_name)
+        repeat_check[field_name] = true
+    end
+    
+    local indexs_list = self._indexs_list
+    local index_list_map = self._index_list_map
+    for i = 1,#list do
+        local field_name = list[i]
+        if not index_list_map[field_name] then
+            index_list_map[field_name] = {}
+        end
+        index_list_map = index_list_map[field_name]
+    end
+
+    indexs_list[index_name] = list
     return self
 end
 
@@ -445,12 +480,13 @@ local function builder(t, adapterinterface)
     local field_map = t._field_map
     local field_list = t._field_list
     local key_list = t._keylist
+    local indexs_list = t._indexs_list
 
     t._main_index = unique_index:new("main_index", key_list, t._cache_time == 0)
     
     t._is_builder = true
 
-    adapterinterface:builder(tab_name, field_list, field_map, key_list)
+    adapterinterface:builder(tab_name, field_list, field_map, key_list, indexs_list)
     return t
 end
 
@@ -924,6 +960,67 @@ local function batch_delete_entry_by_range(t, query_list)
     return res
 end
 
+local function idx_get_entry(t, query)
+    local res = t._adapterinterface:idx_get_entry(query)
+    for i, entry_data in pairs(res) do
+        local entry = ormentry:new(t, entry_data)
+        res[i] = add_key_select(t, entry)
+    end
+    return res
+end
+
+local function idx_get_entry_by_limit(t, cursor, limit, sort, sort_field_name, query)
+    local cursor, res, count = t._adapterinterface:idx_get_entry_by_limit(cursor, limit, sort, sort_field_name, query)
+    for i, entry_data in pairs(res) do
+        local entry = ormentry:new(t, entry_data)
+        res[i] = add_key_select(t, entry)
+    end
+    return cursor, res, count
+end
+
+local function idx_delete_entry(t, query)
+    if t._cache_time then
+        local entry_list = idx_get_entry(t, query)
+        local ret = t._adapterinterface:idx_delete_entry(query)
+        if not ret then return ret end
+
+        for i = 1, #entry_list do
+            local entry = entry_list[i]
+            del_key_select(t, entry, true)
+        end
+
+        return ret
+    else
+        return t._adapterinterface:idx_delete_entry(query)
+    end
+end
+
+local function idx_get_entry_by_range(t, left, right, range_field_name, query)
+    local res = t._adapterinterface:idx_get_entry_by_range(left, right, range_field_name, query)
+    for i, entry_data in pairs(res) do
+        local entry = ormentry:new(t, entry_data)
+        res[i] = add_key_select(t, entry)
+    end
+    return res
+end
+
+local function idx_delete_entry_by_range(t, left, right, range_field_name, query)
+    if t._cache_time then
+        local entry_list = idx_get_entry_by_range(t, left, right, range_field_name, query)
+        local ret = t._adapterinterface:idx_delete_entry_by_range(left, right, range_field_name, query)
+        if not ret then return ret end
+
+        for i = 1, #entry_list do
+            local entry = entry_list[i]
+            del_key_select(t, entry, true)
+        end
+
+        return ret
+    else
+        return t._adapterinterface:idx_delete_entry_by_range(left, right, range_field_name, query)
+    end
+end
+
 ---#desc 批量创建新数据
 ---@param entry_data_list table 数据列表
 ---@return table obj
@@ -1055,6 +1152,8 @@ end
 ---@return table obj[](ormentry)
 function M:get_entry_by_limit(cursor, limit, sort, ...)
     assert(self._is_builder, "not builder can`t get_entry_by_limit")
+    assert(type(limit) == 'number', "err limit:" .. tostring(limit))
+    assert(type(sort) == 'number', "err sort:" .. tostring(sort))
     local key_list = self._keylist
     local key_values = {...}
     local len = #key_values
@@ -1101,8 +1200,8 @@ end
 ---#content [nil, right] 删除 <= right
 ---#content format`[delete from player where key1=? and key2>=? and key2<=?;]`
 ---#desc 范围删除 包含left right 可以有三种操作方式 [left, right] 范围删除  >= left <= right  [left, nil] 删除 >= left [nil, right] 删除 <= right
----@param left string|number 左值
----@param right string|number 右值
+---@param left string|number|nil 左值
+---@param right string|number|nil 右值
 ---@param ... string[] 最左前缀主键列表 无需填入left right值 对应的key
 ---@return boolean
 function M:delete_entry_by_range(left, right, ...)
@@ -1202,6 +1301,168 @@ function M:batch_delete_entry_by_range(query_list)
     end
 
     return queue_doing(self, nil, batch_delete_entry_by_range, self, query_list)
+end
+
+local function check_index_field(t, field_list)
+    local len = #field_list
+    local index_list_map = t._index_list_map
+    local indexs_list = t._indexs_list
+    local check_nook_map = {}
+    for i = 1, len do
+        local field_name = field_list[i]
+        if not index_list_map[field_name] then
+            check_nook_map[field_name] = true
+        end
+    end
+
+    if not next(check_nook_map) then return end
+
+    for f_list in table_util.permute_pairs(field_list) do
+        for _, ff_list in pairs(indexs_list) do
+            if #ff_list >= 1 then
+                for i = 1, len do
+                    local f_name = f_list[i]
+                    local ff_name = ff_list[i]
+                    if f_name ~= ff_name then
+                        break
+                    else
+                        check_nook_map[f_name] = nil
+                    end
+                end
+            end
+        end
+
+        if not next(check_nook_map) then return end
+    end
+
+    local cant_index_list = {}
+    for field_name in pairs(check_nook_map) do
+        tinsert(cant_index_list, field_name)
+    end
+
+    error(sformat('can`t hit index field_name_list(%s) Please follow the leftmost prefix principle', tconcat(cant_index_list, ',')))
+end
+
+---#desc 通过普通索引查询,设置缓存的情况下，也会先查询数据库 format `select * from tab_name where (key1 = ? and key2 = ?)`
+---@param query table 索引值 [key1 = xxx, key2 = xxx]
+---@return table 查询结果列表
+function M:idx_get_entry(query)
+    assert(self._is_builder, "not builder can`t idx_get_entry")
+    assert(next(query), "query can`t be empty")
+    
+    local field_list = {}
+    for field_name, field_value in pairs(query) do
+        check_one_field(self, field_name, field_value)
+        tinsert(field_list, field_name)
+    end
+
+    check_index_field(self, field_list)
+
+    return queue_doing(self, nil, idx_get_entry, self, query)
+end
+
+---#desc 基于普通索引分页查询 format`[select * from tab_name where key1 = ? and key2 > ? order by ? desc limit ?]`
+---@param cursor number|string 游标
+---@param limit number 数量限制
+---@param sort number 1升序  -1降序
+---@param sort_field_name string 排序字段名
+---@param query? table 索引值 [key1 = xxx, key2 = xxx]
+---@return table obj[](ormentry)
+function M:idx_get_entry_by_limit(cursor, limit, sort, sort_field_name, query)
+    assert(self._is_builder, "not builder can`t idx_get_entry_by_limit")
+    assert(type(limit) == 'number', "err limit:" .. tostring(limit))
+    assert(type(sort) == 'number', "err sort:" .. tostring(sort))
+
+    local field_list = {}
+    if query then
+        for field_name, field_value in pairs(query) do
+            check_one_field(self, field_name, field_value)
+            tinsert(field_list, field_name)
+        end
+    end
+    tinsert(field_list, sort_field_name)
+
+    check_index_field(self, field_list)
+    return queue_doing(self, nil, idx_get_entry_by_limit, self, cursor, limit, sort, sort_field_name, query)
+end
+
+---#desc 通过普通索引删除数据 format `delete from tab_name where (key1 = ? and key2 = ?)`
+---@param query table 索引值 [key1 = xxx, key2 = xxx]
+---@return boolean 删除结果
+function M:idx_delete_entry(query)
+    assert(self._is_builder, "not builder can`t idx_delete_entry")
+    assert(next(query), "query can`t be empty")
+    local field_list = {}
+    for field_name, field_value in pairs(query) do
+        check_one_field(self, field_name, field_value)
+        tinsert(field_list, field_name)
+    end
+
+    check_index_field(self, field_list)
+
+    return queue_doing(self, nil, idx_delete_entry, self, query)
+end
+
+---#content 范围查询 包含left right
+---#content 可以有三种操作方式
+---#content [left, right] 范围查询  >= left <= right
+---#content [left, nil] 查询 range_field_name >= left
+---#content [nil, right] 查询 range_field_name <= right
+---#content format`[select * from player where key1=? and key2>=? and key2<=?;]`
+---#desc 范围查询 包含left right 可以有三种操作方式 [left, right] 范围查询
+---@param left string|number|nil 左值
+---@param right string|number|nil 右值
+---@param range_field_name string 基于该索引值范围
+---@param query table 前置的普通索引查询
+---@return boolean
+function M:idx_get_entry_by_range(left, right, range_field_name, query)
+    assert(self._is_builder, "not builder can`t idx_get_entry_by_range")
+    assert(left or right, "not left or right")
+    if left and right then
+        assert(left <= right, "left right err")
+    end
+    local field_list = {}
+    if query then
+        for field_name, field_value in pairs(query) do
+            check_one_field(self, field_name, field_value)
+            tinsert(field_list, field_name)
+        end
+    end
+    tinsert(field_list, range_field_name)
+
+    check_index_field(self, field_list)
+    return queue_doing(self, nil, idx_get_entry_by_range, self, left, right, range_field_name, query)
+end
+
+---#content 范围删除 包含left right
+---#content 可以有三种操作方式
+---#content [left, right] 范围删除  >= left <= right
+---#content [left, nil] 删除 >= left
+---#content [nil, right] 删除 <= right
+---#content format`[delete from player where key1=? and key2>=? and key2<=?;]`
+---#desc 范围删除 包含left right 可以有三种操作方式 [left, right] 范围删除
+---@param left string|number|nil 左值
+---@param right string|number|nil 右值
+---@param range_field_name string 基于该索引值范围
+---@param query table 前置的普通索引查询
+---@return boolean
+function M:idx_delete_entry_by_range(left, right, range_field_name, query)
+    assert(self._is_builder, "not builder can`t idx_delete_entry_by_range")
+    assert(left or right, "not left or right")
+    if left and right then
+        assert(left <= right, "left right err")
+    end
+    local field_list = {}
+    if query then
+        for field_name, field_value in pairs(query) do
+            check_one_field(self, field_name, field_value)
+            tinsert(field_list, field_name)
+        end
+    end
+    tinsert(field_list, range_field_name)
+
+    check_index_field(self, field_list)
+    return queue_doing(self, nil, idx_delete_entry_by_range, self, left, right, range_field_name, query)
 end
 
 return M

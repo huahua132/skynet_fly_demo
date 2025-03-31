@@ -56,7 +56,9 @@ function M.init(interface_mgr)
 	--初始化
 	for _, m in ipairs(g_modules_list) do
 		if m.init then
-			m.init(interface_mgr)
+			skynet.fork(function()
+				m.init(interface_mgr)
+			end)
 		end
 		if m.on_login then
 			tinsert(g_login_funcs, m.on_login)

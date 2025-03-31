@@ -71,11 +71,12 @@ function M:set_batch_delete_num(num)
     return self
 end
 
-function M:builder(tab_name, field_list, field_map, key_list)
+function M:builder(tab_name, field_list, field_map, key_list, indexs_list)
     self._tab_name = tab_name
     self._field_map = field_map
     self._key_list = key_list
     self._field_list = field_list
+    self._indexs_list = indexs_list
 
     local args = {}
     local index_name = "index"
@@ -89,9 +90,24 @@ function M:builder(tab_name, field_list, field_map, key_list)
     local collect_db = self._db[tab_name]
     local res = collect_db:create_index(args)
     if res.ok ~= 1 then
-        log.error("builder err ", tab_name, res)
+        log.error("builder unique key err ", tab_name, res)
     end
-    assert(res.ok == 1, "builder err")
+    assert(res.ok == 1, "builder unique key err")
+
+    for index_name, list in pairs(indexs_list) do
+        local args = {
+            unique = false,
+            name = index_name,
+        }
+        for _,field_name in ipairs(list) do
+            tinsert(args, {[field_name] = 1})
+        end
+        local res = collect_db:create_index(args)
+        if res.ok ~= 1 then
+            log.error("builder index err ", tab_name, res)
+        end
+        assert(res.ok == 1, "builder index err")
+    end
 
     local key_len = #key_list
     --insert 创建
@@ -345,7 +361,7 @@ function M:builder(tab_name, field_list, field_map, key_list)
 
         local isok,err = collect_db:safe_delete(delete_query)
         if not isok then
-            log.error("delete doc err ", self._tab_name, err)
+            log.error("delete doc err ", self._tab_name, key_values, err)
             error("delete doc err")
         end
         return true
@@ -512,6 +528,89 @@ function M:builder(tab_name, field_list, field_map, key_list)
         return res_list
     end
 
+    self._idx_select = function(query)
+        local res_list = {}
+
+        local ret = collect_db:find(query)
+        while ret:has_next() do
+            local entry_data = ret:next()
+            entry_data._id = nil
+            tinsert(res_list, entry_data)
+        end
+    
+        return res_list
+    end
+
+    self._idx_get_entry_by_limit = function(cursor, limit, sort, sort_field_name, query)
+        query = query or {}
+        local end_field_name = sort_field_name
+
+        local count = nil
+        if not cursor then
+            count = collect_db:find(query):count()
+        end
+
+        local res_list = {}
+        local ret = collect_db:find(query):sort({[end_field_name] = sort}):skip(cursor or 0):limit(limit)
+        while ret:has_next() do
+            local entry_data = ret:next()
+            entry_data._id = nil
+            tinsert(res_list, entry_data)
+        end
+
+        if #res_list > 0 then
+            cursor = (cursor or 0) + limit
+        else
+            cursor = nil
+        end
+        
+        return cursor, res_list, count
+    end
+
+    self._idx_delete_entry = function(query)
+        local isok,err = collect_db:safe_delete(query)
+        if not isok then
+            log.error("_idx_delete_entry doc err ", self._tab_name, query, err)
+            error("_idx_delete_entry doc err")
+        end
+        return true
+    end
+
+    self._idx_get_entry_by_range = function(left, right, range_field_name, query)
+        local args = {}
+        if query then
+            for k,v in pairs(query) do
+                args[k] = v
+            end
+        end
+        args[range_field_name] = {['$gte'] = left, ['$lte'] = right}
+        local res_list = {}
+        local ret = collect_db:find(args)
+        while ret:has_next() do
+            local entry_data = ret:next()
+            entry_data._id = nil
+            tinsert(res_list, entry_data)
+        end
+
+        return res_list
+    end
+
+    self._idx_delete_entry_by_range = function(left, right, range_field_name, query)
+        local args = {}
+        if query then
+            for k,v in pairs(query) do
+                args[k] = v
+            end
+        end
+        args[range_field_name] = {['$gte'] = left, ['$lte'] = right}
+        local isok,err = collect_db:safe_delete(args)
+        if not isok then
+            log.error("_idx_delete_entry_by_range doc err ", self._tab_name, args, err)
+            error("_idx_delete_entry_by_range doc err")
+        end
+        return true
+    end
+
     return self
 end
 
@@ -602,6 +701,31 @@ end
 --批量范围删除
 function M:batch_delete_entry_by_range(query_list)
     return self._batch_delete_by_range(query_list)
+end
+
+--通过普通索引查询
+function M:idx_get_entry(query)
+    return self._idx_select(query)
+end
+
+--通过普通索引分页查询
+function M:idx_get_entry_by_limit(cursor, limit, sort, sort_field_name, query)
+    return self._idx_get_entry_by_limit(cursor, limit, sort, sort_field_name, query)
+end
+
+--通过普通索引删除
+function M:idx_delete_entry(query)
+    return self._idx_delete_entry(query)
+end
+
+--通过普通索引范围查询
+function M:idx_get_entry_by_range(left, right, range_field_name, query)
+    return self._idx_get_entry_by_range(left, right, range_field_name, query)
+end
+
+--通过普通索引范围删除
+function M:idx_delete_entry_by_range(left, right, range_field_name, query)
+    return self._idx_delete_entry_by_range(left, right, range_field_name, query)
 end
 
 return M
