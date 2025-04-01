@@ -42,7 +42,7 @@ return {
 	},
     --日志切割
 	logrotate_m = {
-        launch_seq = 3000,
+        launch_seq = 1,
         launch_num = 1,
         default_arg = {
             file_path = server_cfg.world.hallserver_1.logpath,          --文件路径

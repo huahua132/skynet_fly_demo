@@ -6,6 +6,7 @@ local player = require "common.rpc.hallserver.player"
 local item = require "common.rpc.hallserver.item"
 local timer = require "skynet-fly.timer"
 local chess_conf = hotfix_require "common.conf.chess_conf"
+local ITEM_CHANGE_SOURCE = hotfix_require "common.enum.ITEM_CHANGE_SOURCE"
 
 local setmetatable = setmetatable
 local assert = assert
@@ -112,7 +113,7 @@ end
 --获得奖励
 function M:add_item_map(item_map)
 	local player_id = self.player.player_id
-	return item.add_item_map(player_id, item_map)
+	return item.add_item_map(player_id, item_map, ITEM_CHANGE_SOURCE.CHESS_CONCLUDE_REWARD)
 end
 
 --设置操作,总时长,单次时长

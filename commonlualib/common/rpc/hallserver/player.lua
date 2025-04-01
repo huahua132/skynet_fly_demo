@@ -91,9 +91,9 @@ function M.get_players_info(player_list, field_map)
             table_util.merge(res, ret_map)
         else
             --其他服
-            local ret = frpc_client:instance("hallserver", "room_game_hall_m"):set_svr_id(svr_id):byid_balance_call("player_get_players_info", list, field_map)
+            local ret, code, errmsg = frpc_client:instance("hallserver", "room_game_hall_m"):set_svr_id(svr_id):byid_balance_call("player_get_players_info", list, field_map)
             if not ret or not ret.result[1] then
-                log.error_fmt("get_players_info call err svr_id = %s", svr_id)
+                log.error_fmt("get_players_info call err svr_id = %s code = %s errmsg = %s", svr_id, code, errmsg)
             else
                 table_util.merge(res, ret.result[1])
             end
@@ -110,9 +110,9 @@ function M.get_player_info(player_id, field_map)
         return contriner_client:instance("room_game_hall_m"):mod_call("player_get_info", player_id, field_map)
     else
         local cli = base.hallserver_room_game_hall_m(player_id)
-        local ret = cli:byid_mod_call("player_get_info", player_id)
+        local ret, code, errmsg = cli:byid_mod_call("player_get_info", player_id)
         if not ret then
-            log.error("get_player_info err ", player_id)
+            log.error("get_player_info err ", player_id, code, errmsg)
             return nil
         end
         return table.unpack(ret.result)
@@ -130,9 +130,9 @@ function M.is_onlines(player_list)
             table_util.merge(res, ret_map)
         else
             --其他服
-            local ret = frpc_client:instance("hallserver", ".room_game_login"):set_svr_id(svr_id):byid_call_by_name("is_onlines", list)
+            local ret, code, errmsg = frpc_client:instance("hallserver", ".room_game_login"):set_svr_id(svr_id):byid_call_by_name("is_onlines", list)
             if not ret or not ret.result[1] then
-                log.error_fmt("is_onlines call err svr_id = %s", svr_id)
+                log.error_fmt("is_onlines call err svr_id = %s code = %s errmsg = %s", svr_id, code, errmsg)
             else
                 table_util.merge(res, ret.result[1])
             end
@@ -148,9 +148,9 @@ function M.is_online(player_id)
     if g_svr_name == "hallserver" and svr_id == g_svr_id then
         return skynet.call(".room_game_login", "lua", "is_online", player_id)
     else
-        local ret = frpc_client:instance("hallserver", ".room_game_login"):set_svr_id(svr_id):byid_call_by_name("is_online", player_id)
+        local ret, code, errmsg = frpc_client:instance("hallserver", ".room_game_login"):set_svr_id(svr_id):byid_call_by_name("is_online", player_id)
         if not ret then
-            log.error("is_online err ", svr_id, player_id)
+            log.error("is_online err ", code, errmsg, svr_id, player_id)
             return
         end
 
@@ -176,9 +176,9 @@ function M.call_player_hall(player_id, ...)
         return skynet.call(".room_game_login", "lua", "call_player_hall", player_id, ...)
     else
         local cli = base.hallserver_room_game_login(player_id)
-        local ret = cli:byid_call_by_name("call_player_hall", player_id, ...)
+        local ret, code, errmsg = cli:byid_call_by_name("call_player_hall", player_id, ...)
         if not ret then
-            log.error("call_player_hall err ", player_id)
+            log.error("call_player_hall err ", code, errmsg, player_id, ...)
             return
         end
         return table.unpack(ret.result)

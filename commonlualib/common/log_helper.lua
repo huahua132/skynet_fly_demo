@@ -4,6 +4,7 @@ local ormadapter_uselog = require "skynet-fly.db.ormadapter.ormadapter_uselog"
 local SYN_CHANNEL_NAME = require "common.enum.SYN_CHANNEL_NAME"
 local time_util = require "skynet-fly.utils.time_util"
 local env_util = require "skynet-fly.utils.env_util"
+local misc_helper = require "common.misc_helper"
 local log = require "skynet-fly.log"
 
 local assert = assert
@@ -18,7 +19,10 @@ local user_log_name = skynet.getenv('user_log_name')
 local g_svr_name = env_util.get_svr_name()
 local g_svr_id = env_util.get_svr_id()
 
-local g_flush_inval = 10 * 60
+local g_flush_inval = 0
+if misc_helper.is_prod() then
+    g_flush_inval = 10 * 60
+end
 local g_max_age = 7
 
 local g_errobj = nil

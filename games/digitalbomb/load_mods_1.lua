@@ -65,7 +65,7 @@ return {
 
 	--日志切割
 	logrotate_m = {
-        launch_seq = 5000,
+        launch_seq = 1,
         launch_num = 1,
         default_arg = {
             file_path = server_cfg.games.digitalbomb_1.logpath,          --文件路径

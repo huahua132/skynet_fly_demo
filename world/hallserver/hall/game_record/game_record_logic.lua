@@ -1,9 +1,9 @@
 local event_mgr = require "common.event_mgr"
-local EVENT_ID = require "enum.EVENT_ID"
+local EVENT_ID = hotfix_require "enum.EVENT_ID"
 local log = require "skynet-fly.log"
 local errorcode = require "common.enum.errorcode"
 local orm_table_client = require "skynet-fly.client.orm_table_client"
-local game_record_msg = require "msg.game_record_msg"
+local game_record_msg = hotfix_require "msg.game_record_msg"
 local state_data = require "skynet-fly.hotfix.state_data"
 
 local g_game_record_cli = orm_table_client:new("game_record")

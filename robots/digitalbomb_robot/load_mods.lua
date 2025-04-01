@@ -5,7 +5,7 @@ local frpc_server_cfg = loadfile("../../commonlualib/common/etc/frpc_server_cfg.
 return {
 	--共享配置
 	share_config_m = {
-		launch_seq = 1,     --启动顺序，从小到大
+		launch_seq = 2,     --启动顺序，从小到大
 		launch_num = 1,     --启动数量
 		default_arg = {     --默认配置
 			redis = {
@@ -24,7 +24,7 @@ return {
 
 	--日志切割
 	logrotate_m = {
-        launch_seq = 2,
+        launch_seq = 1,
         launch_num = 1,
         default_arg = {
             file_path = server_cfg.robots.digitalbomb_robot.logpath,          --文件路径
@@ -49,7 +49,7 @@ return {
 		launch_seq = 5,
 		launch_num = 1,
 		default_arg = {
-			robot_num = 10,    --启动机器人数量
+			robot_num = 2500,    --启动机器人数量
 		}
 	},
 

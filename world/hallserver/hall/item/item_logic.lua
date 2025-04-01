@@ -1,10 +1,10 @@
 local log = require "skynet-fly.log"
 local time_util = require "skynet-fly.utils.time_util"
-local item_msg = require "msg.item_msg"
+local item_msg = hotfix_require "msg.item_msg"
 local orm_table_client = require "skynet-fly.client.orm_table_client"
 local state_data = require "skynet-fly.hotfix.state_data"
 local event_mgr = require "common.event_mgr"
-local EVENT_ID = require "enum.EVENT_ID"
+local EVENT_ID = hotfix_require "enum.EVENT_ID"
 local interface = require "hall.item.interface"
 local table_util = require "skynet-fly.utils.table_util"
 local item_conf = hotfix_require "common.conf.item_conf"
@@ -187,23 +187,23 @@ function interface.get_item(player_id, id)
 end
 
 --增加道具
-function interface.add_item(player_id, id, num)
-    return M.cmd_add_item(player_id, id, num)
+function interface.add_item(player_id, id, num, source)
+    return M.cmd_add_item(player_id, id, num, source)
 end
 
 --减少道具
-function interface.reduce_item(player_id, id, num)
-    return M.cmd_reduce_item(player_id, id, num)
+function interface.reduce_item(player_id, id, num, source)
+    return M.cmd_reduce_item(player_id, id, num, source)
 end
 
 --批量增加道具
-function interface.add_item_map(player_id, item_map)
-    return M.cmd_add_item_map(player_id, item_map)
+function interface.add_item_map(player_id, item_map, source)
+    return M.cmd_add_item_map(player_id, item_map, source)
 end
 
 --批量增加道具
-function interface.add_item_list(player_id, item_list)
-    return M.cmd_add_item_list(player_id, item_list)
+function interface.add_item_list(player_id, item_list, source)
+    return M.cmd_add_item_list(player_id, item_list, source)
 end
 
 --道具转换

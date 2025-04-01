@@ -31,24 +31,24 @@ function CMD.item_get_item(player_id, id)
     return item_logic.cmd_get_item(player_id, id)
 end
 --增加道具
-function CMD.item_add_item(player_id, id, num)
-    return item_logic.cmd_add_item(player_id, id, num)
+function CMD.item_add_item(player_id, id, num, source)
+    return item_logic.cmd_add_item(player_id, id, num, source)
 end
 --扣除道具
-function CMD.item_reduce_item(player_id, id, num)
-    return item_logic.cmd_reduce_item(player_id, id, num)
+function CMD.item_reduce_item(player_id, id, num, source)
+    return item_logic.cmd_reduce_item(player_id, id, num, source)
 end
 --批量查询道具
 function CMD.item_get_item_map(player_id, id_list)
     return item_logic.cmd_get_item_map(player_id, id_list)
 end
 --批量增加道具
-function CMD.item_add_item_map(player_id, item_map)
-    return item_logic.cmd_add_item_map(player_id, item_map)
+function CMD.item_add_item_map(player_id, item_map, source)
+    return item_logic.cmd_add_item_map(player_id, item_map, source)
 end
 --批量增加道具
-function CMD.item_add_item_list(player_id, item_list)
-    return item_logic.cmd_add_item_list(player_id, item_list)
+function CMD.item_add_item_list(player_id, item_list, source)
+    return item_logic.cmd_add_item_list(player_id, item_list, source)
 end
 
 M.register_cmd = CMD

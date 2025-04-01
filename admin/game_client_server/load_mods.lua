@@ -25,7 +25,7 @@ return {
 	},
     --日志切割
     logrotate_m = {
-        launch_seq = 4000,
+        launch_seq = 1,
         launch_num = 1,
         default_arg = {
             file_path = server_cfg.admin.game_client_server.logpath,     --文件路径

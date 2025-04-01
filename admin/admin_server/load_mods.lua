@@ -5,6 +5,21 @@ local frpc_server_cfg = loadfile("../../commonlualib/common/etc/frpc_server_cfg.
 local http_cfg = loadfile("../../commonlualib/common/etc/http_cfg.lua")()
 
 return {
+	--日志切割
+	logrotate_m = {
+        launch_seq = 1,
+        launch_num = 1,
+        default_arg = {
+            file_path = server_cfg.admin.admin_server.logpath,     --文件路径
+            filename = 'server.log',   --文件名
+            limit_size = 0,            --最小分割大小
+            max_age = 7,               --最大保留天数
+            max_backups = 7,           --最大保留文件数
+            sys_cmd = [[
+                /usr/bin/pkill -HUP -f skynet.make/admin_server_config.lua\n
+            ]],              --系统命令
+        }
+    },
     --共享配置
 	share_config_m = {
 		launch_seq = 1000,     --启动顺序，从小到大
@@ -45,21 +60,6 @@ return {
 		launch_num = 1,
 		default_arg = http_cfg.admin.admin_server.master
 	},
-    --日志切割
-    logrotate_m = {
-        launch_seq = 4000,
-        launch_num = 1,
-        default_arg = {
-            file_path = server_cfg.admin.admin_server.logpath,     --文件路径
-            filename = 'server.log',   --文件名
-            limit_size = 0,            --最小分割大小
-            max_age = 7,               --最大保留天数
-            max_backups = 7,           --最大保留文件数
-            sys_cmd = [[
-                /usr/bin/pkill -HUP -f skynet.make/admin_server_config.lua\n
-            ]],              --系统命令
-        }
-    },
 	-- orm
 	orm_table_m = {
 		launch_seq = 5500,
