@@ -3,6 +3,21 @@ local redis_cfg = loadfile("../../commonlualib/common/etc/redis_cfg.lua")()
 local frpc_server_cfg = loadfile("../../commonlualib/common/etc/frpc_server_cfg.lua")()
 
 local cfg = {
+	--日志切割
+	logrotate_m = {
+		launch_seq = 1,
+		launch_num = 1,
+		default_arg = {
+			file_path = server_cfg.world.logserver.logpath,          --文件路径
+			filename = 'server.log',   --文件名
+			limit_size = 0,            --最小分割大小
+			max_age = 7,               --最大保留天数
+			max_backups = 7,           --最大保留文件数
+			sys_cmd = [[
+				/usr/bin/pkill -HUP -f skynet.make/logserver_config.lua\n
+			]],              --系统命令
+		}
+	},
         --共享配置
 	share_config_m = {
 		launch_seq = 2,     --启动顺序，从小到大
@@ -24,27 +39,6 @@ local cfg = {
 		launch_seq = 3,
 		launch_num = 1,
 	},
-    	--日志切割
-	logrotate_m = {
-        launch_seq = 1,
-        launch_num = 1,
-        default_arg = {
-            file_path = server_cfg.world.logserver.logpath,          --文件路径
-            filename = 'server.log',   --文件名
-            limit_size = 0,            --最小分割大小
-            max_age = 7,               --最大保留天数
-            max_backups = 7,           --最大保留文件数
-            sys_cmd = [[
-                /usr/bin/pkill -HUP -f skynet.make/logserver_config.lua\n
-            ]],              --系统命令
-        }
-    },
-
-    warn_m = {
-        launch_seq = 4,
-        launch_num = 1,
-    },
-
 	--集群客户端
     frpc_client_m = {
 		launch_seq = 5,
@@ -69,7 +63,5 @@ local cfg = {
 		}
 	},
 }
-
-cfg.warn_m.default_arg = cfg.frpc_client_m.default_arg
 
 return cfg
