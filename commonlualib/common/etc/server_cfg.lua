@@ -6,18 +6,21 @@ local RECORD_LIMIT = 1024 * 1024 * 100
 
 M.games = {
     chinese_chess_1 = {
+        svr_type = 101,   --对于svr_name的唯一标识(0,255)
         svr_id = 1,         --服务ID
         thread = 8,         --工作线程数
         debug_port = 9011,  --调试端口
         logpath = '../../logs/chinese_chess_1',
     },
     chinese_chess_2 = {
+        svr_type = 101,   --对于svr_name的唯一标识(0,255)
         svr_id = 2,
         thread = 8,
         debug_port = 9021,
         logpath = '../../logs/chinese_chess_2',
     },
     digitalbomb_1 = {
+        svr_type = 102,   --对于svr_name的唯一标识(0,255)
         svr_id = 1,         --服务ID
         thread = 8,         --工作线程数
         debug_port = 9031,  --调试端口
@@ -25,6 +28,7 @@ M.games = {
         loglevel = 'error',
     },
     digitalbomb_2 = {
+        svr_type = 102,   --对于svr_name的唯一标识(0,255)
         svr_id = 2,         --服务ID
         thread = 8,         --工作线程数
         debug_port = 9041,  --调试端口
@@ -50,6 +54,7 @@ M.admin = {
 --世界配置 11开头
 M.world = {
     centerserver = {
+        svr_type = 1,   --对于svr_name的唯一标识(0,255)
         thread = 8,
         debug_port = 11011,
         logpath = '../../logs/centerserver',
@@ -57,18 +62,21 @@ M.world = {
     },
 
     logserver = {
+        svr_type = 2,   --对于svr_name的唯一标识(0,255)
         thread = 2,
         debug_port = 11021,
         logpath = '../../logs/logserver',
     },
 
     matchserver = {
+        svr_type = 3,   --对于svr_name的唯一标识(0,255)
         thread = 4,
         debug_port = 11031,
         logpath = '../../logs/matchserver',
     },
 
     loginserver_1 = {
+        svr_type = 4,   --对于svr_name的唯一标识(0,255)
         thread = 4,
         svr_id = 1,
         logpath = '../../logs/loginserver_1',
@@ -76,6 +84,7 @@ M.world = {
         loglevel = 'error',
     },
     loginserver_2 = {
+        svr_type = 4,   --对于svr_name的唯一标识(0,255)
         thread = 4,
         svr_id = 2,
         logpath = '../../logs/loginserver_2',
@@ -84,6 +93,7 @@ M.world = {
     },
 
     hallserver_1 = {
+        svr_type = 5,   --对于svr_name的唯一标识(0,255)
         thread = 8,
         svr_id = 1,
         logpath = '../../logs/hallserver_1',
@@ -93,6 +103,7 @@ M.world = {
         machine_id = 11,                         --机器人号，全局唯一，用于雪花算法guid生成
     },
     hallserver_2 = {
+        svr_type = 5,   --对于svr_name的唯一标识(0,255)
         thread = 8,
         svr_id = 2,
         logpath = '../../logs/hallserver_2',
@@ -105,11 +116,13 @@ M.world = {
 --世界配置 12开头
 M.robots = {
     chinese_chess_robot = {
+        svr_type = 201,   --对于svr_name的唯一标识(0,255)
         thread = 8,
         debug_port = 12011,
         logpath = '../../logs/chinese_chess_robot',
     },
     digitalbomb_robot = {
+        svr_type = 202,   --对于svr_name的唯一标识(0,255)
         thread = 8,
         debug_port = 12021,
         logpath = '../../logs/digitalbomb_robot',
