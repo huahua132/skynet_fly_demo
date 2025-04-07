@@ -8,7 +8,8 @@ local cfg = loadfile('load_mods.lua')()
 
 cfg.share_config_m.default_arg.redis.rpc = redis_cfg.rpc
 cfg.share_config_m.default_arg.redis.global = redis_cfg.global
-cfg.share_config_m.default_arg.mysql[mysql_cfg.admin.database] = mysql_cfg.admin
+cfg.share_config_m.default_arg.mysql.orm_db = mysql_cfg.admin
+cfg.share_config_m.default_arg.mysql.log_db = mysql_cfg.world.logserver
 
 cfg.share_config_m.default_arg.frpc_server = frpc_server_cfg.admin.admin_server
 cfg.share_config_m.default_arg.server_cfg = server_cfg.admin.admin_server

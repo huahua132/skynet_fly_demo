@@ -14,7 +14,7 @@ local M = {}
 local handle = {}
 
 function M.init()
-    local adapter = ormadapter_mysql:new("admin")
+    local adapter = ormadapter_mysql:new("orm_db")
     g_ormobj = ormtable:new("roles")
     :string64("name")
     :string512("description")

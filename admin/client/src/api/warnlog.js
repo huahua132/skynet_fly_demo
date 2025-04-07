@@ -1,11 +1,9 @@
 import request from '@/utils/request'
 
-export function getInfo(pre_day) {
+export function getlist(data) {
   return request({
-    url: '/warnlog/info',
-    method: 'get',
-    params: { 
-      pre_day : pre_day,
-    }
+    url: '/warnlog/list',
+    method: 'post',
+    data
   })
 }

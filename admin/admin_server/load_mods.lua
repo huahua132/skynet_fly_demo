@@ -33,7 +33,8 @@ return {
 			},
 
 			mysql = {
-				[mysql_cfg.admin.database] = mysql_cfg.admin,
+				orm_db = mysql_cfg.admin,
+				log_db = mysql_cfg.world.logserver,
 			},
 			--cluster_server用的配置
 			frpc_server = frpc_server_cfg.admin.admin_server,
