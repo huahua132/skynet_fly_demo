@@ -18,11 +18,14 @@ M.world = {
     centerserver = table_util.deep_copy(db1),
     hallserver_1 = table_util.deep_copy(db1),
     hallserver_2 = table_util.deep_copy(db1),
+    logserver = table_util.deep_copy(db1),
 }
 M.world.centerserver.database = 'center'
 
 M.world.hallserver_1.database = 'hall_1'
 M.world.hallserver_2.database = 'hall_2'
+
+M.world.logserver.database = 'log'
 
 
 M.games = {

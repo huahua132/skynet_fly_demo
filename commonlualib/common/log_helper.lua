@@ -24,7 +24,7 @@ local g_flush_inval = 0
 if misc_helper.is_prod() then
     g_flush_inval = 10 * 60
 end
-local g_max_age = 7
+local g_default_maxage = 7             --默认日志保留天数
 
 local g_errobj = nil
 local g_orm_obj_map = {}
@@ -50,39 +50,43 @@ end}
 
 --错误日志
 function M.error_log(err_str)
-    log.info("error_log >>>", err_str)
+    local tab_name = "error_log"
     if not g_errobj then
-        local adapter = ormadapter_uselog:new(error_log_path, error_log_name, 0, g_max_age)
-        adapter:set_sub_syn(SYN_CHANNEL_NAME.log_desc_info)
-        g_errobj = ormtable:new("error_log")
-        :string32("guid")
-        :uint8('svr_type')
-        :uint16('svr_id')
-        :uint32('time')
-        :text('err_str')
-        :set_keys('guid')
-        :set_index('time_index', 'time')
-        :set_index("svr_index", 'svr_type', 'svr_id')
+        local adapter = ormadapter_uselog:new(error_log_path, error_log_name, 0, g_default_maxage)
+        adapter:set_sub_syn(SYN_CHANNEL_NAME.log_desc_info .. tab_name)
+        g_errobj = ormtable:new(tab_name)
+        :string32("_guid")
+        :string64("_log_name")
+        :uint8('_svr_type')
+        :uint16('_svr_id')
+        :uint32('_time')
+        :text('_err_str')
+        :set_keys('_guid')
+        :set_index('time_index', '_time')
+        :set_index("svr_index", '_svr_type', '_svr_id')
         :builder(adapter)
     end
 
     local info = {
-        guid = guid_util.fly_guid(),
-        time = time_util.time(),
-        svr_type = g_svr_type,
-        svr_id = g_svr_id,
-        err_str = err_str,
+        _guid = guid_util.fly_guid(),
+        _time = time_util.time(),
+        _log_name = tab_name,
+        _svr_type = g_svr_type,
+        _svr_id = g_svr_id,
+        _err_str = err_str,
     }
 
     g_errobj:create_one_entry(info)
 end
 
 --新建用户日志
-function M:new_user_log(log_name)
+function M:new_user_log(log_name, maxage)
+    maxage = maxage or g_default_maxage
     local ormobj = ormtable:new(log_name)
     local t = {
         _ormobj = ormobj,
         _is_builder = false,
+        _maxage = maxage,
     }
     
     setmetatable(t, mt)
@@ -104,15 +108,16 @@ end
 function M:builder()
     assert(not self._is_builder)
     self._is_builder = true
-    local adapter = ormadapter_uselog:new(user_log_path, user_log_name, g_flush_inval, g_max_age)
-    adapter:set_sub_syn(SYN_CHANNEL_NAME.log_desc_info)
-    self._ormobj:string32('guid')
-    self._ormobj:uint32('time')
-    self._ormobj:uint8('svr_type')
-    self._ormobj:uint16('svr_id')
-    self._ormobj:set_keys('guid')
-    self._ormobj:set_index('time_index', 'time')
-    self._ormobj:set_index("svr_index", 'svr_type', 'svr_id')
+    local adapter = ormadapter_uselog:new(user_log_path, user_log_name, g_flush_inval, self._maxage)
+    adapter:set_sub_syn(SYN_CHANNEL_NAME.log_desc_info .. self._ormobj._tab_name)
+    self._ormobj:string32('_guid')
+    self._ormobj:string64('_log_name')
+    self._ormobj:uint32('_time')
+    self._ormobj:uint8('_svr_type')
+    self._ormobj:uint16('_svr_id')
+    self._ormobj:set_keys('_guid')
+    self._ormobj:set_index('time_index', '_time')
+    self._ormobj:set_index("svr_index", '_svr_type', '_svr_id')
 
     self._ormobj:builder(adapter)
 
@@ -120,10 +125,11 @@ function M:builder()
 end
 
 function M:write_log(info_t)
-    info_t.guid = guid_util.fly_guid()
-    info_t.time = time_util.time()
-    info_t.svr_type = g_svr_type
-    info_t.svr_id = g_svr_id
+    info_t._guid = guid_util.fly_guid()
+    info_t._time = time_util.time()
+    info_t._svr_type = g_svr_type
+    info_t._svr_id = g_svr_id
+    info_t._log_name = self._ormobj._tab_name
     self._ormobj:create_one_entry(info_t)
 end
 

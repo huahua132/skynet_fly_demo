@@ -1,5 +1,6 @@
 local server_cfg = loadfile("../../commonlualib/common/etc/server_cfg.lua")()
 local redis_cfg = loadfile("../../commonlualib/common/etc/redis_cfg.lua")()
+local mysql_cfg = loadfile("../../commonlualib/common/etc/mysql_cfg.lua")()
 local frpc_server_cfg = loadfile("../../commonlualib/common/etc/frpc_server_cfg.lua")()
 
 local cfg = {
@@ -26,6 +27,10 @@ local cfg = {
 			redis = {
 				--rpc连接配置
 				rpc = redis_cfg.rpc
+			},
+
+			mysql = {
+				orm_db = mysql_cfg.world.logserver,
 			},
 
 			--cluster_server用的配置
@@ -62,6 +67,16 @@ local cfg = {
 			watch = 'redis',  --监听redis的方式做服务发现
 		}
 	},
+
+	log_gather_m = {
+		launch_seq = 6,
+		launch_num = 1,
+		default_arg = {
+
+		}
+	}
 }
+
+cfg.log_gather_m.default_arg.node_map = cfg.frpc_client_m.default_arg.node_map
 
 return cfg

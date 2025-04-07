@@ -114,7 +114,9 @@ function M.on_recv_global_emails(all_global_emails)
     for i = 1, #online_player_list do
         local player_id = online_player_list[i]
         --使用玩家的skynet.queue处理，如果玩家下线了，就不用处理了，等上线逻辑触发处理
-        g_logic_info.interface_mgr:queue(player_id, M.change_global_email, player_id, add_list, change_list, del_list)
+        if player_id then
+            g_logic_info.interface_mgr:queue(player_id, M.change_global_email, player_id, add_list, change_list, del_list)
+        end
     end
 end
 
