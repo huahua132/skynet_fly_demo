@@ -9,6 +9,7 @@
 ---#content [ormadapter_mongo](https://github.com/huahua132/skynet_fly/blob/master/lualib/skynet-fly/db/ormadapter/ormadapter_mongo.lua)
 
 local mongof = require "skynet-fly.db.mongof"
+local table_util = require "skynet-fly.utils.table_util"
 local log = require "skynet-fly.log"
 
 local setmetatable = setmetatable
@@ -253,18 +254,26 @@ function M:builder(tab_name, field_list, field_map, key_list, indexs_list)
             count = collect_db:find(args):count()
         end
 
+        if cursor then
+            if sort == 1 then   --升序
+                args[end_field_name] = { ['$gt'] = cursor }
+            else                --降序 
+                args[end_field_name] = { ['$lt'] = cursor }
+            end
+        end
+
         local res_list = {}
-        local ret = collect_db:find(args, only_keys):sort({[end_field_name] = sort}):skip(cursor or 0):limit(limit)
+        local ret = collect_db:find(args, only_keys):sort({[end_field_name] = sort}):limit(limit)
         while ret:has_next() do
             local entry_data = ret:next()
             entry_data._id = nil
             tinsert(res_list, entry_data)
         end
 
+        local cursor = nil
         if #res_list > 0 then
-            cursor = (cursor or 0) + limit
-        else
-            cursor = nil
+            local end_ret = res_list[#res_list]
+            cursor = end_ret[end_field_name]
         end
         
         return cursor, res_list, count
@@ -544,7 +553,7 @@ function M:builder(tab_name, field_list, field_map, key_list, indexs_list)
         return res_list
     end
 
-    self._idx_get_entry_by_limit = function(cursor, limit, sort, sort_field_name, query)
+    self._idx_get_entry_by_limit = function(cursor, limit, sort, sort_field_name, query, offset)
         query = query or {}
         local end_field_name = sort_field_name
 
@@ -553,20 +562,29 @@ function M:builder(tab_name, field_list, field_map, key_list, indexs_list)
             count = collect_db:find(query):count()
         end
 
+        local use_query = table_util.copy(query)
+        if cursor then
+            if sort == 1 then   --升序
+                use_query[end_field_name] = { ['$gt'] = cursor }
+            else                --降序 
+                use_query[end_field_name] = { ['$lt'] = cursor }
+            end
+        end
+
         local res_list = {}
-        local ret = collect_db:find(query):sort({[end_field_name] = sort}):skip(cursor or 0):limit(limit)
+        local ret = collect_db:find(use_query):sort({[end_field_name] = sort}):skip(offset or 0):limit(limit)
         while ret:has_next() do
             local entry_data = ret:next()
             entry_data._id = nil
             tinsert(res_list, entry_data)
         end
 
+        local cursor = nil
         if #res_list > 0 then
-            cursor = (cursor or 0) + limit
-        else
-            cursor = nil
+            local end_ret = res_list[#res_list]
+            cursor = end_ret[end_field_name]
         end
-        
+
         return cursor, res_list, count
     end
 
@@ -677,8 +695,8 @@ function M:idx_get_entry(query)
 end
 
 --通过普通索引分页查询
-function M:idx_get_entry_by_limit(cursor, limit, sort, sort_field_name, query)
-    return self._idx_get_entry_by_limit(cursor, limit, sort, sort_field_name, query)
+function M:idx_get_entry_by_limit(cursor, limit, sort, sort_field_name, query, offset)
+    return self._idx_get_entry_by_limit(cursor, limit, sort, sort_field_name, query, offset)
 end
 
 --通过普通索引删除
