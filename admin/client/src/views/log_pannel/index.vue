@@ -56,6 +56,8 @@ import { getLogNameList, getLogDesc, getLogList } from '@/api/log_pannel'
 export default {
     data() {
         return {
+          pagecount : 20,
+          count : 0,
           logNameList : [],
           field_list : [],
           field_map : {},

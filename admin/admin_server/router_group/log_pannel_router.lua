@@ -74,7 +74,6 @@ return function(group)
             cursor = nil
         end
         local isok, cursor, res, count = contriner_client:instance("log_pannel_m"):mod_call('get_log_list', logname, cursor, limit, sort, sort_field_name, query, offset)
-        log.info(">>> ", isok, cursor, res, count)
         if not isok then
             rsp_body.set_rsp(c, nil ,CODE.ERR_SERVER, "err server")
             return
