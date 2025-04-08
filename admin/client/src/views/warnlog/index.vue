@@ -1,6 +1,25 @@
 <template>
     <div>
-        <el-table :data="data_list" style="width: 100%" height="800">
+        <el-row>
+        <el-col :span="3"><div>
+            <el-input v-model="setSvrType" placeholder="服务类型"></el-input>
+        </div></el-col>
+        <el-col :span="3"><div>
+            <el-input v-model="setSvrId" placeholder="服务ID"></el-input>
+        </div></el-col>
+        <el-col :span="8"><div>
+            <el-date-picker
+                v-model="setTimeValue"
+                type="datetimerange"
+                value-format="timestamp"
+                range-separator="至"
+                start-placeholder="开始日期"
+                end-placeholder="结束日期">
+            </el-date-picker>
+        </div></el-col>
+        </el-row>
+        
+        <el-table :data="data_list" style="width: 100%" height="750">
             <el-table-column label="日期" width="150">
                 <template slot-scope="scope">
                     <p>{{ new Date(scope.row._time * 1000).toLocaleString('zh-CN') }}</p>
@@ -48,9 +67,11 @@ export default {
             pagecount : 20,
             cursor : null,
             count : 0,
-            query : {},
             data_list : [],
             pageCachMap : {},
+            setSvrType : "",
+            setSvrId : "",
+            setTimeValue : null,
             loadingFirst : false,
             loadingPre : false,
             loadingNext : false,
@@ -71,12 +92,27 @@ export default {
                 this.pageCachMap = {}
                 this.cursor = null
             }
+            let query = {}
+            if (this.setSvrType != "" && Number(this.setSvrType) != NaN) {
+                query._svr_type = Number(this.setSvrType)
+            }
+            if (this.setSvrId != "" && Number(this.setSvrId) != NaN) {
+                query._svr_id = Number(this.setSvrId)
+            }
+            
+            if (this.setTimeValue) {
+                query._time = {
+                    ['$gte'] : Math.floor(this.setTimeValue[0] / 1000),
+                    ['$lte'] : Math.floor(this.setTimeValue[1] / 1000),
+                }
+            }
 
             const res = await getlist({
                 pagenum : this.pagenum,
                 cursor : this.cursor,
-                query : this.query,
+                query : query,
             })
+            
             let data = res.data
             this.cursor = data.cursor
             this.pagenum = data.pagenum
