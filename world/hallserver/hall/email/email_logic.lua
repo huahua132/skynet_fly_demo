@@ -233,7 +233,7 @@ function M.on_login(player_id)
     local del_list = {}     --删除全服邮件
 
     local gemail_map = {}
-    local all_global_emails = g_logic_info.all_global_emails
+    local all_global_emails = g_logic_info.all_global_emails or {}
     for i = 1, #all_global_emails do
         local one_email = all_global_emails[i]
         gemail_map[one_email.guid] = one_email
