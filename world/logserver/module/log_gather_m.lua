@@ -23,6 +23,7 @@ local os = os
 local math = math
 local string = string
 local table = table
+local setmetatable = setmetatable
 
 local g_IGNORE_MAP = {
     ['_log_name'] = true
@@ -33,6 +34,7 @@ local g_log_info_map = {}
 local g_timer = nil
 local g_timer_point = nil
 local g_loop_timer_map = {}
+local g_is_over_map = setmetatable({}, {__mode = 'kv'})
 
 local g_orm_type_strs = {}
 do
@@ -75,111 +77,122 @@ end
 --创建采集循环
 local function create_gather_loop(cluster_name, use_log_info)
     local file_name = use_log_info.file_name
-    local entry = g_gater_ormobj:get_one_entry(cluster_name, file_name)
-    if not entry then
-        entry = g_gater_ormobj:create_one_entry({cluster_name = cluster_name, file_name = file_name, cur_date = 0, offset = 0})
-    end
-
     local time_key = cluster_name .. '-' .. file_name
     local pre_timer = g_loop_timer_map[time_key]
     if pre_timer then
         pre_timer:cancel()
     end
 
-    local cur_time = time_util.time()
     local file_path = use_log_info.file_path
     local split_str = string_util.split(cluster_name, ':')
     local svr_name, svr_id = split_str[1], tonumber(split_str[2])
-    --local maxage = use_log_info.maxage
     local one_line = 20
-    local cur_date = tonumber(os.date("%Y%m%d", cur_time))
-
-    local use_date = entry:get('cur_date')
-    if use_date == 0 or use_date > cur_date then
-        entry:set('cur_date', cur_date)
-    end
-
-    use_date = entry:get('cur_date')
-    local fname = use_date .. '_' .. file_name
-
     local frpc_cli = frpc_client:instance(svr_name, '.use_log'):set_svr_id(svr_id)
+
     local function gather_logic()
-        local offset = entry:get('offset')
-        local ret, errcode, errmsg = frpc_cli:byid_call_by_name('read', file_path, fname, offset, one_line)
-        if not ret then
-            log.error("gather err ", errcode, errmsg)
-            return
+        local cur_time = time_util.time()
+        local cur_date = tonumber(os.date("%Y%m%d", cur_time))
+        local entry = g_gater_ormobj:get_one_entry(cluster_name, file_name, cur_date)
+        if not entry then
+            entry = g_gater_ormobj:create_one_entry({cluster_name = cluster_name, file_name = file_name, cur_date = cur_date})
         end
 
-        local isok, ret_str, last_offset, file_size = tunpack(ret.result)
-        if use_date < cur_date and (not isok or offset == last_offset) then    --不是当天并且玩家不存在或者已读完
-            --切换到下一天
-            local year = math.floor(use_date / 1000)
-            local month = math.floor(use_date / 10) % 100
-            local day = use_date % 100
+        local entry_list = g_gater_ormobj:get_entry(cluster_name, file_name)
+        for i = 1, #entry_list do
+            local entry = entry_list[i]
+            local date = entry:get('cur_date')
+            local year = math.floor(date / 1000)
+            local month = math.floor(date / 10) % 100
+            local day = date % 100
             local date_t = time_util.date(cur_date)
             date_t.year = year
             date_t.month = month
             date_t.day = day + 1
             local next_time = os.time(date_t)
-            use_date = tonumber(os.date("%Y%m%d", next_time))
-            entry:set('cur_date', use_date)
-            fname = use_date .. '_' .. file_name
-
-            log.info("next day: ", cluster_name, fname)
-        elseif offset == last_offset then
-            if offset > file_size then      --文件被修改了，重新来
-                entry:set('offset', 0)
-            end
-        else
-            local pre_index = 1
-            --log.info(">>>>>>> ", cluster_name, fname, ret_str)
-            local data_list_map = {}
-            for i = 1, one_line do
-                local s,e = string.find(ret_str, '\n', pre_index, true)
-                if not s then
-                    break
-                end
-                local json_str = ret_str:sub(pre_index, s - 1)
-                --log.info(" >>>>> json_str = ", pre_index, s - 1, json_str)
-                local str_len = #json_str
-                if json_str:sub(str_len, str_len) ~= '}' then
-                    break
-                end
-                local log_data, err = json.decode(json_str)
- 
-                if not log_data then
-                    log.error("decode json err ", err, json_str)
+            local next_date = tonumber(os.date("%Y%m%d", next_time))
+            local fname = date .. '_' .. file_name
+            local offset = entry:get('offset')
+            if not g_is_over_map[entry] then
+                local ret, errcode, errmsg = frpc_cli:byid_call_by_name('read', file_path, fname, offset, one_line)
+                if not ret then
+                    log.error("gather err ", file_path, fname, errcode, errmsg)
                 else
-                    local tab_name = log_data._log_name
-                    log_data._log_name = nil
-                    if not data_list_map[tab_name] then
-                        data_list_map[tab_name] = {}
-                    end
-                    table.insert(data_list_map[tab_name], log_data)
-                end
-
-                pre_index = e + 1
-                offset = offset + str_len + 1
-            end
-
-            for tab_name, data_list in pairs(data_list_map) do
-                local orm = g_orm_map[tab_name]
-                if not orm then
-                    log.warn("wait create orm ", cluster_name, tab_name)
-                    wait:wait(tab_name)
-                else
-                    local res = orm:create_entry(data_list)
-                    for i = 1, #res do
-                        if not res[i] then
-                            log.error("create_entry err ", tab_name, data_list[i])
+                    local isok, ret_str, last_offset, file_size = tunpack(ret.result)
+                    if not isok then                --文件不存在
+                        if date ~= cur_date then
+                            log.info_fmt("file open faild cluster_name[%s] file_path[%s] fname[%s] date[%s] ret_str[%s]", cluster_name, file_path, fname, date, ret_str)
+                            g_is_over_map[entry] = true
                         end
+                    elseif offset == last_offset then   --已读完
+                        if offset > file_size then      --文件被修改了，重新来
+                            entry:set('offset', 0)
+                        elseif date == cur_date then      --当天不管
+                        elseif next_date == cur_date then --昨天        --继续读1个小时(读到凌晨1点)，避免卡到文件关闭的间隙导致尾部部分没有读取
+                            local over_time = time_util.day_time(0, 1, 0, 0, cur_time)
+                            if cur_time > over_time then
+                                g_is_over_map[entry] = true --标记已读完
+                                log.info_fmt("file read over yesterday cluster_name[%s] file_path[%s] fname[%s] date[%s] ret_str[%s]", cluster_name, file_path, fname, date, ret_str)
+                            end
+                        else                              --其他时间标记已读完
+                            g_is_over_map[entry] = true
+                            log.info_fmt("file read over preday cluster_name[%s] file_path[%s] fname[%s] date[%s] ret_str[%s]", cluster_name, file_path, fname, date, ret_str)
+                        end
+                    else
+                        entry:set('file_size', file_size)
+                        local pre_index = 1
+                        local add_line = 0
+                        --log.info(">>>>>>> ", cluster_name, fname, ret_str)
+                        local data_list_map = {}
+                        for i = 1, one_line do
+                            local s,e = string.find(ret_str, '\n', pre_index, true)
+                            if not s then
+                                break
+                            end
+                            local json_str = ret_str:sub(pre_index, s - 1)
+                            --log.info(" >>>>> json_str = ", pre_index, s - 1, json_str)
+                            local str_len = #json_str
+                            if json_str:sub(str_len, str_len) ~= '}' then
+                                break
+                            end
+                            local log_data, err = json.decode(json_str)
+            
+                            if not log_data then
+                                log.error("decode json err ", err, json_str)
+                            else
+                                local tab_name = log_data._log_name
+                                log_data._log_name = nil
+                                if not data_list_map[tab_name] then
+                                    data_list_map[tab_name] = {}
+                                end
+                                table.insert(data_list_map[tab_name], log_data)
+                            end
+
+                            pre_index = e + 1
+                            offset = offset + str_len + 1
+                            add_line = add_line + 1
+                        end
+
+                        for tab_name, data_list in pairs(data_list_map) do
+                            local orm = g_orm_map[tab_name]
+                            if not orm then
+                                log.warn("wait create orm ", cluster_name, tab_name)
+                                wait:wait(tab_name)
+                            else
+                                local res = orm:create_entry(data_list)
+                                for i = 1, #res do
+                                    if not res[i] then
+                                        log.error("create_entry err ", tab_name, data_list[i])
+                                    end
+                                end
+                            end
+                        end
+
+                        entry:set('offset', offset)
+                        local pre_line_num = entry:get('linenum')
+                        entry:set('linenum', pre_line_num + add_line)
                     end
                 end
             end
-
-            entry:set('offset', offset)
-            --log.info(" >>>> offset >>> ", offset)
         end
     end
 
@@ -195,10 +208,13 @@ local function create_gather_loop(cluster_name, use_log_info)
             --删除保留天数以外的数据
             local orm = g_orm_map[tab_name]
             if orm then
-                if not orm:idx_delete_entry_by_range(nil, pre_time, "_time") then
-                    log.error("idx_delete_entry_by_range err", tab_name, pre_time)
-                end
+                orm:idx_delete_entry({_time = {['$lte'] = pre_time}})
             end
+
+            local pre_time = time_util.day_time(-7, 0, 0, 0, cur_Time)
+            local pre_date = tonumber(os.date("%Y%m%d", pre_time))
+            --只保留7天的采集数据
+            g_gater_ormobj:idx_delete_entry({cur_date = {['lte'] = pre_date}})
         end
     end)
 end
@@ -213,10 +229,13 @@ function CMD.start(config)
         g_gater_ormobj = ormtable:new('gather_info')
         :string64('cluster_name')
         :string64('file_name')
-        :uint32('cur_date')     --当前采集的日期
-        :uint32('offset')       --文件记录的偏移量
+        :uint32('cur_date')     --采集的日期
+        :uint32('offset')       --文件采集的偏移量
+        :uint32('file_size')    --文件大小
+        :uint32('linenum')      --采集总行数
         :set_cache(0, 500)      --永久缓存，5秒同步一次修改
-        :set_keys('cluster_name','file_name')
+        :set_index('date_index', 'cur_date')
+        :set_keys('cluster_name','file_name', 'cur_date')
         :builder(adapter)
 
         wait:wakeup("gater")
