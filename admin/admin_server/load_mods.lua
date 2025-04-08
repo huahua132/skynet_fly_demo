@@ -125,4 +125,15 @@ return {
 			}
 		}
 	},
+
+	--日志看板
+	log_pannel_m = {
+		launch_seq = 9000,
+		launch_num = 1,
+		default_arg = {
+			node_map = {
+				['hallserver'] = true,
+			}
+		}
+	}
 }

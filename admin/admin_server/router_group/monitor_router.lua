@@ -38,7 +38,6 @@ local function get_log_file_info(cluster_name, server_name, pre_day)
         file_path = string.format('%s%s_%s.log',file_path,date,server_name)
     end
 
-    log.info("get_log_file >>> ",file_path)
     local cache = g_file_cache:get_cache(file_path)
     if cache then
         return "OK",cache
@@ -68,7 +67,7 @@ local function get_register_map()
             tinsert(g_cluster_list,cluster_name)
             g_cluster_servers_map[cluster_name] = {}
             
-            for server_name,_ in table_util.sort_ipairs(server_map) do
+            for server_name,_ in table_util.sort_ipairs(server_map, nil) do
                 tinsert(g_cluster_servers_map[cluster_name], server_name)
             end
         end
@@ -133,8 +132,6 @@ return function(group)
             log.error("byid_mod_call err ", address)
             return
         end
-        log.error("server_id:>>>>>>>>>>>>>>>>",split_str,address)
-        log.error("server_ret:>>",server_ret)
 
         server_ret.result[1] = cjson_safe.decode(server_ret.result[1])
 

@@ -53,7 +53,7 @@ function M.auth(white_list) --验证白名单
     return function(context)
         local request_path = context.req.path
         local in_white_list = w_router:match(request_path)
-        log.info("token_auth_mid:", request_path, in_white_list)
+        --log.info("token_auth_mid:", request_path, in_white_list)
         if in_white_list then
             context.token_auth = {
                 is_white = true   --白名单
@@ -62,7 +62,7 @@ function M.auth(white_list) --验证白名单
         else
             local token = context.req.header['x-token']
             local username = context.req.header['x-username']
-            log.info("token_auth_mid>>>>>>>>>>>>>>:", username)
+            --log.info("token_auth_mid>>>>>>>>>>>>>>:", username)
             if not token or not username then
                 rsp_body.set_rsp(context, nil ,CODE.ILLEGAL_TOKEN, "not token")
                 context:abort()
@@ -83,7 +83,7 @@ function M.auth(white_list) --验证白名单
                 return
             end
 
-            log.error("token:", token, payload)
+            --log.error("token:", token, payload)
             context.token_auth = payload
             context:next()
         end

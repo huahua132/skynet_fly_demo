@@ -45,7 +45,7 @@ function M.auth()
         end
 
         local client_path = pathmap[path]
-        log.info("permission_mid>>> ",method, path, client_path)
+        --log.info("permission_mid>>> ",method, path, client_path)
         if not routes_map[client_path] then
             --没有权限
             log.info("没有权限>>>>>>>>>>>>>>>>>>>", path)

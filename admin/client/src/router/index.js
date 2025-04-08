@@ -95,6 +95,19 @@ export const constantRoutes = [
       }
     ]
   },
+
+  {
+    path: '/log_pannel',
+    component: Layout,
+    children: [
+      {
+        path : 'index',
+        name : 'LogPannel',
+        component: () => import('@/views/log_pannel/index'),
+        meta: {title: '日志看板'},
+      }
+    ]
+  },
 ]
 
 /**
