@@ -18,10 +18,10 @@ local type = type
 
 local g_item_entity = orm_table_client:instance("item")
 
-local g_local_info = state_data.alloc_table("g_local_info")
+local g_logic_info = state_data.alloc_table("g_logic_info")
 
 local function hotfix_init()
-    g_local_info.item_change_log = log_helper:new_user_log('item_change_log')
+    g_logic_info.item_change_log = log_helper:new_user_log('item_change_log')
     :int64("player_id")         --玩家ID
     :int64("item_id")           --道具ID
     :int64("change_num")        --改变值
@@ -29,10 +29,11 @@ local function hotfix_init()
     :uint32("source")           --变更来源
     :set_index("item_index", "item_id", "change_num")
     :set_index("player_index", "player_id")
+    :set_index("source_index", "source")
     :builder()
 
     event_mgr.monitor(EVENT_ID.ITEM_CHANGE, function(player_id, id, num, count, source)
-        g_local_info.item_change_log:write_log({
+        g_logic_info.item_change_log:write_log({
             player_id = player_id,
             item_id = id,
             change_num = num,
@@ -44,7 +45,7 @@ end
 
 local M = {}
 function M.init(interface_mgr)
-    g_local_info.item_msg = item_msg:new(interface_mgr)
+    g_logic_info.item_msg = item_msg:new(interface_mgr)
     hotfix_init()
 end
 
@@ -56,7 +57,7 @@ end
 ---------------------------其他逻辑------------------------------------
 local function player_item_notice(player_id)
     local item_list = g_item_entity:get_entry(player_id)
-    g_local_info.item_msg:item_list_notice(player_id, {
+    g_logic_info.item_msg:item_list_notice(player_id, {
         item_list = item_list,
     })
 end
@@ -98,7 +99,7 @@ function M.cmd_add_item(player_id, id, num, source)
 
     local item_list = {{id = id, count = count}}
     --同步到客户端
-    g_local_info.item_msg:item_list_notice(player_id, {
+    g_logic_info.item_msg:item_list_notice(player_id, {
         item_list = item_list
     })
 
@@ -116,7 +117,7 @@ function M.cmd_reduce_item(player_id, id, num, source)
     end
 
     --同步到客户端
-    g_local_info.item_msg:item_list_notice(player_id, {
+    g_logic_info.item_msg:item_list_notice(player_id, {
         item_list = {{id = id, count = count}}
     })
     event_mgr.publish(EVENT_ID.ITEM_CHANGE, player_id, id, -num, count, source)
@@ -145,7 +146,7 @@ function M.cmd_add_item_map(player_id, item_map, source)
         local num = item_map[id]
         event_mgr.publish(EVENT_ID.ITEM_CHANGE, player_id, id, num, count, source)
     end
-    g_local_info.item_msg:item_list_notice(player_id, {item_list = item_list})
+    g_logic_info.item_msg:item_list_notice(player_id, {item_list = item_list})
 
     return ret_map
 end
@@ -175,7 +176,7 @@ function M.cmd_add_item_list(player_id, item_list, source)
         local num = item_map[id]
         event_mgr.publish(EVENT_ID.ITEM_CHANGE, player_id, id, num, count, source)
     end
-    g_local_info.item_msg:item_list_notice(player_id, {item_list = item_list})
+    g_logic_info.item_msg:item_list_notice(player_id, {item_list = item_list})
 
     return ret_map
 end

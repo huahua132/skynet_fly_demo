@@ -10,6 +10,7 @@ local event_mgr = require "common.event_mgr"
 local EVENT_ID = hotfix_require "enum.EVENT_ID"
 local errorcode = hotfix_require "common.enum.errorcode"
 local email_conf = hotfix_require "hall.email.email_conf"
+local log_helper = require "common.log_helper"
 
 --interface
 local interface = require "hall.email.interface"
@@ -198,6 +199,21 @@ function M.change_global_email(player_id, add_list, change_list, del_list)
     end
 end
 
+local function hotfix_init()
+    g_logic_info.add_email_log = log_helper:new_user_log('add_email_log')
+    :int64("player_id")         --玩家ID
+    :int64("guid")              --邮件guid
+    :int64("from_id")           --来源ID
+    :int64("email_type")        --邮件类型
+    :string256("title")         --标题
+    :string8192("content")      --内容
+    :int64("vaild_time")        --有效时间
+    :table("item_list")         --道具奖励
+    :set_index("player_index", "player_id")
+    :set_index("type_index", "email_type")
+    :builder()
+end
+
 --初始化
 function M.init(interface_mgr)
     g_logic_info.all_global_emails = nil --全服邮件同步
@@ -207,6 +223,12 @@ function M.init(interface_mgr)
         M.on_recv_global_emails(all_global_emails)
     end)
     g_logic_info.email_msg = email_msg:new(interface_mgr)
+    hotfix_init()
+end
+
+--热更脚本
+function M.hotfix()
+    hotfix_init()
 end
 ---------------------------客户端事件----------------------------------
 --登录
@@ -381,6 +403,18 @@ function interface.add_sys_email(player_id, email_id, items, title_params, conte
     g_email_entity:create_one_entry(email)
     g_logic_info.email_msg:one_email_notice(player_id, {
         email = email,
+    })
+
+    --写日志
+    g_logic_info.add_email_log:write_log({
+        player_id = email.player_id,
+        guid = email.guid,
+        from_id = email.from_id,
+        email_type = email.email_type,
+        title = email.title,
+        content = email.content,
+        vaild_time = email.vaild_time,
+        item_list = email.item_list,
     })
 
     return true

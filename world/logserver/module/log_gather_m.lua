@@ -142,7 +142,7 @@ local function create_gather_loop(cluster_name, use_log_info)
     local file_path = use_log_info.file_path
     local split_str = string_util.split(cluster_name, ':')
     local svr_name, svr_id = split_str[1], tonumber(split_str[2])
-    local one_line = 20
+    local one_line = 100
     local frpc_cli = frpc_client:instance(svr_name, '.use_log'):set_svr_id(svr_id)
 
     local function gather_logic()
@@ -284,7 +284,7 @@ local function create_gather_loop(cluster_name, use_log_info)
             local pre_time = time_util.day_time(-7, 0, 0, 0, cur_Time)
             local pre_date = tonumber(os.date("%Y%m%d", pre_time))
             --只保留7天的采集数据
-            g_gater_ormobj:idx_delete_entry({cur_date = {['lte'] = pre_date}})
+            g_gater_ormobj:idx_delete_entry({cur_date = {['$lte'] = pre_date}})
         end
     end)
 end

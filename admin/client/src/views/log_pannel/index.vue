@@ -30,7 +30,7 @@
         </el-row>
 
         <div>
-            <el-table border stripe :data="data_list" style="width: 100%" height="700">
+            <el-table border stripe :data="data_list" style="width: 100%" height="650">
                 <el-table-column v-for="item in field_list" :label="item" resizable min-width="50" >
                     <template slot-scope="scope">
                         {{ parseItemShow(item, scope.row[item]) }}
@@ -45,6 +45,7 @@
                 <el-button :loading="loadingPre" type="primary" icon="el-icon-arrow-left" @click="onClickPre">上一页</el-button>
                 <el-button :loading="loadingNext" type="primary" @click="onClickNext">下一页<i class="el-icon-arrow-right el-icon--right"></i></el-button>
             </el-button-group>
+            <p>{{ this.pagenum + "/" + this.totalPageNum }}</p>
         </div>
     </div>
   </template>
@@ -58,6 +59,7 @@ export default {
         return {
           pagecount : 20,
           count : 0,
+          totalPageNum : 0,
           logNameList : [],
           field_list : [],
           field_map : {},
@@ -95,6 +97,7 @@ export default {
         clearData() {
             this.pageCachMap = {}
             this.pagenum = 1
+            this.totalPageNum = 0
             this.cursor = null
             this.data_list = []
             this.setSvrType = ""
@@ -195,6 +198,7 @@ export default {
             this.pagenum = data.pagenum
             if (data.count) {
                 this.count = data.count
+                this.totalPageNum = Math.ceil(this.count / this.pagecount)
             }
             
             if (Array.isArray(data.list)) {
