@@ -50,8 +50,15 @@ return {
 		launch_num = 1,
 		default_arg = {
 			node_map = {
-				['hallserver'] = true,      --大厅服
-			},
+				['hallserver'] = true,          --大厅服
+                ['matchserver'] = true,         --匹配服
+                ['logserver'] = true,           --日志服
+                ['loginserver'] = true,         --登录服
+                ['chinese_chess'] = true,       --象棋游戏服
+                ['digitalbomb'] = true,         --数字炸弹游戏服
+                ['chinese_chess_robot'] = true, --象棋游戏机器人服
+                ['digitalbomb_robot'] = true,   --数字炸弹机器人服
+			}, 
 			watch = 'redis',  --监听redis的方式做服务发现
 		}
 	},
@@ -59,7 +66,7 @@ return {
     -- orm
 	orm_table_m = {
 		launch_seq = 5000,
-		launch_num = 12,
+		launch_num = 13,
 		mod_args = {
 			{instance_name = "account_1",orm_plug  = "orm_entity.account_entity"},
             {instance_name = "account_2",orm_plug  = "orm_entity.account_entity"},
@@ -76,6 +83,8 @@ return {
             {instance_name = "allocid",   orm_plug = "orm_entity.allocid_entity"},
             --全服邮件
             {instance_name = "global_email", orm_plug = "orm_entity.global_email_entity"},
+            --服务状态
+            {instance_name = "server_info", orm_plug = "orm_entity.sever_info_entity"},
 		}
 	},
 
@@ -87,5 +96,10 @@ return {
     global_email_m = {
         launch_seq = 7000,
         launch_num = 1,
-    }
+    },
+
+    server_info_m = {
+        launch_seq = 8000,
+        launch_num = 1,
+    },
 }
