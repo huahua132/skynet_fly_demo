@@ -350,7 +350,7 @@ function M:leave(player_id, reason)
     --log.info("leave ", player_id, reason)
     local seat_id = self.m_player_seat_map[player_id]
     if not seat_id then
-        log.error("not in table ",player_id)
+        log.warn("not in table ",player_id)
         return
     end
 
@@ -390,7 +390,7 @@ function M:game_state_req(player_id, pack_id, pack_body)
     --log.info("handle >>>> ", pack_id)
     local seat_id = self.m_player_seat_map[player_id]
     if not seat_id then
-        log.error("player not seat_down ",player_id)
+        log.warn("player not seat_down ",player_id)
         return
     end
     local seat_player = self.m_seat_list[seat_id]
@@ -401,17 +401,17 @@ end
 function M:move_req(player_id,pack_id,pack_body)
     --log.info("move_req >>>> ", player_id,pack_id,pack_body)
     if self.m_game_state ~= GAME_STATE.playing then
-        log.error("not is playing state ", self.m_game_state)
+        log.warn("not is playing state ", self.m_game_state)
         return
     end
     local seat_id = self.m_player_seat_map[player_id]
     if not seat_id then
-        log.error("player not seat_down ",player_id)
+        log.warn("player not seat_down ",player_id)
         return
     end
 
     if seat_id ~= self.m_next_doing.seat_id then
-        log.error("can`t doing now ",seat_id)
+        log.warn("can`t doing now ",seat_id)
         return
     end
 
@@ -431,13 +431,13 @@ function M:move_req(player_id,pack_id,pack_body)
     end
 
     if not move_chess then
-        log.error("args err not find chess ",chess_id)
+        log.warn("args err not find chess ",chess_id)
         return
     end
 
     local can_move_list = self.m_can_move_map[chess_id]
     if not can_move_list then
-        log.error("cant`t move chess ", chess_id)
+        log.warn("cant`t move chess ", chess_id)
         return
     end
     local isok = false
@@ -449,7 +449,7 @@ function M:move_req(player_id,pack_id,pack_body)
     end
 
     if not isok then
-        log.error("can`t move to ",move_chess,move_row,move_col)
+        log.warn("can`t move to ",move_chess,move_row,move_col)
         return
     end
 

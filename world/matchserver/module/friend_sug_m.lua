@@ -15,7 +15,7 @@ local g_online_list = {}
 local function sys_online_player()
     local ret, code, msgerr = player_rpc.get_all_online()
     if not ret then
-        log.error("sys_online_player get_all_online failed ", code, msgerr)
+        log.warn("sys_online_player get_all_online failed ", code, msgerr)
         return
     end
 
