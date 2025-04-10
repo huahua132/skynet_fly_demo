@@ -1180,21 +1180,62 @@ function M:builder(tab_name, field_list, field_map, key_list, indexs_list)
                     tinsert(args, field_value)
                     cache_key = cache_key .. field_name .. '-'
                 else
-                    if field_value['$gte'] and field_value['$lte'] then
-                        tinsert(args, field_value['$gte'])
-                        tinsert(args, field_value['$lte'])
-                        cache_key = cache_key .. field_name .. '-gl-'
-                    elseif field_value['$gte'] then
-                        tinsert(args, field_value['$gte'])
-                        cache_key = cache_key .. field_name .. '-g-'
-                    else
-                        tinsert(args, field_value['$lte'])
-                        cache_key = cache_key .. field_name .. '-l-'
+                    cache_key = cache_key .. '-'
+                    if field_value['$gt'] then
+                        tinsert(args, field_value['$gt'])
+                        cache_key = cache_key .. 'g'
                     end
+
+                    if field_value['$gte'] then
+                        tinsert(args, field_value['$gte'])
+                        cache_key = cache_key .. 'ge'
+                    end
+
+                    if field_value['$lt'] then
+                        tinsert(args, field_value['$lt'])
+                        cache_key = cache_key .. 'l'
+                    end
+
+                    if field_value['$lte'] then
+                        tinsert(args, field_value['$lte'])
+                        cache_key = cache_key .. 'le'
+                    end
+                    cache_key = cache_key .. '-'
                 end
             end
         end
         return field_values, field_names, args, cache_key
+    end
+
+    local function join_query_prepare_str(field_name, field_value, prepare_str)
+        local isL = false
+        if field_value['$gt'] then
+            prepare_str = prepare_str .. sformat('`%s`>?', field_name)
+            isL = true
+        end
+
+        if field_value['$gte'] then
+            prepare_str = prepare_str .. sformat('`%s`>=?', field_name)
+            isL = true
+        end
+
+        if field_value['$lt'] then
+            if isL then
+                prepare_str = prepare_str .. sformat(' and `%s`<?', field_name)
+            else
+                prepare_str = prepare_str .. sformat('`%s`<?', field_name)
+            end
+        end
+
+        if field_value['$lte'] then
+            if isL then
+                prepare_str = prepare_str .. sformat(' and `%s`<=?', field_name)
+            else
+                prepare_str = prepare_str .. sformat('`%s`<=?', field_name)
+            end
+        end
+
+        return prepare_str
     end
 
     self._idx_select = function(query)
@@ -1212,13 +1253,7 @@ function M:builder(tab_name, field_list, field_map, key_list, indexs_list)
                 if type(field_value) ~= 'table' then
                     prepare_str = prepare_str .. sformat('`%s` = ?', field_name)
                 else
-                    if field_value['$gte'] and field_value['$lte'] then
-                        prepare_str = prepare_str .. sformat('`%s`>=? and `%s`<=?', field_name, field_name)
-                    elseif field_value['$gte'] then
-                        prepare_str = prepare_str .. sformat('`%s`>=?', field_name)
-                    else
-                        prepare_str = prepare_str .. sformat('`%s`<=?', field_name)
-                    end
+                    prepare_str = join_query_prepare_str(field_name, field_value, prepare_str)
                 end
                 if i ~= len then
                     prepare_str = prepare_str .. ' and '
@@ -1265,13 +1300,7 @@ function M:builder(tab_name, field_list, field_map, key_list, indexs_list)
                 if type(field_value) ~= 'table' then
                     prepare_str = prepare_str .. sformat('`%s` = ?', field_name)
                 else
-                    if field_value['$gte'] and field_value['$lte'] then
-                        prepare_str = prepare_str .. sformat('`%s`>=? and `%s`<=?', field_name, field_name)
-                    elseif field_value['$gte'] then
-                        prepare_str = prepare_str .. sformat('`%s`>=?', field_name)
-                    else
-                        prepare_str = prepare_str .. sformat('`%s`<=?', field_name)
-                    end
+                    prepare_str = join_query_prepare_str(field_name, field_value, prepare_str)
                 end
                 if i ~= len or cursor then
                     prepare_str = prepare_str .. ' and '
@@ -1302,7 +1331,6 @@ function M:builder(tab_name, field_list, field_map, key_list, indexs_list)
         --拿一下count
         if not cursor then
             local count_prepare_obj = nil
-            local cache_key = tconcat(field_names, ',')
             if _idx_limit_count_prepare_cache_map[cache_key] then
                 count_prepare_obj = _idx_limit_count_prepare_cache_map[cache_key]
             else
@@ -1319,13 +1347,7 @@ function M:builder(tab_name, field_list, field_map, key_list, indexs_list)
                     if type(field_value) ~= 'table' then
                         count_pre_pare_str = count_pre_pare_str .. sformat('`%s` = ?', field_name)
                     else
-                        if field_value['$gte'] and field_value['$lte'] then
-                            count_pre_pare_str = count_pre_pare_str .. sformat('`%s`>=? and `%s`<=?', field_name, field_name)
-                        elseif field_value['$gte'] then
-                            count_pre_pare_str = count_pre_pare_str .. sformat('`%s`>=?', field_name)
-                        else
-                            count_pre_pare_str = count_pre_pare_str .. sformat('`%s`<=?', field_name)
-                        end
+                        count_pre_pare_str = join_query_prepare_str(field_name, field_value, count_pre_pare_str)
                     end
                     if i ~= len then
                         count_pre_pare_str = count_pre_pare_str .. ' and '
@@ -1336,7 +1358,7 @@ function M:builder(tab_name, field_list, field_map, key_list, indexs_list)
             end
             local isok, ret = pcall(prepare_execute, self._db, count_prepare_obj, tunpack(args))
             if not isok or not ret or ret.err then
-                log.error("_idx_get_entry_by_limit err ", ret, cursor, limit, sort, sort_field_name, query)
+                log.error("_idx_get_entry_by_limit err ", count_prepare_obj.prepare_str, ret, cursor, limit, sort, sort_field_name, query)
                 error("_idx_get_entry_by_limit err ")
             end
             count = ret[1]["count(*)"]
@@ -1382,13 +1404,7 @@ function M:builder(tab_name, field_list, field_map, key_list, indexs_list)
                 if type(field_value) ~= 'table' then
                     prepare_str = prepare_str .. sformat('`%s` = ?', field_name)
                 else
-                    if field_value['$gte'] and field_value['$lte'] then
-                        prepare_str = prepare_str .. sformat('`%s`>=? and `%s`<=?', field_name, field_name)
-                    elseif field_value['$gte'] then
-                        prepare_str = prepare_str .. sformat('`%s`>=?', field_name)
-                    else
-                        prepare_str = prepare_str .. sformat('`%s`<=?', field_name)
-                    end
+                    prepare_str = join_query_prepare_str(field_name, field_value, prepare_str)
                 end
                 if i ~= len then
                     prepare_str = prepare_str .. ' and '

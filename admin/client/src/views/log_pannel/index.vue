@@ -53,6 +53,7 @@
 <script>
 
 import { getLogNameList, getLogDesc, getLogList } from '@/api/log_pannel'
+import { number } from 'echarts/lib/export'
 
 export default {
     data() {
@@ -177,8 +178,34 @@ export default {
                 if (field_value != '') {
                     let ft = this.field_map[field_name]
                     if (ft < 20) {
+                        const numbers = field_value.replace(/\s+/g, "").match(/-?\d+/g)?.map(Number) || [];
+                        const regexs = field_value.match(/(>=|<=|>|<)/g) || [];
                         if (Number(field_value) != NaN) {
                             query[field_name] = Number(field_value)
+                        }
+                        
+                        let len = numbers.length;
+                        for (let i = 0; i < len; i++) {
+                            let number = numbers[i];
+                            let regex = regexs[i];
+                            if (regex) {
+                                if (!query[field_name]) {
+                                    query[field_name] = {}
+                                }
+                                if (regex == '>') {
+                                    query[field_name]['$gt'] = number
+                                } else if (regex == '>=') {
+                                    query[field_name]['$gte'] = number
+                                } else if (regex == '<=') {
+                                    query[field_name]['$lte'] = number
+                                } else if (regex == '<') {
+                                    query[field_name]['$lt'] = number
+                                } else {
+                                    delete query[field_name]
+                                }
+                            } else {
+                                query[field_name] = number
+                            }
                         }
                     } else {
                         query[field_name] = field_value
