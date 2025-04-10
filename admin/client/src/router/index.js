@@ -216,6 +216,26 @@ export var asyncRoutes = [
     ]
   },
 
+  {
+    path: '/server_switch',
+    component: Layout,
+    meta: {
+      //title: 'GM',
+      roles: ['admin', 'developer'] // you can set roles in root nav
+    },
+    children: [
+      {
+        path : 'index',
+        name : 'server_switch',
+        component: () => import('@/views/server_switch/index'),
+        meta: {
+          title: '服务开关',
+          roles: ['admin']
+        },
+      }
+    ]
+  },
+
   // 404 page must be placed at the end !!!
   { path: '*', redirect: '/404', hidden: true }
 ]

@@ -28,7 +28,7 @@ end
 function handle.get_server_info(cluster_name)
     local entry = g_ormobj:get_one_entry(cluster_name)
     if not entry then
-        entry = g_ormobj:create_one_entry({cluster_name = cluster_name})
+        entry = g_ormobj:create_one_entry({cluster_name = cluster_name, status = 1, switch = 2})
     end
 
     return entry:get_entry_data()

@@ -7,6 +7,7 @@ local dashboard_router = require "router_group.dashboard_router"
 local global_email_router = require "router_group.global_email_router"
 local gm_router = require "router_group.gm_router"
 local log_pannel_router = require "router_group.log_pannel_router"
+local server_switch_router = require "router_group.server_switch_router"
 
 return function(app)
     user_router(app:group("/user"))                     --用户模块
@@ -18,4 +19,5 @@ return function(app)
     global_email_router(app:group("/global_email"))     --全服邮件
     gm_router(app:group("/gm"))                         --gm
     log_pannel_router(app:group("/log_pannel"))         --日志看板
+    server_switch_router(app:group("/server_switch"))   --服务开关
 end

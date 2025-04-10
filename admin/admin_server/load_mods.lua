@@ -135,5 +135,11 @@ return {
 				['hallserver'] = true,
 			}
 		}
+	},
+
+	--服务信息
+	server_info_m = {
+		launch_seq = 10000,
+		launch_num = 1,
 	}
 }

@@ -20,7 +20,7 @@ local g_server_info_map = {}
 local g_timer = nil
 
 local function change_status(cluster_name, server_info, status)
-    log.warn_fmt("change_status cluster_name[%s] status[%s]", cluster_name, status)
+    log.info_fmt("change_status cluster_name[%s] status[%s]", cluster_name, status)
     g_server_info_client:change_status(cluster_name, status)
     server_info.status = status
 
@@ -28,15 +28,16 @@ local function change_status(cluster_name, server_info, status)
 end
 
 local function change_switch(cluster_name, server_info, switch)
-    log.warn_fmt("change_switch cluster_name[%s] switch[%s]", cluster_name, switch)
+    log.info_fmt("change_switch cluster_name[%s] switch[%s]", cluster_name, switch)
     g_server_info_client:change_switch(cluster_name, switch)
     server_info.switch = switch
 
     watch_server.pubsyn(SYN_CHANNEL_NAME.server_info .. cluster_name, cluster_name, server_info)
+    return true
 end
 
 local function up_server(svr_name, svr_id)
-    local cluster_name = svr_name .. ':' .. svr_id
+    local cluster_name = svr_name .. '-' .. svr_id
     local server_info = g_server_info_map[cluster_name]
     if not server_info then
         server_info = g_server_info_client:get_server_info(cluster_name)
@@ -51,7 +52,7 @@ end)
 
 local function check_loop()
     for cluster_name, server_info in pairs(g_server_info_map) do
-        local svr_name, svr_id = tunpack(string_util.split(cluster_name, ':'))
+        local svr_name, svr_id = tunpack(string_util.split(cluster_name, '-'))
         svr_id = tonumber(svr_id)
         if frpc_client:is_active(svr_name, svr_id) then
             if server_info.status ~= SERVER_STATUS.OPEN then 
@@ -71,9 +72,9 @@ function CMD.change_switch(cluster_name, switch)
     local server_info = g_server_info_map[cluster_name]
     if not server_info then
         log.error_fmt("change_switch not server_info cluster_name[%s] switch[%s]", cluster_name, switch)
-        return
+        return false
     end
-    queue(cluster_name, server_info, switch)
+    return queue(change_switch, cluster_name, server_info, switch)
 end
 
 function CMD.start()
