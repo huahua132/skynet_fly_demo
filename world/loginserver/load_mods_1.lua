@@ -11,7 +11,9 @@ return {
 		default_arg = {     --默认配置
 			redis = {
 				--rpc连接配置
-				rpc = redis_cfg.rpc
+				rpc = redis_cfg.rpc,
+				--全服共用的redis
+				global = redis_cfg.global,
 			},
 
 			--cluster_server用的配置

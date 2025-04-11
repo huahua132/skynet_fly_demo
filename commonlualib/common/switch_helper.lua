@@ -10,7 +10,7 @@ do
     local svr_name = env_util.get_svr_name()
     local svr_id = env_util.get_svr_id()
     local cluster_name = svr_name .. '-' .. svr_id
-    watch_syn_client.watch_byid(svr_name, svr_id, SYN_CHANNEL_NAME.server_info .. cluster_name, "switch_helper", function(_, _, server_info)
+    watch_syn_client.watch("centerserver", SYN_CHANNEL_NAME.server_info .. cluster_name, "switch_helper", function(_, _, server_info)
         g_server_info = server_info
     end)
 end
@@ -20,6 +20,11 @@ local M = {}
 --获取开关状态
 function M.get_switch()
     return g_server_info.switch or SERVER_SWITCH_STATUS.CLOSE
+end
+
+--是否开启
+function M.is_open()
+    return g_server_info.switch == SERVER_SWITCH_STATUS.OPEN
 end
 
 return M
