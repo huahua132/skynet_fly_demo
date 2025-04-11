@@ -66,7 +66,7 @@ return {
     -- orm
 	orm_table_m = {
 		launch_seq = 5000,
-		launch_num = 13,
+		launch_num = 14,
 		mod_args = {
 			{instance_name = "account_1",orm_plug  = "orm_entity.account_entity"},
             {instance_name = "account_2",orm_plug  = "orm_entity.account_entity"},
@@ -85,6 +85,8 @@ return {
             {instance_name = "global_email", orm_plug = "orm_entity.global_email_entity"},
             --服务状态
             {instance_name = "server_info", orm_plug = "orm_entity.sever_info_entity"},
+            --白名单
+            {instance_name = "white", orm_plug = "orm_entity.white_entity"},
 		}
 	},
 

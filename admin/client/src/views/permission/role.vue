@@ -196,7 +196,7 @@ export default {
           await deleteRole(row.name)
           this.rolesList.splice($index, 1)
           this.$message({
-            type: '成功',
+            type: 'success',
             message: '删除成功'
           })
         })

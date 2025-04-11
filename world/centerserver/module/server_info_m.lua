@@ -8,6 +8,7 @@ local SERVER_STATUS = require "common.enum.SERVER_STATUS"
 local string_util = require "skynet-fly.utils.string_util"
 local watch_server = require "skynet-fly.rpc.watch_server"
 local SYN_CHANNEL_NAME = require "common.enum.SYN_CHANNEL_NAME"
+local SERVER_SWITCH_STATUS = require "common.enum.SERVER_SWITCH_STATUS"
 
 local ipairs = ipairs
 local pairs = pairs
@@ -15,8 +16,10 @@ local tunpack = table.unpack
 local tonumber = tonumber
 
 local g_server_info_client = orm_table_client:new("server_info")   --server_info 对应 load_mods.lua orm_table_m 中写的instance_name
+local g_white_client = orm_table_client:new("white")
 
 local g_server_info_map = {}
+local g_white_map = {}
 local g_timer = nil
 
 local function change_status(cluster_name, server_info, status)
@@ -31,7 +34,6 @@ local function change_switch(cluster_name, server_info, switch)
     log.info_fmt("change_switch cluster_name[%s] switch[%s]", cluster_name, switch)
     g_server_info_client:change_switch(cluster_name, switch)
     server_info.switch = switch
-
     watch_server.pubsyn(SYN_CHANNEL_NAME.server_info .. cluster_name, cluster_name, server_info)
     return true
 end
@@ -68,13 +70,58 @@ end
 
 local CMD = {}
 
+--改变开关状态
 function CMD.change_switch(cluster_name, switch)
     local server_info = g_server_info_map[cluster_name]
     if not server_info then
         log.error_fmt("change_switch not server_info cluster_name[%s] switch[%s]", cluster_name, switch)
         return false
     end
+    if not SERVER_SWITCH_STATUS[switch] then
+        log.error_fmt("change_switch not status cluster_name[%s] switch[%s]", cluster_name, switch)
+        return false
+    end
     return queue(change_switch, cluster_name, server_info, switch)
+end
+
+local function add_white(player_id)
+    if g_white_map[player_id] then
+        log.warn_fmt("add_white exists player_id[%s]", player_id)
+        return false
+    end
+
+    if not g_white_client:create_one_entry({player_id = player_id}) then
+        return false
+    end
+
+    g_white_map[player_id] = true
+    watch_server.pubsyn(SYN_CHANNEL_NAME.white_info, g_white_map)
+    return true
+end
+
+local function del_white(player_id)
+    if not g_white_map[player_id] then
+        log.warn_fmt("del_white not exists player_id[%s]", player_id)
+        return false
+    end
+
+    if not g_white_client:delete_entry(player_id) then
+        return false
+    end
+
+    g_white_map[player_id] = nil
+    watch_server.pubsyn(SYN_CHANNEL_NAME.white_info, g_white_map)
+    return true
+end
+
+--添加白名单
+function CMD.add_white(player_id)
+    return queue(add_white, player_id)
+end
+
+--移除白名单
+function CMD.del_white(player_id)
+    return queue(del_white, player_id)
 end
 
 function CMD.start()
@@ -85,6 +132,12 @@ function CMD.start()
                 g_server_info_map[one_info.cluster_name] = one_info
                 watch_server.pubsyn(SYN_CHANNEL_NAME.server_info .. one_info.cluster_name, one_info.cluster_name, one_info)
             end
+
+            local all_white_info = g_white_client:get_all_entry()
+            for _, one_info in ipairs(all_white_info) do
+                g_white_map[one_info.player_id] = true
+            end
+            watch_server.pubsyn(SYN_CHANNEL_NAME.white_info, g_white_map)
         end)
     end)
 
