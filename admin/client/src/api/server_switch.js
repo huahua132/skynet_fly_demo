@@ -15,6 +15,14 @@ export function changeSwitch(data) {
     })
 }
 
+export function changeAllSwitch(data) {
+    return request({
+      url: '/server_switch/change_all_switch',
+      method: 'post',
+      data
+    })
+}
+
 export function getWhiteInfos() {
     return request({
       url: '/server_switch/white_info',

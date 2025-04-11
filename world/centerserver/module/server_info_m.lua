@@ -84,6 +84,20 @@ function CMD.change_switch(cluster_name, switch)
     return queue(change_switch, cluster_name, server_info, switch)
 end
 
+local function change_all_switch(switch)
+    for cluster_name, server_info in pairs(g_server_info_map) do
+        if server_info.switch ~= switch then
+            change_switch(cluster_name, server_info, switch)
+        end
+    end
+
+    return true
+end
+--一键改变开关状态
+function CMD.change_all_switch(switch)
+    return queue(change_all_switch, switch)
+end
+
 local function add_white(player_id)
     if g_white_map[player_id] then
         log.warn_fmt("add_white exists player_id[%s]", player_id)

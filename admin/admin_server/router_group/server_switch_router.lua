@@ -38,6 +38,25 @@ return function(group)
         })
     end)
 
+    group:post('/change_all_switch', function(c)
+        local body = c.req.body
+        local switch = body.switch
+        if not SERVER_SWITCH_STATUS[switch] then
+            rsp_body.set_rsp(c, nil, CODE.ERR_PARAM, "not switch status")
+            return
+        end
+
+        local ret, errno, errmsg = contriner_client:instance('server_info_m'):mod_call('change_all_switch', switch)
+        if not ret then
+            log.error("change_all_switch err ", errno, errmsg)
+            rsp_body.set_rsp(c, nil, CODE.ERR_SERVER, "err server")
+            return
+        end
+        rsp_body.set_rsp(c, {
+            result = ret.result[1],
+        })
+    end)
+
     --白名单
     permission_mid.set('get', group:calculate_absolute_convert_path('/white_info'), '/server_switch/index')
     group:get('/white_info', function(c)

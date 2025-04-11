@@ -22,6 +22,11 @@ function CMD.change_switch(cluster_name, switch)
     return frpc_client:instance('centerserver', 'server_info_m'):one_balance_call('change_switch', cluster_name, switch)
 end
 
+--一键修改开关状态
+function CMD.change_all_switch(switch)
+    return frpc_client:instance('centerserver', 'server_info_m'):one_balance_call('change_all_switch', switch)
+end
+
 --获取白名单map
 function CMD.get_white_map()
     local map = white_helper.get_white_map()

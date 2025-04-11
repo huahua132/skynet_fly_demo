@@ -2,14 +2,22 @@
     <div><el-row>
         <el-col :span="12">
             <div style="text-align: center; padding-top: 10px;">服务开关</div>
+            <div style="text-align: center; padding-top: 10px; padding-bottom: 10px">
+                <el-radio-group v-model="allSwitch" @change="handleAllChange">
+                    <el-radio :label="0" >关闭</el-radio>
+                    <el-radio :label="1" >关闭入口</el-radio>
+                    <el-radio :label="2">白名单</el-radio>
+                    <el-radio :label="3">开启</el-radio>
+                </el-radio-group>
+            </div>
             <el-table border stripe :data="serverInfoList" style="width: 100%" height="650">
-                <el-table-column  label="集群名称" width="150" >
+                <el-table-column  label="集群名称" width="200" >
                     <template slot-scope="scope">
                         {{ scope.row.cluster_name }}
                     </template>
                 </el-table-column>
 
-                <el-table-column  label="服务状态" width="150" >
+                <el-table-column  label="服务状态" width="100" >
                     <template slot-scope="scope">
                         {{ parseStatus(scope.row.status) }}
                     </template>
@@ -33,13 +41,13 @@
             
             <div style="text-align: center; padding-top: 10px; padding-bottom: 10px">
                 <el-row>
-                <el-col :span="6">
-                    <el-input v-model="addPlayerId" placeholder="请输入玩家ID"></el-input>
-                </el-col>
-                <el-col :span="6">
-                    <el-button type="primary" @click="addWhite">新增白名单</el-button>
-                </el-col>
-            </el-row>
+                    <el-col :span="6">
+                        <el-input v-model="addPlayerId" placeholder="请输入玩家ID"></el-input>
+                    </el-col>
+                    <el-col :span="6">
+                        <el-button type="primary" @click="addWhite">新增白名单</el-button>
+                    </el-col>
+                </el-row>
             </div>
             <el-table border stripe :data="whiteList" style="width: 100%" height="650">
                 <el-table-column  label="玩家ID" >
@@ -67,7 +75,7 @@ let switchNameMap = {
     [3] : "开启",
 }
 
-import { getInfos, changeSwitch, getWhiteInfos, addWhite, delWhite } from '@/api/server_switch'
+import { getInfos, changeSwitch, changeAllSwitch, getWhiteInfos, addWhite, delWhite } from '@/api/server_switch'
 
 export default {
     data() {
@@ -75,6 +83,7 @@ export default {
             serverInfoList : [],
             whiteList : [],
             addPlayerId : null,
+            allSwitch : null,
         }
     },
 
@@ -94,7 +103,18 @@ export default {
             }
 
             list.sort(function(a,b) {
-                return a.cluster_name - b.cluster_name
+                let spliStrsA = a.cluster_name.split('-')
+                let svrNameA = spliStrsA[0]
+                let svrIdA = Number(spliStrsA[1])
+
+                let spliStrsB = b.cluster_name.split('-')
+                let svrNameB = spliStrsB[0]
+                let svrIdB = Number(spliStrsB[1])
+                if (svrNameA == svrNameB) {
+                    return svrIdA - svrIdB
+                } else {
+                    return svrNameA.localeCompare(svrNameB)
+                }
             })
             this.serverInfoList = list
        },
@@ -102,6 +122,14 @@ export default {
        async changeSwitch(cluster_name, switchVal) {
             let res = await changeSwitch({
                 cluster_name : cluster_name,
+                switch : switchVal,
+            })
+            let result = res.data.result
+            return result
+       },
+
+       async changeAllSwitch(switchVal) {
+            let res = await changeAllSwitch({
                 switch : switchVal,
             })
             let result = res.data.result
@@ -118,7 +146,7 @@ export default {
 
         handleChange(scope) {
             let switchNum = Number(scope.row.switch)
-            this.$confirm("您确定要调整为" + switchNameMap[switchNum] + "状态吗？", "提示", {
+            this.$confirm("您确定要调整为" + switchNameMap[switchNum] + "状态吗？", "开关调整", {
                 confirmButtonText: '确定',
                 cancelButtonText: '取消',
                 type: 'warning'
@@ -141,11 +169,49 @@ export default {
                     scope.row.switch = scope.row.preVal
                     this.$message({
                         type: 'info',
-                        message: '已取消操作'
+                        message: '操作失败'
                     });   
                 })
             }).catch(() => {
                 scope.row.switch = scope.row.preVal
+                this.$message({
+                    type: 'info',
+                    message: '已取消操作'
+                });          
+            });
+       },
+
+       handleAllChange(val) {
+            this.allSwitch = null
+            let switchNum = Number(val)
+            this.$confirm("您确定要全部调整为" + switchNameMap[switchNum] + "状态吗？", "全部开关调整", {
+                confirmButtonText: '确定',
+                cancelButtonText: '取消',
+                type: 'warning'
+            }).then(() => {
+                this.changeAllSwitch(switchNum).then((result)=>{
+                    if (result == true) {
+                        for (let i = 0; i < this.serverInfoList.length; i++) {
+                            let info = this.serverInfoList[i]
+                            info.switch = switchNum
+                        }
+                        this.$message({
+                            type: 'success',
+                            message: '操作成功'
+                        });
+                    } else {
+                        this.$message({
+                            type: 'info',
+                            message: '操作失败'
+                        });         
+                    }
+                }).catch(()=>{
+                    this.$message({
+                        type: 'info',
+                        message: '操作失败'
+                    });   
+                })
+            }).catch(() => {
                 this.$message({
                     type: 'info',
                     message: '已取消操作'
