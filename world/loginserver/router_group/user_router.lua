@@ -43,8 +43,7 @@ local function login(c)
                 return
             end
         elseif switch == SERVER_SWITCH_STATUS.WHITE then
-            local white_map = white_helper.get_white_map()
-            if not white_map[player_id] then
+            if not white_helper.is_white(player_id) then
                 rsp_body.set_rsp(c, nil, CODE.SERVER_CLOSE, "close service")
                 return
             end

@@ -31,6 +31,11 @@ M.handle = {
     end,
 }
 
+--开关忽略
+M.switch_ignores = {
+    [PACK.login.HeartReq] = true,
+}
+
 local CMD = {}
 
 --获取所有在线玩家ID

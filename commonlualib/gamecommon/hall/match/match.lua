@@ -16,6 +16,11 @@ M.handle = {
     end,
 }
 
+--开关忽略
+M.switch_ignores = {
+    [PACK.game_hall.JoinReq] = true,
+}
+
 local CMD = {}
 
 M.register_cmd = CMD

@@ -8,6 +8,10 @@ local rsp_msg = require "common.msg.rsp_msg"
 local g_modules_list = require "hall.hall"
 local pack_helper = require "common.pack_helper"
 local table_util = require "skynet-fly.utils.table_util"
+local switch_helper = require "common.switch_helper"
+local white_helper = require "common.white_helper"
+local SERVER_SWITCH_STATUS = require "common.enum.SERVER_SWITCH_STATUS"
+local errorcode = require "common.enum.errorcode"
 
 local assert = assert
 local ipairs = ipairs
@@ -26,6 +30,7 @@ local g_loginout_funcs = {}
 
 local g_before_funcs = {}
 local g_before_id_funcs = {}
+local g_switch_ignore_map = {}		--开关忽略的消息
 local g_gm_cmd_map = {}
 
 local M = {}
@@ -49,6 +54,12 @@ function M.init(interface_mgr)
 		if handle then
 			for pack_id,func in pairs(handle) do
 				g_interface_mgr:handle(pack_id, func)
+			end
+		end
+		local switch_ignores = m.switch_ignores
+		if switch_ignores then
+			for pack_id in pairs(switch_ignores) do
+				g_switch_ignore_map[pack_id] = true
 			end
 		end
 	end
@@ -217,6 +228,21 @@ end
 
 --客户端消息前置处理
 function M.handle_before(player_id, pack_id, pack_body, rsp_session)
+
+	if not g_switch_ignore_map[pack_id] then
+		--判定开关
+		local switch = switch_helper.get_switch()
+		if switch == SERVER_SWITCH_STATUS.CLOSE or switch == SERVER_SWITCH_STATUS.CLOSE_JOIN then	--关闭状态
+			errors_msg:errors(player_id, errorcode.SERVER_CLOSE, "SERVER_CLOSE", pack_id, rsp_session)
+			return false
+		elseif switch == SERVER_SWITCH_STATUS.WHITE then
+			if not white_helper.is_white(player_id) then
+				errors_msg:errors(player_id, errorcode.SERVER_CLOSE, "SERVER_CLOSE", pack_id, rsp_session)
+				return false
+			end
+		end
+	end
+
 	local ret, errcode, errmsg
 	for i = 1, #g_before_funcs do
 		local func = g_before_funcs[i]
