@@ -78,7 +78,7 @@ function M.auth(white_list) --验证白名单
                 else
                     rsp_body.set_rsp(context, nil ,CODE.ILLEGAL_TOKEN, msg)
                 end
-                log.error("token 失效:",msg)
+                log.info("token 失效:",msg)
                 context:abort()
                 return
             end

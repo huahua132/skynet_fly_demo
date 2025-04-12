@@ -158,7 +158,7 @@ end
 function M:leave(player_id, reason)
     local seat_id = self.m_player_seat_map[player_id]
     if not seat_id then
-        log.error("not in table ",player_id)
+        log.warn("not in table ",player_id)
         return
     end
 
@@ -181,11 +181,11 @@ function M:leave(player_id, reason)
 end
 
 function M:disconnect(player_id)
-    log.error("disconnect:",player_id)
+    log.info("disconnect:",player_id)
 end
 
 function M:reconnect(player_id)
-    log.error("reconnect:",player_id)
+    log.info("reconnect:",player_id)
 end
 -----------------------------------------------------------------------
 --client
@@ -246,7 +246,7 @@ end
 function M:game_status_req(player_id, pack_id, pack_body)
     local seat_id = self.m_player_seat_map[player_id]
     if not seat_id then
-        log.error("not in table ",player_id)
+        log.warn("not in table ",player_id)
         return
     end
 
@@ -277,24 +277,24 @@ end
 --sys
 -----------------------------------------------------------------------
 function M:herald_exit()
-    log.error("预告退出", self.m_table_id)
+    log.info("预告退出", self.m_table_id)
 end
 
 function M:exit()
-	log.error("退出", self.m_table_id)
+	log.info("退出", self.m_table_id)
 	return true
 end
 
 function M:fix_exit()
-    log.fatal("确认要退出", self.m_table_id, GAME_STATE_ENUM.stop)
+    log.info("确认要退出", self.m_table_id, GAME_STATE_ENUM.stop)
 end
 
 function M:cancel_exit()
-    log.error("取消退出", self.m_table_id)
+    log.info("取消退出", self.m_table_id)
 end
 
 function M:check_exit()
-    log.error("检查退出", self.m_table_id)
+    log.info("检查退出", self.m_table_id)
 end
 -----------------------------------------------------------------------
 --sys
