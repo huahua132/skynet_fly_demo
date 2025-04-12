@@ -27,7 +27,6 @@ export default {
 
     methods: {
         handleSetLineChartData(data,svr_name,day) {
-            console.log("handleSetLineChartData:",data,svr_name)
             this.lineChartData = data
             this.svr_name = svr_name
             this.isNotData = false
@@ -40,7 +39,6 @@ export default {
 
         //没有数据
         handleNotData() {
-            console.log("没有数据>>>>>")
             this.isNotData = true
         }
     }

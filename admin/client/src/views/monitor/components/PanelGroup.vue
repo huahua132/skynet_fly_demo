@@ -70,15 +70,28 @@ export default {
     methods: {
         async getClusterList() {
             const res = await get_cluster_list()
-            console.log("getClusterList>>>",res)
+            
             this.clusterList = res.data.cluster_list
+            this.clusterList.sort(function(a,b) {
+                return a.localeCompare(b)
+            })
+            
             this.serverMap = res.data.server_map
+            for (let key in this.serverMap) {
+                let list = this.serverMap[key]
+                list.sort(function(a,b) {
+                    if (a == 'total'){
+                        return -1
+                    } else {
+                        return a.localeCompare(b)
+                    }
+                })
+            }
         },
 
         async getInfo() {
             const res = await getInfo(this.cluster, this.server, this.pre_day)
             let data = res.data
-            console.log("getInfo>> ",data)
             if (data.result != "OK") {
                 this.$emit('handleNotData')
                 return
@@ -102,7 +115,6 @@ export default {
                 }
             }
 
-            console.log("opts:",opts)
             this.$emit('handleSetLineChartData',{
                 time : timeList,
                 opts : opts

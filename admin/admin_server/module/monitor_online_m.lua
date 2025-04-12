@@ -72,7 +72,7 @@ local function rigister_rotate(svr_name, file_path, file_name, tag)
     local cfg = assert(TAG_TIMER_POINT_CFG[tag], "not exists tag :" .. tag)
 
     g_rigister_info[svr_name] = file_name
-    logrotate:new(file_name):set_file_path(file_path):set_max_age(cfg.max_age):set_hour(5):set_point_type(cfg.point_type):builder()
+    logrotate:new(file_name):set_file_path(file_path):set_max_age(cfg.max_age):set_point_type(cfg.point_type):builder()
 end
 
 local function write_info(svr_name, tag, infostr)

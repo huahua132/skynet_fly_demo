@@ -102,42 +102,4 @@ return function(group)
             data = info_list,
         })
     end)
-
-    group:get('/serverinfo', function(c)
-        get_register_map()
-        local query = c.req.query
-        local cluster_name = assert(query.cluster_name, "not cluster_name") --集群服务的名字
-        local server_name = assert(query.server_name, "not server_name")    --服务名字
-
-        if server_name == "total" then
-            rsp_body.set_rsp(c, {
-                run_time = 0,
-                server_info = {}
-            })
-            return
-        end
-
-        local split_str = string_util.split(cluster_name,'-')
-        assert(#split_str == 2, "err cluster_name " .. cluster_name)
-        local svr_name,svr_id = split_str[1],tonumber(split_str[2])
-        split_str = string_util.split(server_name,'-')
-        assert(#split_str == 2, "err server_name " .. cluster_name)
-        local address = ':'..split_str[2]
-
-        local instance = frpc_client:instance(svr_name,"debug_console_m"):set_svr_id(svr_id)
-        local ret = instance:byid_mod_call('run_time')
-        
-        local server_ret = instance:byid_mod_call('call','info',address)
-        if not server_ret then
-            log.error("byid_mod_call err ", address)
-            return
-        end
-
-        server_ret.result[1] = cjson_safe.decode(server_ret.result[1])
-
-        rsp_body.set_rsp(c,{
-            run_time = ret.result[1],
-            server_info = server_ret.result[1],
-        })
-    end)
 end

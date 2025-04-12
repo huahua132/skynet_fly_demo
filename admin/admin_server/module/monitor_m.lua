@@ -21,6 +21,7 @@ local pairs = pairs
 local io = io
 local string = string
 local error = error
+local sfind = string.find
 
 local g_file_cache = tti:new(time_util.DAY, function(key, file)
     file:flush()
@@ -53,7 +54,7 @@ local function rigister_rotate(cluster_name,server_name,file_path,file_name)
     end
 
     g_rigister_info[cluster_name][server_name] = file_name
-    logrotate:new(file_name):set_file_path(file_path):set_max_age(7):set_hour(5):builder()
+    logrotate:new(file_name):set_file_path(file_path):set_max_age(7):builder()
 end
 
 local function monitor(svr_name)
@@ -74,15 +75,30 @@ local function monitor(svr_name)
             server_id = server_id:sub(2, server_id:len())
             local split = string_util.split(server_info,' ')
             local mem = tonumber(split[1])
-            local name = split[4]:sub(1,#split[4] - 1)
-            if name == "hot_containe" and split[5] then
-                name = split[5]
+            local name = split[4]
+            if sfind(name, ')', name:len(), true) then
+                name = name:sub(1, name:len() - 1)
             end
-           
-            server_name_map[server_id] = name.. '-' .. server_id
-            svr_info_map[v.cluster_name][name .. '-' .. server_id] = {
-                mem = mem,
-            }
+            if name == "hot_container" and split[5] then
+                name = split[5]
+            elseif name == "service_cell" then
+                name = split[5]
+                name = name:sub(1, #name - 1)
+            end
+
+            server_name_map[server_id] = name
+            if not svr_info_map[v.cluster_name][name] then
+                svr_info_map[v.cluster_name][name] = {
+                    mem = 0,
+                    task = 0,
+                    mqlen = 0,
+                    cpu = 0,
+                    message = 0,
+                    cmem = 0,
+                }
+            end
+            svr_info_map[v.cluster_name][name].mem = svr_info_map[v.cluster_name][name].mem + mem
+
             if not svr_info_map[v.cluster_name]['total'] then
                 svr_info_map[v.cluster_name]['total'] = {
                     mem = 0,
@@ -107,10 +123,10 @@ local function monitor(svr_name)
                 local name_server = server_name_map[server_id]
                 if name_server and svr_info_map[v.cluster_name] and svr_info_map[v.cluster_name][name_server] then
                     local svr_info = svr_info_map[v.cluster_name][name_server]
-                    svr_info.task = server_info.task
-                    svr_info.mqlen = server_info.mqlen
-                    svr_info.cpu = server_info.cpu
-                    svr_info.message = server_info.message
+                    svr_info.task = svr_info.task + server_info.task
+                    svr_info.mqlen = server_info.mqlen + server_info.mqlen
+                    svr_info.cpu = server_info.cpu + server_info.cpu
+                    svr_info.message = server_info.message + server_info.message
 
                     local total_info = svr_info_map[v.cluster_name]['total']
                     total_info.task = total_info.task + server_info.task
@@ -131,7 +147,7 @@ local function monitor(svr_name)
                 local name_server = server_name_map[server_id]
                 if name_server and svr_info_map[v.cluster_name] and svr_info_map[v.cluster_name][name_server] then
                     local svr_info = svr_info_map[v.cluster_name][name_server]
-                    svr_info.cmem = math_util.number_div_str(cmem / 1024 * 100, 2)  --kb 保持2位小数
+                    svr_info.cmem = svr_info.cmem + math_util.number_div_str(cmem / 1024 * 100, 2)  --kb 保持2位小数
 
                     local total_info = svr_info_map[v.cluster_name]['total']
                     total_info.cmem = total_info.cmem + svr_info.cmem

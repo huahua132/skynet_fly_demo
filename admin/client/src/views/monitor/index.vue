@@ -4,24 +4,17 @@
         <el-row style="background:#fff;padding:16px 16px 0;margin-bottom:32px;">
             <line-chart :chart-data="lineChartData" :is-notdata = "isNotData" />
         </el-row>
-        
-        <el-row v-show="isCurDay">
-            <server-info :cluster="cluster" :server="server">
-            </server-info>
-        </el-row>
     </div>
 </template>
 
 <script>
 import PanelGroup from './components/PanelGroup'
 import LineChart from '@/components/LineChart'
-import ServerInfo from './components/ServerInfo'
 
 export default {
     components: {
         PanelGroup,
         LineChart,
-        ServerInfo,
     },
     data() {
         return {
@@ -49,7 +42,6 @@ export default {
 
         //没有数据
         handleNotData() {
-            console.log("没有数据>>>>>")
             this.isNotData = true
         }
     }

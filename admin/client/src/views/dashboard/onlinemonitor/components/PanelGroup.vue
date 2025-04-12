@@ -72,7 +72,7 @@ export default {
                     }
                 }
             }
-            console.log("setDateList:", this.nodeMap, this.svr_name, this.tag, this.dayOption)
+
             this.dayOption.sort(function(a, b) {
                 if (a == "cur") {
                     return -1
@@ -123,7 +123,6 @@ export default {
 
         async getsvrNameList() {
             const res = await getNodeMap()
-            console.log("getsvrNameList>>>",res)
             this.svrNameList = []
             this.nodeMap = res.data.node_map
             for (let svrName in this.nodeMap) {
@@ -135,7 +134,6 @@ export default {
         async getOnlineRecord() {
             const res = await getOnlineRecord(this.svr_name, this.date, this.tag)
             let data = res.data
-            console.log("getOnlineRecord>> ",data)
             if (data.result != "OK") {
                 this.$emit('handleNotData')
                 return
@@ -158,8 +156,6 @@ export default {
                     }
                 }
             }
-
-            console.log("opts:",opts)
             this.$emit('handleSetLineChartData',{
                 time : timeList,
                 opts : opts

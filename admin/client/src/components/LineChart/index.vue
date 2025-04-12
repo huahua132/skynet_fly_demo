@@ -131,13 +131,13 @@ watch: {
     chartData: {
     deep: true,
     handler(val) {
-        console.log("handler>>>",val)
+        //console.log("handler>>>",val)
         this.setOptions(val)
     }
     },
     isNotdata : {
     handler(val) {
-        console.log("isNotdata:",this.isNotdata,val)
+        //console.log("isNotdata:",this.isNotdata,val)
         if (this.isNotdata) {
         if (!this.chart) {
             return
