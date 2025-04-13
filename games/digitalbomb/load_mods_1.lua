@@ -39,7 +39,7 @@ return {
 		}
 	},
 
-	--匹配服
+	--分配服
 	room_game_alloc_m = {
 		launch_seq = 3000, --第三个启动
 		launch_num = 1, --启动1个
