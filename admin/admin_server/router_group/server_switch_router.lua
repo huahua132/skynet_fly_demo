@@ -38,6 +38,7 @@ return function(group)
         })
     end)
 
+    permission_mid.set('post', group:calculate_absolute_convert_path('/change_all_switch'), '/server_switch/index')
     group:post('/change_all_switch', function(c)
         local body = c.req.body
         local switch = body.switch
