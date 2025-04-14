@@ -6,37 +6,38 @@ fi
 
 to_time=$1
 one_add=1
+env_name=$2
 
 #世界相关服
 cd world/logserver
-bash make/script/fasttime.sh load_mods.lua ${to_time} ${one_add}
+bash make/script/fasttime.sh load_mods${env_name}.lua ${to_time} ${one_add}
 cd ../../
 
 cd world/centerserver
-bash make/script/fasttime.sh load_mods.lua ${to_time} ${one_add}
+bash make/script/fasttime.sh load_mods${env_name}.lua ${to_time} ${one_add}
 cd ../../
 
 cd world/matchserver
-bash make/script/fasttime.sh load_mods.lua ${to_time} ${one_add}
+bash make/script/fasttime.sh load_mods${env_name}.lua ${to_time} ${one_add}
 cd ../../
 
 cd world/loginserver
-bash make/script/fasttime.sh load_mods_1.lua ${to_time} ${one_add}
-bash make/script/fasttime.sh load_mods_2.lua ${to_time} ${one_add}
+bash make/script/fasttime.sh load_mods${env_name}_1.lua ${to_time} ${one_add}
+bash make/script/fasttime.sh load_mods${env_name}_2.lua ${to_time} ${one_add}
 cd ../../
 
 cd world/hallserver
-bash make/script/fasttime.sh load_mods_1.lua ${to_time} ${one_add}
-bash make/script/fasttime.sh load_mods_2.lua ${to_time} ${one_add}
+bash make/script/fasttime.sh load_mods${env_name}_1.lua ${to_time} ${one_add}
+bash make/script/fasttime.sh load_mods${env_name}_2.lua ${to_time} ${one_add}
 cd ../../
 
 #游戏
 cd games/chinese_chess
-bash make/script/fasttime.sh load_mods_1.lua ${to_time} ${one_add}
-bash make/script/fasttime.sh load_mods_2.lua ${to_time} ${one_add}
+bash make/script/fasttime.sh load_mods${env_name}_1.lua ${to_time} ${one_add}
+bash make/script/fasttime.sh load_mods${env_name}_2.lua ${to_time} ${one_add}
 cd ../../
 
 cd games/digitalbomb
-bash make/script/fasttime.sh load_mods_1.lua ${to_time} ${one_add}
-bash make/script/fasttime.sh load_mods_2.lua ${to_time} ${one_add}
+bash make/script/fasttime.sh load_mods${env_name}_1.lua ${to_time} ${one_add}
+bash make/script/fasttime.sh load_mods${env_name}_2.lua ${to_time} ${one_add}
 cd ../../
