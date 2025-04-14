@@ -180,7 +180,7 @@ export var asyncRoutes = [
     path: '/global_email',
     component: Layout,
     meta: {
-      //title: '全服邮件',
+      title: '全服邮件',
       roles: ['admin', 'developer'] // you can set roles in root nav
     },
     children: [
@@ -200,7 +200,7 @@ export var asyncRoutes = [
     path: '/gm',
     component: Layout,
     meta: {
-      //title: 'GM',
+      title: 'GM',
       roles: ['admin', 'developer'] // you can set roles in root nav
     },
     children: [
@@ -220,7 +220,7 @@ export var asyncRoutes = [
     path: '/server_switch',
     component: Layout,
     meta: {
-      //title: 'GM',
+      title: '服务开关',
       roles: ['admin', 'developer'] // you can set roles in root nav
     },
     children: [

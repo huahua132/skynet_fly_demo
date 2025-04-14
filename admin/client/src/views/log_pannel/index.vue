@@ -1,15 +1,37 @@
 <template>
     <div>
-        <el-select v-model="logName" filterable placeholder="请选择日志">
-            <el-option
-                v-for="item in logNameList"
-                :key="item.value"
-                :label="item.label"
-                :value="item.value">
-            </el-option>
-        </el-select>
+        <el-row :gutter="0">
+            <el-col :span="4">
+                <el-select v-model="logName" filterable placeholder="请选择日志">
+                    <el-option
+                        v-for="item in logNameList"
+                        :key="item.value"
+                        :label="item.label"
+                        :value="item.value">
+                    </el-option>
+                </el-select>
+            </el-col>
 
-        <el-row>
+            <el-col :span="4">
+                <label>导出格式:</label>
+                <el-select v-model="bookType" style="width:120px;">
+                <el-option
+                    v-for="item in bookTypeOptions"
+                    :key="item"
+                    :label="item"
+                    :value="item"
+                />
+                </el-select>
+            </el-col>
+
+            <el-col :span="3">
+                <el-button :loading="downloadLoading" style="margin:0 0 20px 20px;" type="primary" icon="el-icon-document" @click="handleDownload">
+                    导出数据
+                </el-button>
+            </el-col>
+        </el-row>
+       
+        <el-row :gutter="20">
             <el-col :span="4"><div>
                 <el-input v-model="setSvrType" placeholder="服务类型"></el-input>
                 <el-input v-model="setSvrId" placeholder="服务ID"></el-input>
@@ -30,7 +52,7 @@
         </el-row>
 
         <div>
-            <el-table border stripe :data="data_list" style="width: 100%" height="650">
+            <el-table border stripe :data="data_list" style="width: 100%" height="600">
                 <el-table-column v-for="item in field_list" :label="item" resizable min-width="50" >
                     <template slot-scope="scope">
                         {{ parseItemShow(item, scope.row[item]) }}
@@ -53,7 +75,6 @@
 <script>
 
 import { getLogNameList, getLogDesc, getLogList } from '@/api/log_pannel'
-import { number } from 'echarts/lib/export'
 
 export default {
     data() {
@@ -77,6 +98,9 @@ export default {
           loadingFirst : false,
           loadingPre : false,
           loadingNext : false,
+          downloadLoading : false,
+          bookType : 'xlsx',
+          bookTypeOptions : ['xlsx', 'csv']
         }
     },
 
@@ -237,10 +261,14 @@ export default {
         },
 
         parseItemShow(field_name, field_value) {
-            if (field_name == '_time') {
+            if (field_name.includes('time')) {
                 return new Date(field_value * 1000).toLocaleString('zh-CN')
             } else {
-                return field_value
+                if (typeof(field_value) == 'object') {
+                    return  JSON.stringify(field_value)
+                } else {
+                    return '' + field_value
+                }
             }
         },
 
@@ -268,8 +296,7 @@ export default {
         },
 
         async onClickNext() {
-            let maxPageNum = Math.ceil(this.count / this.pagecount)
-            if (this.pagenum >= maxPageNum) {
+            if (this.pagenum >= this.totalPageNum) {
                 this.$notify({
                     title: '已经到最后一页了',
                 })
@@ -281,6 +308,41 @@ export default {
             this.getLogList()
             this.loadingNext = false
         },
+
+
+        handleDownload() {
+            this.downloadLoading = true
+            const intervalId = setInterval(()=>{
+                if (this.pagenum < this.totalPageNum) {
+                    this.onClickNext()
+                } else {
+                    clearInterval(intervalId)
+                    let list = []
+                    for (let key in this.pageCachMap) {
+                        let ls = this.pageCachMap[key]
+                        list.push.apply(list, ls)
+                    }
+                    console.log("handleDownload >>> ", list)
+                    const data = this.formatJson(this.field_list, list)
+                    import('@/vendor/Export2Excel').then(excel => {
+                        excel.export_json_to_excel({
+                        header: this.field_list,
+                        data,
+                        filename: this.logName,
+                        autoWidth: true,
+                        bookType: this.bookType
+                        })
+                        this.downloadLoading = false
+                        console.log("handleDownload over >>> ", list)
+                    })
+                }
+            }, 10)
+        },
+        formatJson(filterVal, jsonData) {
+            return jsonData.map(v => filterVal.map(j => {
+                return this.parseItemShow(j, v[j])
+            }))
+        }
     }
 }
 </script>

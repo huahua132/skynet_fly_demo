@@ -112,6 +112,7 @@ export default {
       let routes = this.generateRoutes(asyncRoutes)
       this.readRoutes = routes
       this.writeRoutes = routes
+      console.log("readRoutes >>> ", this.readRoutes)
     },
     async getRoles() {
       const res = await getRoles()
