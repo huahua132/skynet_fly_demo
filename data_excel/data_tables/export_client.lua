@@ -3,7 +3,7 @@ local json = require "json"
 local utils = require "utils"
 
 local source_dir = ".\\json"   --配置来源
-local target_dir = "..\\..\\client\\chinesechess_oops\\assets\\data_cfg\\data_tables"
+local target_dir = "..\\..\\client\\chinesechess_oops\\assets\\bundle\\data_tables"
 
 local new_file_map = {}       --新文件map
 
@@ -55,7 +55,7 @@ end
 --更新schema
 --检查替换schema.lua
 local new_file_path = 'jsongen\\schema.ts'
-local old_file_path = '..\\..\\client\\chinesechess_oops\\assets\\data_cfg\\schema.ts'
+local old_file_path = '..\\..\\client\\chinesechess_oops\\assets\\libs\\schema.ts'
 local cmd = string.format('copy "%s" "%s"', new_file_path, old_file_path)
 local isok,status,signal = os.execute(cmd)
 if not isok then

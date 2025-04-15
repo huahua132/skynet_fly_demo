@@ -4,6 +4,7 @@ import { CCComp } from "db://oops-framework/module/common/CCComp";
 import { BoardEntity } from "../BoardEntity"
 import { ChessEntity } from "../../chess/ChessEntity";
 import { TEAM_TYPE } from "../../enum/TEAM_TYPE";
+import {chessHelper} from "../../../common/config/chessHelper"
 
 const { ccclass, property } = _decorator;
 
@@ -43,13 +44,15 @@ export class BoardViewComp extends CCComp {
         let selfNode = this.getNode("selfPlayer");
         let otherNode = this.getNode("otherPlayer");
         selfNode!.getChildByName("nickname")!.getComponent(Label)!.string = entity.BoardModel.selfPlayer!.nickname!;
-        selfNode!.getChildByName("rank")!.getComponent(Label)!.string = entity.BoardModel.selfPlayer!.score!.toString();
+        let rankCfg = chessHelper.GetRankCfgByScore(entity.BoardModel.selfPlayer!.score!)
+        selfNode!.getChildByName("rank")!.getComponent(Label)!.string = rankCfg.rankName + '(' + entity.BoardModel.selfPlayer!.score!.toString() + ')';
         selfNode!.getChildByName("remainTotalTime")!.getComponent(Label)!.string = "600";
         selfNode!.getChildByName("remainOnceTime")!.getComponent(Label)!.string = "60";
         console.log("showPlayerInfo ", entity.BoardModel.rivalPlayer);
         if (entity.BoardModel.rivalPlayer) {
+            let rivalRankCfg = chessHelper.GetRankCfgByScore(entity.BoardModel.rivalPlayer.score!);
             otherNode!.getChildByName("nickname")!.getComponent(Label)!.string = entity.BoardModel.rivalPlayer.nickname!;
-            otherNode!.getChildByName("rank")!.getComponent(Label)!.string = entity.BoardModel.rivalPlayer.score!.toString();
+            otherNode!.getChildByName("rank")!.getComponent(Label)!.string = rivalRankCfg.rankName + '(' + entity.BoardModel.rivalPlayer.score!.toString() + ')';
             otherNode!.getChildByName("remainTotalTime")!.getComponent(Label)!.string = "600";
             otherNode!.getChildByName("remainOnceTime")!.getComponent(Label)!.string = "60";
         }

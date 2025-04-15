@@ -11,6 +11,7 @@ import {UIID} from "../../../common/enum/UIConfig";
 import {EmailBllComp} from "../../email/bll/EmailBll"
 import {FriendBllComp} from "../../friend/bll/FriendBll"
 import {FriendViewComp} from "../../friend/view/FriendViewComp"
+import {chessHelper} from "../../../common/config/chessHelper"
 
 const { ccclass, property } = _decorator;
 
@@ -57,7 +58,8 @@ export class HallViewComp extends CCComp {
         const entity = this.ent as HallEntity;
         this.getNode("playerId")!.getComponent(Label)!.string = "ID:" + entity.HallModel.PlayerId.toString();
         this.getNode("nickName")!.getComponent(Label)!.string = entity.HallModel.NickName;
-        this.getNode("rank")!.getComponent(Label)!.string = entity.HallModel.RankScore.toString();
+        let rankCfg = chessHelper.GetRankCfgByScore(entity.HallModel.RankScore);
+        this.getNode("rank")!.getComponent(Label)!.string = rankCfg.rankName + '(' + entity.HallModel.RankScore + ')'
         this.getNode("levelVal")!.getComponent(Label)!.string = entity.HallModel.Level.toString();
     }
 

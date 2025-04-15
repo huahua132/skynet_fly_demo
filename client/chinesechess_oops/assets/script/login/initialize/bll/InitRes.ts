@@ -11,11 +11,24 @@ import { ModuleUtil } from "../../../../../extensions/oops-plugin-framework/asse
 import { UIID } from "../../../common/enum/UIConfig"
 import { Initialize } from "../Initialize";
 import { LoadingViewComp } from "../view/LoadingViewComp";
+import {JsonAsset} from "cc"
+import { smc } from "../../../common/SingletonModuleComp"
+import { Tables } from "../../../../libs/schema"
 
 /** 初始化游戏公共资源 */
 @ecs.register('InitRes')
 export class InitResComp extends ecs.Comp {
     reset() { }
+}
+
+function loadDataTable(filename: string) {
+    let config = oops.res.get("data_tables/" + filename, JsonAsset)
+    if (config) {
+        return Object.freeze(config.json)
+    } else {
+        oops.log.trace("loadDataTable err filename:" + filename)
+        return {}
+    }
 }
 
 /** 初始化资源逻辑注册到Initialize模块中 */
@@ -50,15 +63,18 @@ export class InitResSystem extends ecs.ComblockSystem implements ecs.IEntityEnte
         queue.push((next: NextFunction, params: any, args: any) => {
             oops.res.loadDir("game", next);
             oops.res.loadDir("gui", next);
+            oops.res.loadDir("data_tables", next);
         });
     }
 
     /** 加载完成进入游戏内容加载界面 */
     private onComplete(queue: AsyncQueue, e: Initialize) {
         queue.complete = async () => {
+            smc.tables = new Tables(loadDataTable);
             ModuleUtil.addViewUi(e, LoadingViewComp, UIID.Loading);
             e.remove(InitResComp);
-            //oops.res.dump();
+            // oops.res.dump();
+            // console.log(">>>> ", smc.tables)
         };
     }
 }

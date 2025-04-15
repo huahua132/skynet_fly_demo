@@ -6,6 +6,7 @@ import {HallEntity} from "../hall/hall/Hall"
 import {BoardEntity} from "../game/board/BoardEntity"
 import {EmailEntity} from "../hall/email/EmailEntity"
 import {FriendEntity} from "../hall/friend/FriendEntity"
+import { Tables } from "../../libs/schema";
 
 /** 游戏单例业务模块 */
 @ecs.register('SingletonModule')
@@ -16,6 +17,8 @@ export class SingletonModuleComp extends ecs.Comp {
     account: Account = null!;
     /** 网络模块 */
     net = new NetNodeManager();
+    /** 配置表 */
+    tables : Tables = null!;
     /** 大厅模块 */
     hall: HallEntity = null!;
     /** 游戏模块 */

@@ -4,7 +4,7 @@
  * @LastEditors: dgflash
  * @LastEditTime: 2022-08-05 18:25:56
  */
-import { _decorator, profiler } from 'cc';
+import { _decorator, profiler, JsonAsset } from 'cc';
 import { DEBUG } from 'cc/env';
 import { oops } from '../../extensions/oops-plugin-framework/assets/core/Oops';
 import { Root } from '../../extensions/oops-plugin-framework/assets/core/Root';
