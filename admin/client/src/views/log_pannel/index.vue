@@ -92,6 +92,7 @@ export default {
           pageCachMap : {},
           data_list : [],
           cursor : null,
+          nextOffset : 0,
           setSvrType : "",
           setSvrId : "",
           setTimeValue : "",
@@ -181,6 +182,7 @@ export default {
             if (this.pagenum == 1) {
                 this.pageCachMap = {}
                 this.cursor = null
+                this.nextOffset = 0
             }
             let query = {}
             if (this.setSvrType != "" && Number(this.setSvrType) != NaN) {
@@ -242,11 +244,15 @@ export default {
                 pagenum : this.pagenum,
                 cursor : this.cursor,
                 query : query,
+                next_offset : this.nextOffset,
             })
             
             let data = res.data
             this.cursor = data.cursor
             this.pagenum = data.pagenum
+            this.nextOffset = data.next_offset
+
+            //console.log(">>> data >>> ", data)
             if (data.count) {
                 this.count = data.count
                 this.totalPageNum = Math.ceil(this.count / this.pagecount)
@@ -312,6 +318,7 @@ export default {
 
         handleDownload() {
             this.downloadLoading = true
+            this.pagenum = 1
             const intervalId = setInterval(()=>{
                 if (this.pagenum < this.totalPageNum) {
                     this.onClickNext()
@@ -336,7 +343,7 @@ export default {
                         console.log("handleDownload over >>> ", list)
                     })
                 }
-            }, 10)
+            }, 1000)
         },
         formatJson(filterVal, jsonData) {
             return jsonData.map(v => filterVal.map(j => {

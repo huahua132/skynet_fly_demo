@@ -60,17 +60,17 @@ end
 
 local CMD = {}
 
-function CMD.get_log_list(log_name, cursor, limit, sort, sort_field_name, query, offset)
+function CMD.get_log_list(log_name, cursor, limit, sort, sort_field_name, query, next_offset)
     local orm = g_orm_map[log_name]
     if not orm then
         return nil
     end
-    local cursor, res, count = orm:idx_get_entry_by_limit(cursor, limit, sort, sort_field_name, query, offset)
+    local cursor, res, count, next_offset = orm:idx_get_entry_by_limit(cursor, limit, sort, sort_field_name, query, next_offset)
     local list = {}
     for i = 1, #res do
         list[i] = res[i]:get_entry_data()
     end
-    return true, cursor, list, count
+    return true, cursor, list, count, next_offset
 end
 
 function CMD.start(config)

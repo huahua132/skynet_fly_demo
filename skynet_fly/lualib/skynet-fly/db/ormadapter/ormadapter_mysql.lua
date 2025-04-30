@@ -373,6 +373,8 @@ function M:builder(tab_name, field_list, field_map, key_list, indexs_list)
     local updates_format_end = " where("
     local updates_format_key = "("
     local delete_format_head = sformat("delete from %s",tab_name)
+    local desc_key_str = ""
+    local asc_key_str = ""
 
     local len = #field_list
     for i = 1,len do
@@ -411,12 +413,16 @@ function M:builder(tab_name, field_list, field_map, key_list, indexs_list)
             select_format_key_head = select_format_key_head .. '`' .. field_name .. '`'
             updates_format_end = updates_format_end .. '`' .. field_name .. '`)'
             updates_format_key = updates_format_key .. '?)'
+            desc_key_str = desc_key_str .. '`' .. field_name .. '` desc '
+            asc_key_str = asc_key_str .. '`' .. field_name .. '` desc '
         else
             select_format_end = select_format_end .. '`' .. field_name .. '`=' .. "?"
             update_format_end = update_format_end .. '`' .. field_name .. '`=' .. "? and "
             select_format_key_head = select_format_key_head .. '`' .. field_name .. '`,'
             updates_format_end = updates_format_end .. '`' .. field_name .. '`,'
             updates_format_key = updates_format_key .. '?,'
+            desc_key_str = desc_key_str .. '`' .. field_name .. '` desc,'
+            asc_key_str = asc_key_str .. '`' .. field_name .. '` desc,'
         end
        
         select_format_end_list[i] = select_format_end
@@ -1276,11 +1282,11 @@ function M:builder(tab_name, field_list, field_map, key_list, indexs_list)
 
     local _idx_limit_preparecache_map = {}
     local _idx_limit_count_prepare_cache_map = {}
-    self._idx_get_entry_by_limit = function(cursor, limit, sort, sort_field_name, query, offset)
+    self._idx_get_entry_by_limit = function(cursor, limit, sort, sort_field_name, query, next_offset)
         local end_field_name = sort_field_name
         local field_values, field_names, args, cache_key = parse_query(query)
         local is_have_cursor = cursor and 1 or 0
-        local is_have_offset = offset and 1 or 0
+        local is_have_offset = next_offset and 1 or 0
         cache_key = cache_key .. sformat(",%s_%s_%s_%s", sort_field_name, sort, is_have_cursor, is_have_offset)
 
         local prepare_obj = nil
@@ -1308,18 +1314,18 @@ function M:builder(tab_name, field_list, field_map, key_list, indexs_list)
             end
             if not cursor then
                 if sort == 1 then  --升序
-                    prepare_str = prepare_str .. sformat(' order by `%s` limit ?', end_field_name)
+                    prepare_str = prepare_str .. sformat(' order by `%s` asc, %s limit ?', end_field_name, asc_key_str)
                 else
-                    prepare_str = prepare_str .. sformat(' order by `%s` desc limit ?', end_field_name)
+                    prepare_str = prepare_str .. sformat(' order by `%s` desc, %s limit ?', end_field_name, desc_key_str)
                 end
             else
                 if sort == 1 then  --升序
-                    prepare_str = prepare_str .. sformat('`%s` > ? order by `%s` limit ?', end_field_name, end_field_name)
+                    prepare_str = prepare_str .. sformat('`%s` >= ? order by `%s` asc, %s limit ?', end_field_name, end_field_name, asc_key_str)
                 else
-                    prepare_str = prepare_str .. sformat('`%s` < ? order by `%s` desc limit ?', end_field_name, end_field_name)
+                    prepare_str = prepare_str .. sformat('`%s` <= ? order by `%s` desc, %s limit ?', end_field_name, end_field_name, desc_key_str)
                 end
             end
-            if offset then
+            if next_offset then
                 prepare_str = prepare_str .. ' offset ?'
             end
             
@@ -1358,7 +1364,7 @@ function M:builder(tab_name, field_list, field_map, key_list, indexs_list)
             end
             local isok, ret = pcall(prepare_execute, self._db, count_prepare_obj, tunpack(args))
             if not isok or not ret or ret.err then
-                log.error("_idx_get_entry_by_limit err ", count_prepare_obj.prepare_str, ret, cursor, limit, sort, sort_field_name, query)
+                log.error("_idx_get_entry_by_limit err ", ret, cursor, limit, sort, sort_field_name, query)
                 error("_idx_get_entry_by_limit err ")
             end
             count = ret[1]["count(*)"]
@@ -1369,26 +1375,42 @@ function M:builder(tab_name, field_list, field_map, key_list, indexs_list)
 
         args[#args + 1] = limit
 
-        if offset then
-            args[#args + 1] = offset
+        if next_offset then
+            args[#args + 1] = next_offset
         end
-        
+
         local isok, ret = pcall(prepare_execute, self._db, prepare_obj, tunpack(args))
         
         if not isok or not ret or ret.err then
-            log.error("_idx_get_entry_by_limit err ", ret, cursor, limit, sort, sort_field_name, query, offset)
+            log.error("_idx_get_entry_by_limit err ", ret, cursor, limit, sort, sort_field_name, query, next_offset)
             error("_idx_get_entry_by_limit err ")
         end
         
-        local cursor = nil
+        local next_cursor = nil
+        local pre_offset = next_offset
+        next_offset = 0
         if #ret > 0 then
             local end_ret = ret[#ret]
-            cursor = end_ret[end_field_name]
+            next_offset = 1
+            next_cursor = end_ret[end_field_name]
+            for i = #ret - 1, 1, -1 do
+                local one_ret = ret[i]
+                if one_ret[end_field_name] == next_cursor then
+                    next_offset = next_offset + 1
+                else
+                    break
+                end
+            end
+            if cursor == next_cursor then
+                if pre_offset then
+                    next_offset = next_offset + pre_offset
+                end
+            end
         end
         decode_tables(ret)
-        return cursor, ret, count
+        return next_cursor, ret, count, next_offset
     end
-
+    
     local _idx_delete_preparecache_map = {}
     self._idx_delete_entry = function(query)
         local field_values, field_names, args, cache_key = parse_query(query)
@@ -1497,8 +1519,8 @@ function M:idx_get_entry(query)
 end
 
 --通过普通索引分页查询
-function M:idx_get_entry_by_limit(cursor, limit, sort, sort_field_name, query, offset)
-    return self._idx_get_entry_by_limit(cursor, limit, sort, sort_field_name, query, offset)
+function M:idx_get_entry_by_limit(cursor, limit, sort, sort_field_name, query, next_offset)
+    return self._idx_get_entry_by_limit(cursor, limit, sort, sort_field_name, query, next_offset)
 end
 
 --通过普通索引删除

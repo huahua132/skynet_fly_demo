@@ -65,7 +65,7 @@ return function(group)
         local logname = body.logname
         local cursor = body.cursor
         local pagenum = body.pagenum
-        local offset = body.offset 
+        local next_offset = body.next_offset 
         local limit = 20
         local sort = -1 --降序
         local sort_field_name = '_time'     --按时间排序
@@ -73,7 +73,17 @@ return function(group)
         if type(cursor) == 'userdata' then 
             cursor = nil
         end
-        local isok, cursor, res, count = contriner_client:instance("log_pannel_m"):mod_call('get_log_list', logname, cursor, limit, sort, sort_field_name, query, offset)
+        --log.info("log_list req >>> ", logname, cursor, limit, sort, sort_field_name, query, next_offset)
+        local isok, cursor, res, count, next_offset = contriner_client:instance("log_pannel_m"):mod_call('get_log_list', logname, cursor, limit, sort, sort_field_name, query, next_offset)
+        local guid_list = {}
+        local time_list = {}
+        for i, oneret in ipairs(res) do
+            table.insert(guid_list, oneret._guid)
+            table.insert(time_list, oneret._time)
+        end
+        -- log.info("guid_list >>> ", table.concat(guid_list, ","))
+        -- log.info("time_list >>> ", table.concat(time_list, ","))
+        -- log.info("log_list res >>> ", isok, cursor, count, next_offset)
         if not isok then
             rsp_body.set_rsp(c, nil ,CODE.ERR_SERVER, "err server")
             return
@@ -85,6 +95,7 @@ return function(group)
             list = list,
             count = count,
             pagenum = pagenum,
+            next_offset = next_offset,
         })
     end)
 end
