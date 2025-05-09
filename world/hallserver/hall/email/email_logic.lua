@@ -2,7 +2,6 @@ local log = require "skynet-fly.log"
 local orm_table_client = require "skynet-fly.client.orm_table_client"
 local state_data = require "skynet-fly.hotfix.state_data"
 local watch_syn_client = require "skynet-fly.rpc.watch_syn_client"
-local snowflake = require "skynet-fly.snowflake"
 local email_msg = hotfix_require "msg.email_msg"
 local schema = hotfix_require "common.enum.schema"
 local time_util = require "skynet-fly.utils.time_util"
@@ -11,6 +10,7 @@ local EVENT_ID = hotfix_require "enum.EVENT_ID"
 local errorcode = hotfix_require "common.enum.errorcode"
 local email_conf = hotfix_require "hall.email.email_conf"
 local log_helper = require "common.log_helper"
+local guid_helper = require "common.guid_helper"
 
 --interface
 local interface = require "hall.email.interface"
@@ -384,7 +384,7 @@ function interface.add_sys_email(player_id, email_id, items, title_params, conte
     local cur_time = time_util.time()
     local email = {
         player_id = player_id,
-        guid = snowflake.new_guid(),
+        guid = guid_helper.new_guid(guid_helper.GUID_MODULE.EMAIL),
         from_id = 0,
         email_type = schema.enums.email_type.SYSTEM,
         title = title,

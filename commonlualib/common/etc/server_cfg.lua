@@ -11,6 +11,7 @@ M.games = {
         thread = 8,         --工作线程数
         debug_port = 9011,  --调试端口
         logpath = '../../logs/chinese_chess_1',
+        machine_id = 10001,                         --机器号(1,16383)，应全局唯一，用于雪花算法guid生成
     },
     chinese_chess_2 = {
         svr_type = 101,   --对于svr_name的唯一标识(0,255)
@@ -18,6 +19,7 @@ M.games = {
         thread = 8,
         debug_port = 9021,
         logpath = '../../logs/chinese_chess_2',
+        machine_id = 10002,                         --机器号(1,16383)，应全局唯一，用于雪花算法guid生成
     },
     digitalbomb_1 = {
         svr_type = 102,   --对于svr_name的唯一标识(0,255)
@@ -26,6 +28,7 @@ M.games = {
         debug_port = 9031,  --调试端口
         logpath = '../../logs/digitalbomb_1',
         loglevel = 'error',
+        machine_id = 10101,                         --机器号(1,16383)，应全局唯一，用于雪花算法guid生成
     },
     digitalbomb_2 = {
         svr_type = 102,   --对于svr_name的唯一标识(0,255)
@@ -34,6 +37,7 @@ M.games = {
         debug_port = 9041,  --调试端口
         logpath = '../../logs/digitalbomb_2',
         loglevel = 'error',
+        machine_id = 10102,                         --机器号(1,16383)，应全局唯一，用于雪花算法guid生成
     },
 }
 
@@ -43,6 +47,7 @@ M.admin = {
         thread = 4,
         debug_port = 10011,
         logpath = '../../logs/admin_server',
+        machine_id = 5,                         --机器号(1,16383)，应全局唯一，用于雪花算法guid生成
     },
     game_client_server = {
         thread = 4,
@@ -58,7 +63,7 @@ M.world = {
         thread = 8,
         debug_port = 11011,
         logpath = '../../logs/centerserver',
-        machine_id = 1,                         --机器人号，全局唯一，用于雪花算法guid生成
+        machine_id = 1,                         --机器号(1,16383)，应全局唯一，用于雪花算法guid生成
     },
 
     logserver = {
@@ -66,6 +71,7 @@ M.world = {
         thread = 2,
         debug_port = 11021,
         logpath = '../../logs/logserver',
+        machine_id = 2,                         --机器号(1,16383)，应全局唯一，用于雪花算法guid生成
     },
 
     matchserver = {
@@ -73,6 +79,7 @@ M.world = {
         thread = 4,
         debug_port = 11031,
         logpath = '../../logs/matchserver',
+        machine_id = 3,                         --机器号(1,16383)，应全局唯一，用于雪花算法guid生成
     },
 
     loginserver_1 = {
@@ -82,6 +89,7 @@ M.world = {
         logpath = '../../logs/loginserver_1',
         debug_port = 11111,
         loglevel = 'error',
+        machine_id = 101,                         --机器号(1,16383)，应全局唯一，用于雪花算法guid生成
     },
     loginserver_2 = {
         svr_type = 4,   --对于svr_name的唯一标识(0,255)
@@ -90,6 +98,7 @@ M.world = {
         logpath = '../../logs/loginserver_2',
         debug_port = 11121,
         loglevel = 'error',
+        machine_id = 102,                         --机器号(1,16383)，应全局唯一，用于雪花算法guid生成
     },
 
     hallserver_1 = {
@@ -100,7 +109,7 @@ M.world = {
         debug_port = 11211,
         recordlimit = RECORD_LIMIT,
         recordpath = '../../records/hallserver_1',
-        machine_id = 11,                         --机器人号，全局唯一，用于雪花算法guid生成
+        machine_id = 1001,                         --机器号(1,16383)，应全局唯一，用于雪花算法guid生成
     },
     hallserver_2 = {
         svr_type = 5,   --对于svr_name的唯一标识(0,255)
@@ -110,7 +119,7 @@ M.world = {
         debug_port = 11221,
         recordlimit = RECORD_LIMIT,
         recordpath = '../../records/hallserver_2',
-        machine_id = 12,                         --机器人号，全局唯一，用于雪花算法guid生成
+        machine_id = 1002,                         --机器号(1,16383)，应全局唯一，用于雪花算法guid生成
     },
 }
 --世界配置 12开头

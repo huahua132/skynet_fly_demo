@@ -3,7 +3,7 @@ local orm_table_client = require "skynet-fly.client.orm_table_client"
 local watch_server = require "skynet-fly.rpc.watch_server"
 local timer_point = require "skynet-fly.time_extend.timer_point"
 local time_util = require "skynet-fly.utils.time_util"
-local snowflake = require "skynet-fly.snowflake"
+local guid_helper = require "common.guid_helper"
 local skynet = require "skynet"
 
 local pairs = pairs
@@ -39,7 +39,7 @@ end
 local CMD = {}
 --新增邮件
 function CMD.add(title, content, item_list, vaild_time)
-    local guid = snowflake.new_guid()
+    local guid = guid_helper.new_guid(guid_helper.GUID_MODULE.EMAIL)
     local new_email = {
         guid = guid,
         title = title,
