@@ -5,8 +5,14 @@ local enum = {
     OPEN       = 3,      --开启             完全开放
 }
 
+local new_enum = {}
+
 for k,v in pairs(enum) do
-    enum[v] = k
+    new_enum[v] = k
+    new_enum[k] = v
 end
+
+enum = new_enum
+new_enum = nil
 
 return enum
