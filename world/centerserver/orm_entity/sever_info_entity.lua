@@ -1,5 +1,6 @@
 local ormtable = require "skynet-fly.db.orm.ormtable"
 local ormadapter_mysql = require "skynet-fly.db.ormadapter.ormadapter_mysql"
+local SERVER_SWITCH_STATUS = require "common.enum.SERVER_SWITCH_STATUS"
 
 local pairs = pairs
 local ipairs = ipairs
@@ -16,7 +17,7 @@ function M.init()
     g_ormobj = ormtable:new("server_info")
     :string64('cluster_name')       --集群名
     :uint8('status')                --服务状态 0未开启  1已开启
-    :uint8('switch')                --服务开关 0关闭 1白名单 2开启
+    :uint8('switch')                --服务开关 0关闭 1关闭入口状态 2白名单 3开启
     :set_keys("cluster_name")
     :set_cache(0, 500)              --永久缓存，5秒同步一次更改
     :builder(adapter)
@@ -28,7 +29,7 @@ end
 function handle.get_server_info(cluster_name)
     local entry = g_ormobj:get_one_entry(cluster_name)
     if not entry then
-        entry = g_ormobj:create_one_entry({cluster_name = cluster_name, status = 1, switch = 2})
+        entry = g_ormobj:create_one_entry({cluster_name = cluster_name, status = 1, switch = SERVER_SWITCH_STATUS.OPEN})
     end
 
     return entry:get_entry_data()
