@@ -159,9 +159,10 @@ local function create_gather_loop(cluster_name, use_log_info)
         for i = 1, #entry_list do
             local entry = entry_list[i]
             local date = entry:get('cur_date')
-            local year = math.floor(date / 1000)
-            local month = math.floor(date / 10) % 100
+            local year = math.floor(date / 10000)   --20250512
+            local month = math.floor(date / 100) % 100
             local day = date % 100
+
             local date_t = time_util.date(cur_date)
             date_t.year = year
             date_t.month = month
