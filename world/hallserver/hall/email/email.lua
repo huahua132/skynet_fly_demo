@@ -44,11 +44,15 @@ M.register_cmd = CMD
 
 local gmCMD = {
     ['email:get_list'] = {
-        func = email_logic.gm_get_list,
+        func = function(...)
+            return email_logic.gm_get_list(...)
+        end,
         help_des = "查询玩家邮件列表 arg1=player_id"
     },
     ['email:item_list_req'] = {
-        func = email_logic.gm_item_list,
+        func = function(...)
+            return email_logic.gm_item_list(...)
+        end,
         help_des = "领取邮件道具奖励 arg1=player_id arg2=guid1 arg3=guid2"
     }
 }
