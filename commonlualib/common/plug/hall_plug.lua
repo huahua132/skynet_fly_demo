@@ -282,10 +282,14 @@ function M.handle_end_rpc(player_id, pack_id, pack_body, rsp_session, handle_res
 	end
 end
 
+--进入房间回调
+function M.join_table(player_id, table_name, table_id)
+
+end
+
 -- 离开房间回调
 function M.leave_table(player_id, table_name, table_id)
-	--离开房间说明对局结束了，就直接踢掉吧
-	skynet.fork(g_interface_mgr.goout, g_interface_mgr, player_id)
+
 end
 
 return M

@@ -21,6 +21,10 @@ function M.do_join(player_id, pack_body)
 	if not pack_body.table_id then
 		return false, errorcode.REQ_PARAM_ERR, "table_id is nil"
 	end
+	local old_table_id = g_logic_info.hall_interface:get_table_id(player_id)
+	if old_table_id ~= '0:0' then			--已经在房间了
+		return {table_id = old_table_id}
+	end
 	local ok,errorcode,errormsg = g_logic_info.hall_interface:join_table(player_id, "default", pack_body.table_id)
 	if ok then
 		return {table_id = ok}

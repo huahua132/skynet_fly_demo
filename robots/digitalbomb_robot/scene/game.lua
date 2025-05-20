@@ -88,18 +88,14 @@ function M:on_connect(player_id, table_id, token, game_rpc)
             end
         end)
 
-        if packbody.isreconnect == 1 then   --如果是重连
-            M:req_game_state()
-        else                            --首次进入
-            --请求进入桌子
-            local packid, packbody = game_rpc:req(PACK.game_hall.JoinReq, {
-                table_id = self.m_table_id
-            })
-            if not packid or packid == PACK.errors.Error then
-                log.warn("请求进入桌子 失败 >>> ", self.m_player_id, packid, packbody)
-            else
-                self:req_game_state()
-            end
+        --请求进入桌子
+        local packid, packbody = game_rpc:req(PACK.game_hall.JoinReq, {
+            table_id = self.m_table_id
+        })
+        if not packid or packid == PACK.errors.Error then
+            log.warn("请求进入桌子 失败 >>> ", self.m_player_id, packid, packbody)
+        else
+            self:req_game_state()
         end
     end
     return true
