@@ -64,9 +64,17 @@ function CMD.createtable(player_list, create_time, play_type)
 	if not table_id then
 		return nil
 	end
+
+	local player_map = {}
+	for _,player_id in ipairs(player_list) do
+		player_map[player_id] = true
+	end
+
 	g_table_info[table_id] = {
 		player_list = player_list,
 		create_time = create_time,
+		player_map = player_map,
+		leave_players = {},				--已离开的
 	}
 	--创建token
 	local token_list = contriner_client:instance("token_m"):mod_call("create_token", player_list, ENUM.LOGIN_TOKEN_TIME_OUT)
@@ -104,6 +112,18 @@ function M.match(player_id) --匹配
 	assert(1 == 2)
 end
 
+--判断是否能进入房间 entertable之前调用
+function M.is_can_enter(table_id, player_id)
+	local t_info = assert(g_table_info[table_id])
+	local player_map = t_info.player_map
+	local leave_players = t_info.leave_players
+	if player_map[player_id] and not leave_players[player_id] then
+		return true
+	end
+
+	return nil, errorcode.CANT_ENTER, "CANT_ENTER"
+end
+
 function M.createtable(table_name, table_id, config, create_player_id) --创建桌子
 	--log.info("createtable:",table_id)
 	g_info.cur_table_num = g_info.cur_table_num + 1
@@ -121,6 +141,10 @@ function M.leavetable(table_id,player_id)  --离开桌子
 	g_info.cur_player_num = g_info.cur_player_num - 1
 	game_redis.del_game_room_info(player_id)
 	g_isneed_pub = true
+
+	local t_info = assert(g_table_info[table_id])
+	local leave_players = t_info.leave_players
+	leave_players[player_id] = true
 end
 
 function M.dismisstable(table_id) --解散桌子
@@ -129,8 +153,11 @@ function M.dismisstable(table_id) --解散桌子
 
 	local t_info = assert(g_table_info[table_id])
 	local player_list = t_info.player_list
+	local leave_players = t_info.leave_players
 	for _,player_id in ipairs(player_list) do
-		game_redis.del_game_room_info(player_id)
+		if not leave_players[player_id] then
+			game_redis.del_game_room_info(player_id)
+		end
 	end
 
 	g_table_info[table_id] = nil

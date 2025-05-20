@@ -18,4 +18,5 @@ return {
 	MATCHING = 15,		     --匹配中
 	NOT_MATCHING = 16,       --没在匹配中
 	SERVER_CLOSE = 17,		 --已关服
+	CANT_ENTER = 18,		 --不允许进入
 }
