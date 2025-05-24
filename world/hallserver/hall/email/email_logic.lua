@@ -11,6 +11,8 @@ local errorcode = hotfix_require "common.enum.errorcode"
 local email_conf = hotfix_require "hall.email.email_conf"
 local log_helper = require "common.log_helper"
 local guid_helper = require "common.guid_helper"
+local queue_helper = require "common.queue_helper"
+local table_util = require "skynet-fly.utils.table_util"
 
 --interface
 local interface = require "hall.email.interface"
@@ -78,8 +80,12 @@ function M.on_recv_global_emails(all_global_emails)
     local old_global_emails = g_logic_info.all_global_emails
     if not old_global_emails then                           --第一次同步
         g_logic_info.all_global_emails = all_global_emails
+        for _, one_email in pairs(all_global_emails) do
+            g_logic_info.all_global_email_map[one_email.guid] = one_email
+        end
         return
     end
+
     local add_list = {}     --新增邮件
     local change_list = {}  --修改邮件
     local del_list = {}     --删除邮件
@@ -111,13 +117,10 @@ function M.on_recv_global_emails(all_global_emails)
     g_logic_info.all_global_email_map = new_global_email_map
     g_logic_info.all_global_emails = all_global_emails
 
-    local online_player_list = player_interface.get_online_list()
+    local online_player_list = table_util.copy(player_interface.get_online_list()) --copy一下再处理，避免因异步上下线，导致有些玩家没有执行到
     for i = 1, #online_player_list do
         local player_id = online_player_list[i]
-        --使用玩家的skynet.queue处理，如果玩家下线了，就不用处理了，等上线逻辑触发处理
-        if player_id then
-            g_logic_info.interface_mgr:queue(player_id, M.change_global_email, player_id, add_list, change_list, del_list)
-        end
+        queue_helper.multi_player_func(player_id, M.change_global_email, player_id, add_list, change_list, del_list)
     end
 end
 

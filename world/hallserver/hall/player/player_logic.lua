@@ -10,13 +10,13 @@ local EVENT_ID = hotfix_require "enum.EVENT_ID"
 local state_data = require "skynet-fly.hotfix.state_data"
 local contriner_client = require "skynet-fly.client.contriner_client"
 local table_util = require "skynet-fly.utils.table_util"
-local mod_queue = require "skynet-fly.mod_queue"
 local item_interface = require "hall.item.interface"
 local schema = hotfix_require "common.enum.schema"
 local player_conf = hotfix_require "hall.player.player_conf"
 local chess_conf = hotfix_require "common.conf.chess_conf"
 local table_util = require "skynet-fly.utils.table_util"
 local errorcode = hotfix_require "common.enum.errorcode"
+local queue_helper = require "common.queue_helper"
 
 contriner_client:register("room_game_hall_m")
 
@@ -48,12 +48,12 @@ local M = {}
 function M.init(interface_mgr)
     g_local_info.hall_interface = interface_mgr
     g_local_info.player_msg = player_msg:new(interface_mgr)
-    g_local_info.mod_queue = mod_queue:new(1024)
     timer_point:new(timer_point.EVERY_DAY):builder(function()
         --跨天
         local player_list = table_util.copy(g_player_list)      --拷贝一份在线玩家列表 避免遍历过程中有玩家下线 导致玩家没有触发跨天
         for i = 1, #player_list do
-            event_mgr.publish(EVENT_ID.CROSS_DAY, player_list[i])        --跨天
+            local player_id = player_list[i]
+            queue_helper.multi_player_func(player_id, event_mgr.publish, EVENT_ID.CROSS_DAY, player_id) --跨天
         end
     end)
 end
@@ -94,7 +94,7 @@ event_mgr.monitor(EVENT_ID.ITEM_CHANGE, function(player_id, item_id, change_num,
         return
     end
 
-    g_local_info.mod_queue:exec(player_id, check_up_level, player_id, item_id, change_num, total_count)
+    check_up_level(player_id, item_id, change_num, total_count)
 end)
 ---------------------------其他逻辑------------------------------------
 --检测心跳

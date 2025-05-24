@@ -15,6 +15,7 @@ local game_redis = require "common.redis.game"
 local assert = assert
 local type = type
 local next = next
+local tonumber = tonumber
 
 --登录
 local function login(c)
@@ -66,7 +67,7 @@ local function signup(c)
     local body = req.body
     local account = body.account
     local password = body.password
-    local channel = body.channel
+    local channel = tonumber(body.channel)
 
     if not switch_helper.is_open() then
         rsp_body.set_rsp(c, nil, CODE.SERVER_CLOSE, "close service")

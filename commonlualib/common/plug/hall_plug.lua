@@ -10,6 +10,7 @@ local pack_helper = require "common.pack_helper"
 local table_util = require "skynet-fly.utils.table_util"
 local switch_helper = require "common.switch_helper"
 local white_helper = require "common.white_helper"
+local queue_helper = require "common.queue_helper"
 local SERVER_SWITCH_STATUS = require "common.enum.SERVER_SWITCH_STATUS"
 local errorcode = require "common.enum.errorcode"
 
@@ -42,6 +43,27 @@ M.ws_broadcast = ws_pbnet_byrpc.broadcast
 M.disconn_time_out = timer.minute                   --掉线一分钟就清理
 M.rpc_pack = require "skynet-fly.utils.net.rpc_server"
 
+--消息前置处理函数
+local function msg_handle_pre(func)
+	return function(player_id, pack_id, pack_body)
+		--加入队列执行
+		return queue_helper.multi_player_func(player_id, func, player_id, pack_id, pack_body)
+	end
+end
+
+--CMD消息前置处理函数
+local function cmd_handle_pre(func)
+	return function(key, ...)
+		--加入队列执行
+		local k_type = type(key)
+		if k_type == 'number' then
+			return queue_helper.multi_player_func(key, func, key, ...)
+		else
+			return queue_helper.unique(func, key, ...)
+		end
+	end
+end
+
 --初始化
 function M.init(interface_mgr)
 	g_interface_mgr = interface_mgr
@@ -53,7 +75,7 @@ function M.init(interface_mgr)
 		local handle = m.handle
 		if handle then
 			for pack_id,func in pairs(handle) do
-				g_interface_mgr:handle(pack_id, func)
+				g_interface_mgr:handle(pack_id, msg_handle_pre(func))
 			end
 		end
 		local switch_ignores = m.switch_ignores
@@ -108,7 +130,7 @@ local function on_login(player_id, is_jump_join)
 end
 
 local function queue_on_login(player_id, is_jump_join)
-	g_interface_mgr:queue(player_id, on_login, player_id, is_jump_join)
+	g_interface_mgr:queue(player_id, queue_helper.multi_player_func, player_id, on_login, player_id, is_jump_join)
 end
 
 --连接成功
@@ -119,8 +141,7 @@ function M.connect(player_id, is_jump_join)
 	}
 end
 
---掉线
-function M.disconnect(player_id)
+local function on_disconnect(player_id)
 	for i = 1, #g_disconnect_funcs do
 		local func = g_disconnect_funcs[i]
 		local isok, err = x_pcall(func, player_id)
@@ -128,6 +149,11 @@ function M.disconnect(player_id)
 			log.error("disconnect err ", player_id, err)
 		end
 	end
+end
+
+--掉线
+function M.disconnect(player_id)
+	g_interface_mgr:queue(player_id, queue_helper.multi_player_func, player_id, on_disconnect, player_id)
 end
 
 local function on_reconnect(player_id)
@@ -141,7 +167,7 @@ local function on_reconnect(player_id)
 end
 
 local function queue_on_reconnect(player_id)
-	g_interface_mgr:queue(player_id, on_reconnect, player_id)
+	g_interface_mgr:queue(player_id, queue_helper.multi_player_func, player_id, on_reconnect, player_id)
 end
 
 --重连
@@ -152,8 +178,7 @@ function M.reconnect(player_id)
 	}
 end
 
---登出
-function M.goout(player_id, is_jump_exit)
+local function on_goout(player_id, is_jump_exit)
 	for i = 1, #g_loginout_funcs do
 		local func = g_loginout_funcs[i]
 		local isok, err = x_pcall(func, player_id, is_jump_exit)
@@ -163,16 +188,28 @@ function M.goout(player_id, is_jump_exit)
 	end
 end
 
+--登出
+function M.goout(player_id, is_jump_exit)
+	g_interface_mgr:queue(player_id, queue_helper.multi_player_func, player_id, on_goout, player_id, is_jump_exit)
+end
+
 local CMD = {}
 --注册gm 命令
 local function reg_gm_cmd(cmd_name, func, help_des)
 	assert(not g_gm_cmd_map[cmd_name], "exists cmd_name:" .. cmd_name)
 	assert(type(func) == 'function', "not func")
 	assert(type(help_des) == 'string', "not help_des")				--描述信息
-	g_gm_cmd_map[cmd_name] = {
-		func = func,
-		help_des = help_des
-	}
+	if cmd_name ~= 'help' then
+		g_gm_cmd_map[cmd_name] = {
+			func = cmd_handle_pre(func),
+			help_des = help_des
+		}
+	else
+		g_gm_cmd_map[cmd_name] = {
+			func = func,
+			help_des = help_des
+		}
+	end
 end
 
 --help 命令
@@ -210,7 +247,7 @@ do
 		if register_cmd then
 			for cmdname,func in pairs(register_cmd) do
 				assert(not M.register_cmd[cmdname], "exists cmdname: " .. cmdname)
-				M.register_cmd[cmdname] = func
+				M.register_cmd[cmdname] = cmd_handle_pre(func)
 			end
 		end
 	end
