@@ -9,7 +9,10 @@ local pairs = pairs
 local pcall = pcall
 local table = table
 local next = next
+local sformat = string.format
+local debug_getinfo = debug.getinfo
 
+local g_is_trace = tonumber(c.command("GETENV", "trace")) == 1
 local g_recordfile = c.command("GETENV","recordfile")
 
 if g_recordfile ~= "" and c.addresscommand "REG" > 1 then
@@ -68,6 +71,7 @@ local session_id_coroutine = {}
 local session_coroutine_id = {}
 local session_coroutine_address = {}
 local session_coroutine_tracetag = {}
+local session_coroutine_luatrace = {}
 local unresponse = {}
 
 local wakeup_queue = {}
@@ -212,6 +216,10 @@ do ---- request/select
 			if tag then
 				c.trace(tag, "call", 4)
 				c.send(addr, skynet.PTYPE_TRACE, 0, tag)
+			end
+			local trace_tag = session_coroutine_luatrace[running_thread]
+			if g_is_trace and trace_tag and p == proto[skynet.PTYPE_LUA] then
+				skynet.trace_log(trace_tag, 'selectcall', req[3], 4)
 			end
 			local session = auxsend(addr, p.id , p.pack(tunpack(req, 3, req.n)))
 			if session == nil then
@@ -395,6 +403,15 @@ local function co_create(f)
 					if tag then c.trace(tag, "end")	end
 					session_coroutine_tracetag[co] = nil
 				end
+
+				local trace_tag = session_coroutine_luatrace[co]
+				if trace_tag then
+					if g_is_trace then
+						skynet.trace_log(trace_tag, 'end')
+					end
+					session_coroutine_luatrace[co] = nil
+				end
+
 				local address = session_coroutine_address[co]
 				if address then
 					session_coroutine_id[co] = nil
@@ -427,6 +444,10 @@ local function dispatch_wakeup()
 				local co = session_id_coroutine[session]
 				local tag = session_coroutine_tracetag[co]
 				if tag then c.trace(tag, "resume") end
+				local trace_tag = session_coroutine_luatrace[co]
+				if g_is_trace and trace_tag then
+					skynet.trace_log(trace_tag, 'resume')
+				end
 				session_id_coroutine[session] = "BREAK"
 				return suspend(co, coroutine_resume(co, false, "BREAK", nil, session))
 			end
@@ -447,6 +468,10 @@ function suspend(co, result, command)
 				-- only call response error
 				local tag = session_coroutine_tracetag[co]
 				if tag then c.trace(tag, "error") end
+				local trace_tag = session_coroutine_luatrace[co]
+				if g_is_trace and trace_tag then
+					skynet.trace_log(trace_tag, 'error')
+				end
 				c.send(addr, skynet.PTYPE_ERROR, session, "")
 			end
 			session_coroutine_id[co] = nil
@@ -506,12 +531,23 @@ function skynet.timeout(ti, func)
 	local co = co_create_for_timeout(func, ti)
 	assert(session_id_coroutine[session] == nil)
 	session_id_coroutine[session] = co
+	local trace_tag = session_coroutine_luatrace[co] or skynet.create_lua_trace()
+	if trace_tag then
+		session_coroutine_luatrace[co] = trace_tag
+		if g_is_trace then
+			skynet.trace_log(trace_tag, 'timeout', nil, 5)
+		end
+	end
 	return co	-- for debug
 end
 
 local function suspend_sleep(session, token)
 	local tag = session_coroutine_tracetag[running_thread]
 	if tag then c.trace(tag, "sleep", 2) end
+	local trace_tag = session_coroutine_luatrace[running_thread]
+	if g_is_trace and trace_tag then
+		skynet.trace_log(trace_tag, 'sleep', nil, 5)
+	end
 	session_id_coroutine[session] = running_thread
 	assert(sleep_session[token] == nil, "token duplicative")
 	sleep_session[token] = session
@@ -732,9 +768,15 @@ function skynet.setenv(key, value)
 	c.command("SETENV",key .. " " ..value)
 end
 
-function skynet.send(addr, typename, ...)
+function skynet.send(addr, typename, arg1,...)
 	local p = proto[typename]
-	return c.send(addr, p.id, 0 , p.pack(...))
+	if p == proto[skynet.PTYPE_LUA] then
+		local trace_tag = session_coroutine_luatrace[running_thread]
+		if g_is_trace and trace_tag then
+			skynet.trace_log(trace_tag, 'send', arg1)
+		end
+	end
+	return c.send(addr, p.id, 0 , p.pack(arg1, ...))
 end
 
 function skynet.rawsend(addr, typename, msg, sz)
@@ -765,7 +807,7 @@ local function yield_call(service, session)
 	return msg,sz
 end
 
-function skynet.call(addr, typename, ...)
+function skynet.call(addr, typename, cmd, ...)
 	local tag = session_coroutine_tracetag[running_thread]
 	if tag then
 		c.trace(tag, "call", 2)
@@ -773,7 +815,14 @@ function skynet.call(addr, typename, ...)
 	end
 
 	local p = proto[typename]
-	local session = auxsend(addr, p.id , p.pack(...))
+	if p == proto[skynet.PTYPE_LUA] then
+		local trace_tag = session_coroutine_luatrace[running_thread]
+		if g_is_trace and trace_tag then
+			skynet.trace_log(trace_tag, 'call', cmd, 3)
+		end
+	end
+
+	local session = auxsend(addr, p.id , p.pack(cmd, ...))
 	if session == nil then
 		error("call to invalid address " .. skynet.address(addr))
 	end
@@ -785,6 +834,10 @@ function skynet.rawcall(addr, typename, msg, sz)
 	if tag then
 		c.trace(tag, "call", 2)
 		c.send(addr, skynet.PTYPE_TRACE, 0, tag)
+	end
+	local trace_tag = session_coroutine_luatrace[running_thread]
+	if g_is_trace and trace_tag then
+		skynet.trace_log(trace_tag, 'rawcall', nil, 3)
 	end
 	local p = proto[typename]
 	local session = assert(auxsend(addr, p.id , msg, sz), "call to invalid address")
@@ -805,6 +858,10 @@ function skynet.ret(msg, sz)
 	msg = msg or ""
 	local tag = session_coroutine_tracetag[running_thread]
 	if tag then c.trace(tag, "response") end
+	local trace_tag = session_coroutine_luatrace[running_thread]
+	if g_is_trace and trace_tag then
+		skynet.trace_log(trace_tag, 'response')
+	end
 	local co_session = session_coroutine_id[running_thread]
 	if co_session == nil then
 		error "No session"
@@ -848,6 +905,8 @@ function skynet.response(pack)
 		--  do not response when session == 0 (send)
 		return function() end
 	end
+
+	local tarce_tag = session_coroutine_luatrace[running_thread]
 	local function response(ok, ...)
 		if ok == "TEST" then
 			return unresponse[response] ~= nil
@@ -863,9 +922,19 @@ function skynet.response(pack)
 				if ret == false then
 					-- If the package is too large, returns false. so we should report error back
 					c.send(co_address, skynet.PTYPE_ERROR, co_session, "")
+					if g_is_trace and tarce_tag then
+						skynet.trace_log(tarce_tag, "delay response error")
+					end
+				else
+					if g_is_trace and tarce_tag then
+						skynet.trace_log(tarce_tag, "delay response")
+					end
 				end
 			else
 				ret = c.send(co_address, skynet.PTYPE_ERROR, co_session, "")
+				if g_is_trace and tarce_tag then
+					skynet.trace_log(tarce_tag, "delay response error2")
+				end
 			end
 			unresponse[response] = nil
 			ret = ret ~= nil
@@ -936,6 +1005,13 @@ function skynet.fork(func,...)
 	local t = fork_queue.t + 1
 	fork_queue.t = t
 	fork_queue[t] = co
+	local trace_tag = session_coroutine_luatrace[co] or skynet.create_lua_trace()
+	if trace_tag then
+		session_coroutine_luatrace[co] = trace_tag
+		if g_is_trace then
+			skynet.trace_log(trace_tag, 'fork begin', nil, 4)
+		end
+	end
 	return co
 end
 
@@ -952,6 +1028,10 @@ local function raw_dispatch_message(prototype, msg, sz, session, source)
 		else
 			local tag = session_coroutine_tracetag[co]
 			if tag then c.trace(tag, "resume") end
+			local trace_tag = session_coroutine_luatrace[co]
+			if g_is_trace and trace_tag then
+				skynet.trace_log(trace_tag, 'resume')
+			end
 			session_id_coroutine[session] = nil
 			suspend(co, coroutine_resume(co, true, msg, sz, session))
 		end
@@ -991,7 +1071,7 @@ local function raw_dispatch_message(prototype, msg, sz, session, source)
 					skynet.trace()
 				end
 			end
-			suspend(co, coroutine_resume(co, session,source, p.unpack(msg,sz)))
+			suspend(co, coroutine_resume(co, session,source, p.unpack(msg,sz,co)))
 		else
 			trace_source[source] = nil
 			if session ~= 0 then
@@ -1221,19 +1301,6 @@ function skynet.memlimit(bytes)
 	skynet.memlimit = nil	-- set only once
 end
 
--- Inject internal debug framework
-local debug = require "skynet.debug"
-debug.init(skynet, {
-	dispatch = skynet.dispatch_message,
-	suspend = suspend,
-	resume = coroutine_resume,
-})
-
-if g_recordfile ~= "" and skynet.self() > 1 then
-	local record_do = require "skynet.record_do"
-	record_do.skynet(skynet)
-end
-
 function skynet.start_record(ARGV, filename)
 	--记录录像
 	if g_recordfile == "" then
@@ -1274,6 +1341,88 @@ function skynet.close_record()
 	if g_recordfile == "" then
 		skynet.recordoff()
 	end
+end
+
+-- lua trace 相关
+--重写 lua 消息的 skynet.pack skynet.unpack
+do
+	local luap = proto[skynet.PTYPE_LUA]
+	local spack = skynet.pack
+	local spackstring = skynet.packstring
+	local sunpack = skynet.unpack
+	luap.pack = function(...)
+		local trace_tag = session_coroutine_luatrace[running_thread]
+		return spack(trace_tag, ...)
+	end
+
+	luap.unpack = function(msg, sz, co)
+		local tab = tpack(sunpack(msg, sz))
+		local trace_tag = tab[1]
+
+		co = co or running_thread
+		local pre_trace_tag = session_coroutine_luatrace[co]
+		if not pre_trace_tag then
+			session_coroutine_luatrace[co] = trace_tag or skynet.create_lua_trace()
+			if co then
+				local trace_tag = session_coroutine_luatrace[co]
+				if g_is_trace and trace_tag then
+					skynet.trace_log(trace_tag, 'request', tab[2], 5)
+				end
+			end
+		end
+
+		return tunpack(tab, 2, tab.n)
+	end
+	skynet.pack = luap.pack
+	skynet.unpack = luap.unpack
+
+	skynet.packstring = function(...)
+		local trace_tag = session_coroutine_luatrace[running_thread]
+		return spackstring(trace_tag, ...)
+	end
+end
+
+--trace_log
+function skynet.trace_log(trace_tag, info, cmd, stack_level, ...)
+	local stack_info = ""
+	if stack_level and stack_level > 0 then
+		for i = stack_level, stack_level - 2, -1 do
+			local line_info = debug_getinfo(i, "Sl")
+			if not line_info or line_info.currentline == -1 then break end
+			stack_info = stack_info .. ' @' .. line_info.short_src .. ":" .. line_info.currentline
+		end
+	end
+	skynet.error(sformat("{luatrace}{%s}{%s}{%s}{%s}{%s}", trace_tag, skynet.hpc(), info, cmd, stack_info), ...)
+end
+
+--创建trace_tag
+function skynet.create_lua_trace()
+	return nil
+end
+
+--设置trace_tag
+function skynet.set_trace_tag()
+	if not session_coroutine_luatrace[running_thread] then
+		session_coroutine_luatrace[running_thread] = skynet.create_lua_trace()
+	end
+end
+
+--获取lua trace_tag
+function skynet.get_lua_trace()
+	return session_coroutine_luatrace[running_thread]
+end
+
+-- Inject internal debug framework
+local debug = require "skynet.debug"
+debug.init(skynet, {
+	dispatch = skynet.dispatch_message,
+	suspend = suspend,
+	resume = coroutine_resume,
+})
+
+if g_recordfile ~= "" and skynet.self() > 1 then
+	local record_do = require "skynet.record_do"
+	record_do.skynet(skynet)
 end
 
 return skynet
