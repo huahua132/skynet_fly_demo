@@ -72,6 +72,7 @@ local session_coroutine_id = {}
 local session_coroutine_address = {}
 local session_coroutine_tracetag = {}
 local session_coroutine_luatrace = {}
+local session_coroutine_queuetrace = {}
 local unresponse = {}
 
 local wakeup_queue = {}
@@ -410,6 +411,11 @@ local function co_create(f)
 						skynet.trace_log(trace_tag, 'end')
 					end
 					session_coroutine_luatrace[co] = nil
+				end
+
+				local queue_tag = session_coroutine_queuetrace[co]
+				if queue_tag then
+					session_coroutine_queuetrace[co] = nil
 				end
 
 				local address = session_coroutine_address[co]
@@ -1352,33 +1358,38 @@ do
 	local sunpack = skynet.unpack
 	luap.pack = function(...)
 		local trace_tag = session_coroutine_luatrace[running_thread]
-		return spack(trace_tag, ...)
+		local queue_tag = session_coroutine_queuetrace[running_thread]
+		return spack(trace_tag, queue_tag, ...)
 	end
 
 	luap.unpack = function(msg, sz, co)
 		local tab = tpack(sunpack(msg, sz))
 		local trace_tag = tab[1]
+		local queue_tag = tab[2]
+		local cmd = tab[3]
 
 		co = co or running_thread
+		session_coroutine_queuetrace[co] = queue_tag
 		local pre_trace_tag = session_coroutine_luatrace[co]
 		if not pre_trace_tag then
 			session_coroutine_luatrace[co] = trace_tag or skynet.create_lua_trace()
 			if co then
 				local trace_tag = session_coroutine_luatrace[co]
 				if g_is_trace and trace_tag then
-					skynet.trace_log(trace_tag, 'request', tab[2], 5)
+					skynet.trace_log(trace_tag, 'request', cmd, 5)
 				end
 			end
 		end
 
-		return tunpack(tab, 2, tab.n)
+		return tunpack(tab, 3, tab.n)
 	end
 	skynet.pack = luap.pack
 	skynet.unpack = luap.unpack
 
 	skynet.packstring = function(...)
 		local trace_tag = session_coroutine_luatrace[running_thread]
-		return spackstring(trace_tag, ...)
+		local queue_tag = session_coroutine_queuetrace[running_thread]
+		return spackstring(trace_tag, queue_tag, ...)
 	end
 end
 
@@ -1410,6 +1421,27 @@ end
 --获取lua trace_tag
 function skynet.get_lua_trace()
 	return session_coroutine_luatrace[running_thread]
+end
+
+--压入queue_trace_tag
+function skynet.push_queue_trace_tag(tag)
+	if not tag then return end
+	if not session_coroutine_queuetrace[running_thread] then
+		session_coroutine_queuetrace[running_thread] = {}
+	end
+	tinsert(session_coroutine_queuetrace[running_thread], tag)
+end
+
+--弹出queue_trace_tag
+function skynet.pop_queue_trace_tag()
+	local tags = session_coroutine_queuetrace[running_thread]
+	if not tags then return end
+	tremove(tags, #tags)
+end
+
+--获取queue_trace_tag
+function skynet.get_queue_trace_tag()
+	return session_coroutine_queuetrace[running_thread]
 end
 
 -- Inject internal debug framework

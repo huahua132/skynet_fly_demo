@@ -3,15 +3,19 @@ local coroutine = coroutine
 local xpcall = xpcall
 local traceback = debug.traceback
 local table = table
+local assert = assert
+local error = error
 
 function skynet.queue()
 	local current_thread
 	local ref = 0
 	local thread_queue = {}
+	local queue_tag = skynet.queue_tag_create()
 
 	local function xpcall_ret(ok, ...)
 		ref = ref - 1
 		if ref == 0 then
+			skynet.pop_queue_trace_tag()
 			current_thread = table.remove(thread_queue,1)
 			if current_thread then
 				skynet.wakeup(current_thread)
@@ -24,14 +28,32 @@ function skynet.queue()
 	return function(f, ...)
 		local thread = coroutine.running()
 		if current_thread and current_thread ~= thread then
+			local queue_tags = skynet.get_queue_trace_tag()
+			if queue_tags then
+				for i = 1, #queue_tags do
+					local tag = queue_tags[i]
+					if tag == queue_tag then
+						error(string.format("queue loop queue_tag[%s] queue_tags[%s]", queue_tag, table.concat(queue_tags, ',')))
+					end
+				end
+			end
+
 			table.insert(thread_queue, thread)
 			skynet.wait()
 			assert(ref == 0)	-- current_thread == thread
 		end
 		current_thread = thread
-
 		ref = ref + 1
+		if ref == 1 then
+			skynet.push_queue_trace_tag(queue_tag)
+		end
 		return xpcall_ret(xpcall(f, traceback, ...))
+	end
+end
+
+if not skynet.queue_tag_create then
+	function skynet.queue_tag_create()
+		return nil
 	end
 end
 
