@@ -74,6 +74,7 @@ local session_coroutine_tracetag = {}
 local session_coroutine_luatrace = {}
 local session_coroutine_queuetrace = {}
 local unresponse = {}
+local g_is_send = false
 
 local wakeup_queue = {}
 local sleep_session = {}
@@ -782,7 +783,11 @@ function skynet.send(addr, typename, arg1,...)
 			skynet.trace_log(trace_tag, 'send', arg1)
 		end
 	end
-	return c.send(addr, p.id, 0 , p.pack(arg1, ...))
+
+	g_is_send = true
+	local msg, sz = p.pack(arg1, ...)
+	g_is_send = false
+	return c.send(addr, p.id, 0 , msg, sz)
 end
 
 function skynet.rawsend(addr, typename, msg, sz)
@@ -1358,7 +1363,10 @@ do
 	local sunpack = skynet.unpack
 	luap.pack = function(...)
 		local trace_tag = session_coroutine_luatrace[running_thread]
-		local queue_tag = session_coroutine_queuetrace[running_thread]
+		local queue_tag = nil
+		if not g_is_send then
+			queue_tag = session_coroutine_queuetrace[running_thread] 
+		end
 		return spack(trace_tag, queue_tag, ...)
 	end
 
