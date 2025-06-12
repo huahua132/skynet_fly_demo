@@ -15,6 +15,9 @@ local enums =
      ---@field public SYSTEM integer @系统邮件
      ---@field public FRIEND integer @好友邮件
     ['email_type'] = {   GLOBAL=1,  SYSTEM=2,  FRIEND=3,  };
+    ---@class friend_email_id @好友邮件ID
+     ---@field public GOLD_REWARD integer @好友金币赠送
+    ['friend_email_id'] = {   GOLD_REWARD=0,  };
     ---@class game_type @游戏类型
      ---@field public CHINESE_CHESS integer @中国象棋游戏
      ---@field public DIGITALBOMB integer @数字炸弹游戏
@@ -91,6 +94,20 @@ local beans = {}
         beans['chess.chess_type'] = class
     end
     do
+    ---@class email.email_friend 
+     ---@field public id integer @好友邮件ID
+     ---@field public title string @邮件标题
+     ---@field public content string @邮件内容
+     ---@field public vaild_time integer @有效时间(秒)(0表示永久)
+        local class = {
+            { name='id', type='integer'},
+            { name='title', type='string'},
+            { name='content', type='string'},
+            { name='vaild_time', type='integer'},
+        }
+        beans['email.email_friend'] = class
+    end
+    do
     ---@class email.email_sys 
      ---@field public id integer @系统邮件ID
      ---@field public title string @邮件标题
@@ -156,6 +173,7 @@ local tables =
     { name='tb_chess_rank', file='chess_rank', mode='map', index='rank_id', value_type='chess.chess_rank' },
     { name='tb_match_game', file='match_game', mode='list', index='', value_type='match.match_game' },
     { name='tb_email_sys', file='email_sys', mode='map', index='id', value_type='email.email_sys' },
+    { name='tb_email_friend', file='email_friend', mode='list', index='', value_type='email.email_friend' },
     { name='tb_misc_param', file='msic_param', mode='one', value_type='misc.msic_param'},
 }
 

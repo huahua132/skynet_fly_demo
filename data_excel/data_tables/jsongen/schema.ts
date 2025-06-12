@@ -30,6 +30,18 @@ export enum email_type {
  
  
 /**
+ * 好友邮件ID
+ */
+export enum friend_email_id {
+    /**
+     * 好友金币赠送
+     */
+    GOLD_REWARD = 0,
+}
+
+ 
+ 
+/**
  * 游戏类型
  */
 export enum game_type {
@@ -265,6 +277,48 @@ export class chess_type {
 
     resolve(tables:Tables) {
         
+        
+        
+        
+        
+    }
+}
+
+}
+
+
+export namespace email {
+export class email_friend {
+
+    constructor(_json_: any) {
+        if (_json_.id === undefined) { throw new Error() }
+        this.id = _json_.id
+        if (_json_.title === undefined) { throw new Error() }
+        this.title = _json_.title
+        if (_json_.content === undefined) { throw new Error() }
+        this.content = _json_.content
+        if (_json_.vaild_time === undefined) { throw new Error() }
+        this.vaildTime = _json_.vaild_time
+    }
+
+    /**
+     * 好友邮件ID
+     */
+    readonly id: friend_email_id
+    /**
+     * 邮件标题
+     */
+    readonly title: string
+    /**
+     * 邮件内容
+     */
+    readonly content: string
+    /**
+     * 有效时间(秒)(0表示永久)
+     */
+    readonly vaildTime: number
+
+    resolve(tables:Tables) {
         
         
         
@@ -664,6 +718,34 @@ export class tb_email_sys {
 }
 
 
+export namespace email {
+export class tb_email_friend {
+    private _dataList: email.email_friend[]
+    
+    constructor(_json_: any) {
+        this._dataList = []
+        for(var _json2_ of _json_) {
+            let _v: email.email_friend
+            _v = new email.email_friend(_json2_)
+            this._dataList.push(_v)
+        }
+    }
+
+    getDataList(): email.email_friend[] { return this._dataList }
+
+    get(index: number): email.email_friend | undefined { return this._dataList[index] }
+    
+    resolve(tables:Tables) {
+        for(let  data of this._dataList)
+        {
+            data.resolve(tables)
+        }
+    }
+
+}
+}
+
+
 export namespace misc {
 export class tb_misc_param {
 
@@ -707,6 +789,8 @@ export class Tables {
     get tb_match_game(): match.tb_match_game  { return this._tb_match_game;}
     private _tb_email_sys: email.tb_email_sys
     get tb_email_sys(): email.tb_email_sys  { return this._tb_email_sys;}
+    private _tb_email_friend: email.tb_email_friend
+    get tb_email_friend(): email.tb_email_friend  { return this._tb_email_friend;}
     private _tb_misc_param: misc.tb_misc_param
     get tb_misc_param(): misc.tb_misc_param  { return this._tb_misc_param;}
 
@@ -718,6 +802,7 @@ export class Tables {
         this._tb_chess_rank = new chess.tb_chess_rank(loader('chess_rank'))
         this._tb_match_game = new match.tb_match_game(loader('match_game'))
         this._tb_email_sys = new email.tb_email_sys(loader('email_sys'))
+        this._tb_email_friend = new email.tb_email_friend(loader('email_friend'))
         this._tb_misc_param = new misc.tb_misc_param(loader('msic_param'))
 
         this._tb_player_level.resolve(this)
@@ -727,6 +812,7 @@ export class Tables {
         this._tb_chess_rank.resolve(this)
         this._tb_match_game.resolve(this)
         this._tb_email_sys.resolve(this)
+        this._tb_email_friend.resolve(this)
         this._tb_misc_param.resolve(this)
     }
 }
