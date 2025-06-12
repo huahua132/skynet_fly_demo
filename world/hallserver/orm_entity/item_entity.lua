@@ -19,10 +19,14 @@ local handle = {}
 --玩家信息
 function M.init()
     local adapter = ormadapter_mysql:new("orm_db")
+    ---@class item_entity
+    ---@field player_id number @玩家ID
+    ---@field id number @道具ID
+    ---@field count number @道具数量
     g_ormobj = ormtable:new("item")
-    :int64("player_id")   --玩家id
-    :int64("id")          --道具ID
-    :int64("count")       --道具数量
+    :int64("player_id")
+    :int64("id")
+    :int64("count")
     :set_keys("player_id","id")
     :set_cache(60 * 60 * 100, 500, 100000)    --缓存1个小时，5秒同步一次更改, 最大缓存10万条数据
     :builder(adapter)

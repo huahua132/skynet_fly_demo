@@ -15,19 +15,32 @@ local handle = {}
 --邮件
 function M.init()
     local adapter = ormadapter_mysql:new("orm_db")
+    ---@class email_entity @邮件表
+    ---@field player_id number @玩家id
+    ---@field guid number @邮件guid
+    ---@field email_type number @邮件类型 1全服邮件 2系统邮件 3好友
+    ---@field from_id number @来源ID   好友ID
+    ---@field title string @标题
+    ---@field content string @内容
+    ---@field create_time number @创建时间
+    ---@field vaild_time number @有效时间
+    ---@field item_list item[] @道具奖励
+    ---@field read_flag number @已读标记 1已读 0未读
+    ---@field item_flag number @道具可领标记  1已领取 0未领取(item_list有东西才能领取)
+    ---@field del_flag number @删除标记 全服邮件用(避免重复创建)
     g_ormobj = ormtable:new("email")
-    :int64("player_id")         --玩家id
-    :int64("guid")              --邮件guid
-    :uint8("email_type")        --邮件类型 1全服邮件 2系统邮件 3好友
-    :int64("from_id")           --来源ID   好友ID
-    :string256("title")         --标题
-    :string8192("content")      --内容
-    :int64("create_time")       --创建时间
-    :int64("vaild_time")        --有效时间
-    :table("item_list")         --道具奖励
-    :int8("read_flag")          --已读标记 1已读 0未读
-    :int8("item_flag")          --道具可领标记  1已领取 0未领取(item_list有东西才能领取)
-    :int8("del_flag")           --删除标记 全服邮件用(避免重复创建)
+    :int64("player_id")
+    :int64("guid")
+    :uint8("email_type")
+    :int64("from_id")
+    :string256("title")
+    :string8192("content")
+    :int64("create_time")
+    :int64("vaild_time")
+    :table("item_list")
+    :int8("read_flag")
+    :int8("item_flag")
+    :int8("del_flag")
     :set_keys("player_id", "guid")
     :set_cache(60 * 60 * 100, 500, 100000)    --缓存1个小时，5秒同步一次更改，最大缓存10万条数据
     :builder(adapter)

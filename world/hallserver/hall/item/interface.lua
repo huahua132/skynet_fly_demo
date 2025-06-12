@@ -30,7 +30,13 @@ function M.add_item_list(player_id, item_list, source)
     error("调用了未实现的接口 add_item_list")
 end
 
+---@class item @道具
+---@field id number @道具ID
+---@field count number @道具数量
+
 --道具转换
+---@param items table<number, number>|number[][]|item[]
+---@return item[]
 function M.convert_item_list(items)
     error("调用了未实现的接口 convert_item_list")
 end

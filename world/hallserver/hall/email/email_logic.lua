@@ -236,6 +236,7 @@ end
 ---------------------------客户端事件----------------------------------
 --登录
 function M.on_login(player_id)
+    ---@type email_entity[]
     local all_email_list = g_email_entity:get_entry(player_id)
     --过滤掉已标记删除的
     for i = #all_email_list, 1, -1 do
@@ -385,6 +386,7 @@ function interface.add_sys_email(player_id, email_id, items, title_params, conte
     end
 
     local cur_time = time_util.time()
+    ---@type email_entity
     local email = {
         player_id = player_id,
         guid = guid_helper.new_guid(guid_helper.GUID_MODULE.EMAIL),
@@ -399,6 +401,7 @@ function interface.add_sys_email(player_id, email_id, items, title_params, conte
         item_flag = 0,
         del_flag = 0,
     }
+    
     if email_cfg.vaild_time > 0 then
         email.vaild_time = cur_time + email_cfg.vaild_time
     end
