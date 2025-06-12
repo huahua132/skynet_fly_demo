@@ -56,7 +56,7 @@ message oneEmail {
     optional int64 vaild_time = 7;      //有效时间
     repeated common.Item item_list = 8; //道具奖励
     optional int32 read_flag = 9;       //已读标记 1已读 0未读
-    optional int32 item_flag = 10;      //道具可领标记  0不可领 1可领 2已领取
+    optional int32 item_flag = 10;      //道具可领标记  1 已领取 0未领取
 }
 
 //下发所有邮件
