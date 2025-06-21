@@ -244,7 +244,7 @@ function M.cmd_agree_req(player_id, do_player_id)
 
     --不在线就不用发了
     if not g_local_info.interface_mgr:is_online(player_id) then
-        return
+        return true
     end
 
     --通知添加好友

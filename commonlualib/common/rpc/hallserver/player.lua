@@ -87,11 +87,11 @@ function M.get_players_info(player_list, field_map)
     for svr_id, list in pairs(svr_map) do
         --本服
         if g_svr_name == "hallserver" and svr_id == g_svr_id then
-            local ret_map = contriner_client:instance("room_game_hall_m"):balance_call("player_get_players_info", list, field_map)
+            local ret_map = contriner_client:instance("room_game_hall_m"):balance_call("player_get_players_info", nil, list, field_map)
             table_util.merge(res, ret_map)
         else
             --其他服
-            local ret, code, errmsg = frpc_client:instance("hallserver", "room_game_hall_m"):set_svr_id(svr_id):byid_balance_call("player_get_players_info", list, field_map)
+            local ret, code, errmsg = frpc_client:instance("hallserver", "room_game_hall_m"):set_svr_id(svr_id):byid_balance_call("player_get_players_info", nil, list, field_map)
             if not ret or not ret.result[1] then
                 log.error_fmt("get_players_info call err svr_id = %s code = %s errmsg = %s", svr_id, code, errmsg)
             else
@@ -107,10 +107,10 @@ end
 function M.get_player_info(player_id, field_map)
     local svr_id = player_util.get_svr_id_by_player_id(player_id)
     if g_svr_name == "hallserver" and svr_id == g_svr_id then
-        return contriner_client:instance("room_game_hall_m"):mod_call("player_get_info", player_id, field_map)
+        return contriner_client:instance("room_game_hall_m"):mod_call("player_get_info", nil, player_id, field_map)
     else
         local cli = base.hallserver_room_game_hall_m(player_id)
-        local ret, code, errmsg = cli:byid_mod_call("player_get_info", player_id)
+        local ret, code, errmsg = cli:byid_mod_call("player_get_info", nil, player_id)
         if not ret then
             log.error("get_player_info err ", player_id, code, errmsg)
             return nil

@@ -58,6 +58,8 @@ local function cmd_handle_pre(func)
 		local k_type = type(key)
 		if k_type == 'number' then
 			return queue_helper.multi_player_func(key, func, key, ...)
+		elseif k_type == 'nil' then	--不进入队列
+			return func(key, ...)
 		else
 			return queue_helper.unique(func, key, ...)
 		end

@@ -63,7 +63,7 @@ M.switch_ignores = {
 local CMD = {}
 
 --获取玩家信息
-function CMD.player_get_info(player_id, field_map)
+function CMD.player_get_info(_, player_id, field_map)
     return player_logic.cmd_get_info(player_id, field_map)
 end
 
@@ -73,7 +73,7 @@ function CMD.get_all_online()
 end
 
 --批量获取玩家字段信息
-function CMD.player_get_players_info(player_list, field_map)
+function CMD.player_get_players_info(_, player_list, field_map)
     return player_logic.cmd_get_players_info(player_list, field_map)
 end
 
