@@ -79,25 +79,28 @@ local function monitor(svr_name)
             if sfind(name, ')', name:len(), true) then
                 name = name:sub(1, name:len() - 1)
             end
+            local pre_name = name
             if name == "hot_container" and split[5] then
                 name = split[5]
             elseif name == "service_cell" then
                 name = split[5]
                 name = name:sub(1, #name - 1)
             end
-
-            server_name_map[server_id] = name
-            if not svr_info_map[v.cluster_name][name] then
-                svr_info_map[v.cluster_name][name] = {
-                    mem = 0,
-                    task = 0,
-                    mqlen = 0,
-                    cpu = 0,
-                    message = 0,
-                    cmem = 0,
-                }
+            if pre_name == "hot_container" then
+                local spstrs = string_util.split(name, '-')
+                server_name_map[server_id] = spstrs[1]
+                if not svr_info_map[v.cluster_name][name] then
+                    svr_info_map[v.cluster_name][name] = {
+                        mem = 0,
+                        task = 0,
+                        mqlen = 0,
+                        cpu = 0,
+                        message = 0,
+                        cmem = 0,
+                    }
+                end
+                svr_info_map[v.cluster_name][name].mem = svr_info_map[v.cluster_name][name].mem + mem
             end
-            svr_info_map[v.cluster_name][name].mem = svr_info_map[v.cluster_name][name].mem + mem
 
             if not svr_info_map[v.cluster_name]['total'] then
                 svr_info_map[v.cluster_name]['total'] = {
