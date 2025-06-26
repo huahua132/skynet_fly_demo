@@ -146,12 +146,12 @@ local beans = {}
         beans['match.match_game'] = class
     end
     do
-    ---@class misc.msic_param 
+    ---@class misc.misc_param 
      ---@field public login_rewards table<integer,integer> @每日登录奖励
         local class = {
             { name='login_rewards', type='table<integer,integer>'},
         }
-        beans['misc.msic_param'] = class
+        beans['misc.misc_param'] = class
     end
     do
     ---@class player.player_level 
@@ -174,7 +174,7 @@ local tables =
     { name='tb_match_game', file='match_game', mode='list', index='', value_type='match.match_game' },
     { name='tb_email_sys', file='email_sys', mode='map', index='id', value_type='email.email_sys' },
     { name='tb_email_friend', file='email_friend', mode='list', index='', value_type='email.email_friend' },
-    { name='tb_misc_param', file='msic_param', mode='one', value_type='misc.msic_param'},
+    { name='tb_misc_param', file='misc_param', mode='one', value_type='misc.misc_param'},
 }
 
 return { enums = enums, beans = beans, tables = tables }

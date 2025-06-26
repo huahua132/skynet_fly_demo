@@ -441,7 +441,7 @@ export class match_game {
 
 
 export namespace misc {
-export class msic_param {
+export class misc_param {
 
     constructor(_json_: any) {
         if (_json_.login_rewards === undefined) { throw new Error() }
@@ -749,13 +749,13 @@ export class tb_email_friend {
 export namespace misc {
 export class tb_misc_param {
 
-    private _data: misc.msic_param
+    private _data: misc.misc_param
     constructor(_json_: any) {
         if (_json_.length != 1) throw new Error('table mode=one, but size != 1')
-        this._data = new misc.msic_param(_json_[0])
+        this._data = new misc.misc_param(_json_[0])
     }
 
-    getData(): misc.msic_param { return this._data; }
+    getData(): misc.misc_param { return this._data; }
 
     /**
      * 每日登录奖励
@@ -803,7 +803,7 @@ export class Tables {
         this._tb_match_game = new match.tb_match_game(loader('match_game'))
         this._tb_email_sys = new email.tb_email_sys(loader('email_sys'))
         this._tb_email_friend = new email.tb_email_friend(loader('email_friend'))
-        this._tb_misc_param = new misc.tb_misc_param(loader('msic_param'))
+        this._tb_misc_param = new misc.tb_misc_param(loader('misc_param'))
 
         this._tb_player_level.resolve(this)
         this._tb_item_info.resolve(this)

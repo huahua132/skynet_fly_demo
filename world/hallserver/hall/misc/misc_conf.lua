@@ -5,7 +5,7 @@ local g_misc_param
 
 
 local function init()
-    g_misc_param = sharedata:new("../../commonlualib/data_tables/msic_param.lua", sharedata.enum.sharedata)
+    g_misc_param = sharedata:new("../../commonlualib/data_tables/misc_param.lua", sharedata.enum.sharedata)
     :builder()
 end
 
