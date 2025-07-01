@@ -17,7 +17,7 @@ function skynet.queue()
 	local function xpcall_ret(ok, ...)
 		ref = ref - 1
 		if ref == 0 then
-			skynet.pop_queue_trace_tag()
+			skynet.del_queue_trace_tag(queue_tag)
 			current_thread = table.remove(thread_queue,1)
 			if current_thread then
 				skynet.wakeup(current_thread)
@@ -31,13 +31,8 @@ function skynet.queue()
 		local thread = coroutine.running()
 		if current_thread and current_thread ~= thread then
 			local queue_tags = skynet.get_queue_trace_tag()
-			if queue_tags then
-				for i = 1, #queue_tags do
-					local tag = queue_tags[i]
-					if tag == queue_tag then
-						error(string.format("queue loop queue_tag[%s] queue_tags[%s]", queue_tag, table.concat(queue_tags, ',')))
-					end
-				end
+			if queue_tags and queue_tags[queue_tag] then
+				error(string.format("queue loop queue_tag[%s]", queue_tag))
 			end
 
 			table.insert(thread_queue, thread)
@@ -47,7 +42,7 @@ function skynet.queue()
 		current_thread = thread
 		ref = ref + 1
 		if ref == 1 then
-			skynet.push_queue_trace_tag(queue_tag)
+			skynet.set_queue_trace_tag(queue_tag)
 		end
 		return xpcall_ret(xpcall(f, traceback, ...))
 	end

@@ -1432,19 +1432,19 @@ function skynet.get_lua_trace()
 end
 
 --压入queue_trace_tag
-function skynet.push_queue_trace_tag(tag)
+function skynet.set_queue_trace_tag(tag)
 	if not tag then return end
 	if not session_coroutine_queuetrace[running_thread] then
 		session_coroutine_queuetrace[running_thread] = {}
 	end
-	tinsert(session_coroutine_queuetrace[running_thread], tag)
+	session_coroutine_queuetrace[running_thread][tag] = true
 end
 
 --弹出queue_trace_tag
-function skynet.pop_queue_trace_tag()
+function skynet.del_queue_trace_tag(tag)
 	local tags = session_coroutine_queuetrace[running_thread]
 	if not tags then return end
-	tremove(tags, #tags)
+	tags[tag] = nil
 end
 
 --获取queue_trace_tag
