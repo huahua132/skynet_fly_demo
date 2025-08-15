@@ -8,24 +8,8 @@ skynet.init(function()
 end)
 
 local sharedata = {}
-local cache = setmetatable({}, { __mode = "kv" })
-
-local function monitor(name, obj, cobj)
-	local newobj = cobj
-	while true do
-		newobj = skynet.call(service, "lua", "monitor", name, newobj)
-		if newobj == nil then
-			break
-		end
-		if not skynet.is_record_handle() then
-			sd.update(obj, newobj)
-		end
-		skynet.send(service, "lua", "confirm" , newobj)
-	end
-	if cache[name] == obj then
-		cache[name] = nil
-	end
-end
+local cache = setmetatable({}, { __mode = "kv"})
+local cobjcache = {}
 
 function sharedata.query(name)
 	if cache[name] then
@@ -48,9 +32,30 @@ function sharedata.query(name)
 		r = f()
 	end
 	skynet.send(service, "lua", "confirm" , obj)
-	skynet.fork(monitor,name, r, obj)
 	cache[name] = r
+	cobjcache[name] = obj
 	return r
+end
+
+function sharedata.update_cobj(name)
+	if not cache[name] then return end
+	local pre_cobj = cobjcache[name]
+	local newobj = skynet.call(service, "lua", "monitor", name, pre_cobj)
+	if newobj == nil then
+		return
+	end
+
+	cobjcache[name] = newobj
+	skynet.send(service, "lua", "confirm" , newobj)
+end
+
+function sharedata.switch_new(name)
+	if not cache[name] then return end
+	local obj = cache[name]
+	local cobj = cobjcache[name]
+	if not skynet.is_record_handle() then
+		sd.update(obj, cobj)
+	end
 end
 
 function sharedata.new(name, v, ...)
