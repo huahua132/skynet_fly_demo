@@ -17,11 +17,11 @@ return function(group)
     group:get('/help/:find_name',function(c)
         local params = c.params
         local find_name = params.find_name
-        local cli = frpc_client:instance("hallserver", "room_game_hall_m")
+        local cli = frpc_client:instance(frpc_client.FRPC_MODE.one, "hallserver", "room_game_hall_m")
         if find_name == "all" then
             find_name = nil
         end
-        local ret = cli:one_balance_call("gm_cmd", "help", find_name)
+        local ret = cli:balance_call("gm_cmd", "help", find_name)
         if not ret then
             rsp_body.set_rsp(c, nil, CODE.ERR_SERVER, "server err")
             return
@@ -44,10 +44,10 @@ return function(group)
         assert(cmd_name, "not cmd_name")
         local params = args.params or {}
         local svr_id = player_util.get_svr_id_by_player_id(player_id)
-        local cli = frpc_client:instance("hallserver", "room_game_hall_m")
+        local cli = frpc_client:instance(frpc_client.FRPC_MODE.byid, "hallserver", "room_game_hall_m")
         cli:set_svr_id(svr_id)
         cli:set_mod_num(player_id)
-        local ret = cli:byid_mod_call("gm_cmd", cmd_name, player_id, table.unpack(params))
+        local ret = cli:mod_call("gm_cmd", cmd_name, player_id, table.unpack(params))
         if not ret then
             rsp_body.set_rsp(c, nil, CODE.ERR_SERVER, "server err")
             return

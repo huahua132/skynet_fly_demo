@@ -143,7 +143,7 @@ local function create_gather_loop(cluster_name, use_log_info)
     local split_str = string_util.split(cluster_name, ':')
     local svr_name, svr_id = split_str[1], tonumber(split_str[2])
     local one_line = 100
-    local frpc_cli = frpc_client:instance(svr_name, '.use_log'):set_svr_id(svr_id)
+    local frpc_cli = frpc_client:instance(frpc_client.FRPC_MODE.byid, svr_name, '.use_log'):set_svr_id(svr_id)
 
     local function gather_logic()
         is_need_wait()
@@ -172,7 +172,7 @@ local function create_gather_loop(cluster_name, use_log_info)
             local fname = date .. '_' .. file_name
             local offset = entry:get('offset')
             if not g_is_over_map[entry] then
-                local ret, errcode, errmsg = frpc_cli:byid_call_by_name('read', file_path, fname, offset, one_line)
+                local ret, errcode, errmsg = frpc_cli:call_by_alias('read', file_path, fname, offset, one_line)
                 if not ret then
                     log.error("gather err ", file_path, fname, errcode, errmsg)
                 else

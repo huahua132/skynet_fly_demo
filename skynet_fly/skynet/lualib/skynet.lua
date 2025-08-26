@@ -1421,6 +1421,7 @@ end
 
 --设置trace_tag
 function skynet.set_trace_tag()
+	if not running_thread then return end
 	if not session_coroutine_luatrace[running_thread] then
 		session_coroutine_luatrace[running_thread] = skynet.create_lua_trace()
 	end
@@ -1428,11 +1429,13 @@ end
 
 --获取lua trace_tag
 function skynet.get_lua_trace()
+	if not running_thread then return end
 	return session_coroutine_luatrace[running_thread]
 end
 
 --压入queue_trace_tag
 function skynet.set_queue_trace_tag(tag)
+	if not running_thread then return end
 	if not tag then return end
 	if not session_coroutine_queuetrace[running_thread] then
 		session_coroutine_queuetrace[running_thread] = {}
@@ -1442,6 +1445,7 @@ end
 
 --弹出queue_trace_tag
 function skynet.del_queue_trace_tag(tag)
+	if not running_thread then return end
 	local tags = session_coroutine_queuetrace[running_thread]
 	if not tags then return end
 	tags[tag] = nil
@@ -1449,6 +1453,7 @@ end
 
 --获取queue_trace_tag
 function skynet.get_queue_trace_tag()
+	if not running_thread then return end
 	return session_coroutine_queuetrace[running_thread]
 end
 

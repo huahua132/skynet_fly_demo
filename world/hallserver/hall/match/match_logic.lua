@@ -27,9 +27,9 @@ local function check_join_room_game(player_id)
     if not game_room_info or not next(game_room_info) then
         return
     end
-    local cli = frpc_client:instance(game_room_info.svr_name, "room_game_alloc_m")
+    local cli = frpc_client:instance(frpc_client.FRPC_MODE.byid, game_room_info.svr_name, "room_game_alloc_m")
     cli:set_svr_id(game_room_info.svr_id)
-    local ret = cli:byid_mod_call("exists", game_room_info.table_id, tonumber(game_room_info.create_time))
+    local ret = cli:mod_call("exists", game_room_info.table_id, tonumber(game_room_info.create_time))
 
     if ret and #ret.result > 0 and ret.result[1] then 
         M.cmd_join_game(player_id, game_room_info.token, game_room_info.host, game_room_info.table_id)

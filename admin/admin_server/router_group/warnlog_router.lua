@@ -1,5 +1,4 @@
 local rsp_body = require "common.rsp_body"
-local frpc_client = require "skynet-fly.client.frpc_client"
 local ormtable = require "skynet-fly.db.orm.ormtable"
 local ormadapter_mysql = require "skynet-fly.db.ormadapter.ormadapter_mysql"
 local skynet = require "skynet"

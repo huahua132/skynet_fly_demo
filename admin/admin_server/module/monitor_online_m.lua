@@ -2,11 +2,9 @@
 --监控在线
 -------------------------------------------------------
 local skynet = require "skynet"
-local frpc_client = require "skynet-fly.client.frpc_client"
 local timer_point = require "skynet-fly.time_extend.timer_point"
 local string_util = require "skynet-fly.utils.string_util"
 local time_util = require "skynet-fly.utils.time_util"
-local math_util = require "skynet-fly.utils.math_util"
 local logrotate = require "skynet-fly.logrotate"
 local player_util = require "common.utils.player"
 local json = require "cjson"

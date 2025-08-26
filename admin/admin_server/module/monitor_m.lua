@@ -64,9 +64,9 @@ local function monitor(svr_name)
     end
 
     local cur_date = os.date("%H:%M:%S", time_util.time())
-    local svr_debug_console = frpc_client:instance(svr_name,"debug_console_m")
+    local svr_debug_console = frpc_client:instance(frpc_client.FRPC_MODE.all, svr_name, "debug_console_m")
     local svr_info_map = {}
-    local ret = svr_debug_console:all_mod_call('call','mem')
+    local ret = svr_debug_console:mod_call('call','mem')
     if not ret then return end
     local server_name_map = {}
     for _,v in ipairs(ret) do
@@ -118,7 +118,7 @@ local function monitor(svr_name)
         end
     end
 
-    local ret = svr_debug_console:all_mod_call('call','stat')
+    local ret = svr_debug_console:mod_call('call','stat')
     if ret then
         for _,v in ipairs(ret) do
             for server_id,server_info in pairs(v.result[1]) do
@@ -142,7 +142,7 @@ local function monitor(svr_name)
     end
 
     --c 内存信息
-    local ret = svr_debug_console:all_mod_call('call','cmem')
+    local ret = svr_debug_console:mod_call('call','cmem')
     if ret then
         for _,v in ipairs(ret) do
             for server_id,cmem in pairs(v.result[1]) do

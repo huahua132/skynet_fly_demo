@@ -54,9 +54,9 @@ return function(group)
         local svr_name,svr_id = split_str[1],tonumber(split_str[2])
 
         local info_list = {}
-        local instance = frpc_client:instance(svr_name,"debug_console_m"):set_svr_id(svr_id)
+        local instance = frpc_client:instance(frpc_client.FRPC_MODE.byid,svr_name,"debug_console_m"):set_svr_id(svr_id)
 
-        local ret = instance:byid_mod_call('call','mem')
+        local ret = instance:mod_call('call','mem')
         if ret then
             for server_id,server_info in pairs(ret.result[1]) do
                 local split = string_util.split(server_info,' ')
@@ -84,7 +84,7 @@ return function(group)
             end
         end
 
-        local ret = instance:byid_mod_call('call','stat')
+        local ret = instance:mod_call('call','stat')
         if ret then
             for server_id,server_info in pairs(ret.result[1]) do
                 info_list[server_id].task = server_info.task
@@ -95,7 +95,7 @@ return function(group)
         end
 
         --c 内存信息
-        local ret = instance:byid_mod_call('call','cmem')
+        local ret = instance:mod_call('call','cmem')
         if ret then
             for server_id,cmem in pairs(ret.result[1]) do
                 if info_list[server_id] then

@@ -19,12 +19,12 @@ end
 
 --修改服务开关状态
 function CMD.change_switch(cluster_name, switch)
-    return frpc_client:instance('centerserver', 'server_info_m'):one_balance_call('change_switch', cluster_name, switch)
+    return frpc_client:instance(frpc_client.FRPC_MODE.one, 'centerserver', 'server_info_m'):balance_call('change_switch', cluster_name, switch)
 end
 
 --一键修改开关状态
 function CMD.change_all_switch(switch)
-    return frpc_client:instance('centerserver', 'server_info_m'):one_balance_call('change_all_switch', switch)
+    return frpc_client:instance(frpc_client.FRPC_MODE.one,'centerserver', 'server_info_m'):balance_call('change_all_switch', switch)
 end
 
 --获取白名单map
@@ -39,12 +39,12 @@ end
 
 --添加白名单
 function CMD.add_white(player_id)
-    return frpc_client:instance('centerserver', 'server_info_m'):one_balance_call('add_white', player_id)
+    return frpc_client:instance(frpc_client.FRPC_MODE.one, 'centerserver', 'server_info_m'):balance_call('add_white', player_id)
 end
 
 --删除白名单
 function CMD.del_white(player_id)
-    return frpc_client:instance('centerserver', 'server_info_m'):one_balance_call('del_white', player_id)
+    return frpc_client:instance(frpc_client.FRPC_MODE.one, 'centerserver', 'server_info_m'):balance_call('del_white', player_id)
 end
 
 function CMD.start()

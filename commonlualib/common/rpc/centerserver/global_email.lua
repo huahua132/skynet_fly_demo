@@ -8,8 +8,8 @@ local M = {}
 
 --新增邮件
 function M.add(title, content, item_list, vaild_time) 
-    local cli = frpc_client:instance("centerserver", "global_email_m")
-    local ret = cli:one_balance_call("add", title, content, item_list, vaild_time)
+    local cli = frpc_client:instance(frpc_client.FRPC_MODE.one, "centerserver", "global_email_m")
+    local ret = cli:balance_call("add", title, content, item_list, vaild_time)
     if not ret then
         log.error("add email err ", title, content, item_list, vaild_time)
         return
@@ -20,8 +20,8 @@ end
 
 --删除邮件 
 function M.del(guid)
-    local cli = frpc_client:instance("centerserver", "global_email_m")
-    local ret = cli:one_balance_call("del", guid)
+    local cli = frpc_client:instance(frpc_client.FRPC_MODE.one, "centerserver", "global_email_m")
+    local ret = cli:balance_call("del", guid)
     if not ret then 
         log.error("del email err ", guid)
         return
@@ -32,8 +32,8 @@ end
 
 --修改邮件
 function M.change(guid, title, content, item_list, vaild_time)
-    local cli = frpc_client:instance("centerserver", "global_email_m")
-    local ret = cli:one_balance_call("change", guid, title, content, item_list, vaild_time)
+    local cli = frpc_client:instance(frpc_client.FRPC_MODE.one, "centerserver", "global_email_m")
+    local ret = cli:balance_call("change", guid, title, content, item_list, vaild_time)
     if not ret then
         log.error("change email err ", guid, title, content, item_list, vaild_time)
         return

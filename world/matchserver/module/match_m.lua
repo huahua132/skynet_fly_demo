@@ -89,7 +89,7 @@ local function match_one(play_type)
 
         --匹配成功，请求游戏服创建房间
         g_game_cli:set_svr_id(game_node_info.svr_id)
-        local ret = g_game_cli:byid_mod_call("createtable", match_list, cur_time, play_type) --创建桌子
+        local ret = g_game_cli:mod_call("createtable", match_list, cur_time, play_type) --创建桌子
         --log.info("match_loop >>> ", ret)
         if ret and #ret.result > 0 then
             local table_id = ret.result[1]
@@ -263,7 +263,7 @@ function CMD.accept_session(player_id, session_id)
 
             --通知游戏服记录游戏房间信息
             g_game_cli:set_svr_id(svr_id)
-            local ret = g_game_cli:byid_mod_call("set_game_room_info", game_info_map) --记录游戏房间信息
+            local ret = g_game_cli:mod_call("set_game_room_info", game_info_map) --记录游戏房间信息
             --log.info("set_game_room_info ret >>>", ret)
             if not ret then
                 log.warn("set_game_room_info err ", svr_name, svr_id, table_id)
@@ -284,7 +284,7 @@ function CMD.start(config)
     --log.info("start match_m", config, module_info.get_cfg())
     
     skynet.fork(function()
-        g_game_cli = frpc_client:new(config.instance_name, "room_game_alloc_m")
+        g_game_cli = frpc_client:new(frpc_client.FRPC_MODE.byid, config.instance_name, "room_game_alloc_m")
         --匹配循环
         g_match_loop_timer = timer:new(timer.second * 5, 0, match_loop)
         --执行完再注册下一次
