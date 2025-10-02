@@ -1,4 +1,4 @@
-import { _decorator, Label, Node } from "cc"
+import { _decorator, Label, EditBox, Node } from "cc"
 import {oops} from "db://oops-framework/core/Oops"
 import { ecs } from "../../../../../extensions/oops-plugin-framework/assets/libs/ecs/ECS";
 import { CCVMParentComp } from "../../../../../extensions/oops-plugin-framework/assets/module/common/CCVMParentComp";
@@ -57,10 +57,10 @@ export class LoginViewComp extends CCVMParentComp {
     /** 确定按钮 */
     btnConfirm() {
         console.warn("btnConfirm")
-        let ip = this.getNode("inputIp")!.getChildByName("TEXT_LABEL")!.getComponent(Label)!.string
-        let account = this.getNode("inputAccount")!.getChildByName("TEXT_LABEL")!.getComponent(Label)!.string
-        let password = this.getNode("inputPassword")!.getChildByName("TEXT_LABEL")!.getComponent(Label)!.string
-
+        let ip = this.getNode("inputIp")!.getComponent(EditBox)!.string;
+        let account = this.getNode("inputAccount")!.getComponent(EditBox)!.string;
+        let password = this.getNode("inputPassword")!.getComponent(EditBox)!.string;
+        console.log("password = " + password);
         let host = 'http://' + ip + ':11014'
         /** 请求登录 */
         let params = {
