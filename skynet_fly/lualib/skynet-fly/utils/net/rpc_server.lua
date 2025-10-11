@@ -90,7 +90,7 @@ function M.handle_msg(packid, body)
     
     local isok, msgbody = decode_func(packid, body.msgstr)
     if not isok then
-        return nil, "decode msg err:" .. packid
+        return nil, "decode msg packid:" .. packid .. " err:" .. msgbody
     end
     
     return packid, msgbody, rsp_session
