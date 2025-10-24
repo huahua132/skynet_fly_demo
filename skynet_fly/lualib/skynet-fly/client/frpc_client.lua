@@ -209,8 +209,8 @@ end)
 ---@param instance_name string 实例名称
 ---@return table obj
 function M:instance(mode, svr_name, module_name, instance_name)
-	assert(svr_name, "not svr_name")
-	assert(module_name, "not module_name")
+	assert(svr_name,"not svr_name")
+	assert(module_name,"not module_name")
 
 	if not g_instance_map[mode] then
 		g_instance_map[mode] = {}
@@ -429,7 +429,7 @@ function M:call_by_alias(...)
 	local cluster_name, rsp, secret, cluster_name2 = g_frpc_client:balance_call(
 		cmd, self.svr_name, self.svr_id, self.module_name, "", FRPC_PACK_ID.call_by_alias, nil, spack(...)
 	)
-
+	
 	return handle_return_result(mode, cluster_name, rsp, secret, cluster_name2)
 end
 

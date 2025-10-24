@@ -52,16 +52,17 @@ local function kick_out_all(table_id, reason)
 	end
 	local t_info = g_table_map[table_id]
 	local player_map = t_info.player_map
-
+	local ok = true
 	for player_id,player in pairs(player_map) do
 		if player_map[player_id] then
 			local isok,err,errmsg = skynet.call(player.hall_server_id,'lua','leave_table',player_id, reason)
 			if not isok then
+				ok = false
 				log.warn("kick_player err ",player_id,err,errmsg)
 			end
 		end
 	end
-	return true
+	return ok
 end
 
 --踢出单个玩家
@@ -316,6 +317,10 @@ end
 function interface:kick_player(player_id, reason)
 	return kick_player(self.table_id, player_id, reason)
 end
+--销毁房间
+function interface:dismisstable()
+	return self:call_alloc("dismisstable", self.table_id)
+end
 --给玩家发消息
 function interface:send_msg(player_id,header,body)
     return send_msg(self.table_id,player_id,header,body)
@@ -429,6 +434,11 @@ function CMD.enter(table_id, player_id, gate, fd, is_ws, addr, hall_server_id)
 
 	assert(not player_map[player_id])
 
+	local isok,errcode,errmsg = t_info.game_table.enter(player_id)
+	if not isok then
+		return isok,errcode,errmsg
+	end
+
 	player_map[player_id] = {
 		player_id = player_id,
 		fd = fd,
@@ -437,11 +447,6 @@ function CMD.enter(table_id, player_id, gate, fd, is_ws, addr, hall_server_id)
 		is_ws = is_ws,
 		addr = addr,
 	}
-
-	local isok,errcode,errmsg = t_info.game_table.enter(player_id)
-	if not isok then
-		return isok,errcode,errmsg
-	end
 
 	return true
 end
@@ -473,7 +478,9 @@ function CMD.dismisstable(table_id)
 	if next(player_map) then  --还有玩家
 		return false
 	end
-
+	if t_info.game_table.destroy then
+		t_info.game_table.destroy()
+	end
 	g_table_map[table_id] = nil
 	return true
 end
