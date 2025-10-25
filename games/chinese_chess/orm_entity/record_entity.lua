@@ -1,6 +1,6 @@
 local ormtable = require "skynet-fly.db.orm.ormtable"
 local ormadapter_mysql = require "skynet-fly.db.ormadapter.ormadapter_mysql"
-local contriner_interface = require "skynet-fly.contriner.contriner_interface"
+local container_interface = require "skynet-fly.container.container_interface"
 local timer_point = require "skynet-fly.time_extend.timer_point"
 local time_util = require "skynet-fly.utils.time_util"
 local skynet = require "skynet"

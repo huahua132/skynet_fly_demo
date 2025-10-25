@@ -8,7 +8,7 @@ local event_mgr = require "common.event_mgr"
 local timer_point = require "skynet-fly.time_extend.timer_point"
 local EVENT_ID = hotfix_require "enum.EVENT_ID"
 local state_data = require "skynet-fly.hotfix.state_data"
-local contriner_client = require "skynet-fly.client.contriner_client"
+local container_client = require "skynet-fly.client.container_client"
 local table_util = require "skynet-fly.utils.table_util"
 local item_interface = require "hall.item.interface"
 local schema = hotfix_require "common.enum.schema"
@@ -18,7 +18,7 @@ local table_util = require "skynet-fly.utils.table_util"
 local errorcode = hotfix_require "common.enum.errorcode"
 local queue_helper = require "common.queue_helper"
 
-contriner_client:register("room_game_hall_m")
+container_client:register("room_game_hall_m")
 
 local assert = assert
 local pairs = pairs

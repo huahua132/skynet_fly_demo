@@ -1,5 +1,5 @@
 local skynet = require "skynet"
-local contriner_launcher = require "skynet-fly.contriner.contriner_launcher"
+local container_launcher = require "skynet-fly.container.container_launcher"
 local timer_point = require "skynet-fly.time_extend.timer_point"
 local time_util = require "skynet-fly.utils.time_util"
 local sharedata = require "skynet-fly.sharedata"
@@ -16,7 +16,7 @@ skynet.start(function()
 	
 	skynet.call('.logger','lua','add_hook','common.log_hook')
 	skynet.error("start admin server !!!>>>>>>>>>>>>>>>>>")
-	contriner_launcher.run()
+	container_launcher.run()
 
 	--启动集群连接入口
 	skynet.uniqueservice("frpc_server")

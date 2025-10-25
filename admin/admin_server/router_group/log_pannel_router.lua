@@ -2,11 +2,11 @@ local rsp_body = require "common.rsp_body"
 local skynet = require "skynet"
 local log = require "skynet-fly.log"
 local watch_syn = require "skynet-fly.watch.watch_syn"
-local contriner_watch_interface = require "skynet-fly.watch.interface.contriner_watch_interface"
-local contriner_client = require "skynet-fly.client.contriner_client"
+local container_watch_interface = require "skynet-fly.watch.interface.container_watch_interface"
+local container_client = require "skynet-fly.client.container_client"
 local CODE = require "common.enum.CODE"
 
-contriner_client:register("log_pannel_m")
+container_client:register("log_pannel_m")
 
 local assert = assert
 local tonumber = tonumber
@@ -30,7 +30,7 @@ end
 
 return function(group)
     skynet.fork(function()
-        local interface = contriner_watch_interface:new("log_pannel_m")
+        local interface = container_watch_interface:new("log_pannel_m")
         local watch_cli = watch_syn.new_client(interface)
         watch_cli:watch("log_info_map")
         g_log_info_map = watch_cli:await_get("log_info_map")
@@ -74,7 +74,7 @@ return function(group)
             cursor = nil
         end
         --log.info("log_list req >>> ", logname, cursor, limit, sort, sort_field_name, query, next_offset)
-        local isok, cursor, res, count, next_offset = contriner_client:instance("log_pannel_m"):mod_call('get_log_list', logname, cursor, limit, sort, sort_field_name, query, next_offset)
+        local isok, cursor, res, count, next_offset = container_client:instance("log_pannel_m"):mod_call('get_log_list', logname, cursor, limit, sort, sort_field_name, query, next_offset)
         local guid_list = {}
         local time_list = {}
         for i, oneret in ipairs(res) do

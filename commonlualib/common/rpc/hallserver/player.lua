@@ -1,7 +1,7 @@
 local base = require "common.rpc.hallserver.base"
 local player_util = require "common.utils.player"
 local frpc_client = require "skynet-fly.client.frpc_client"
-local contriner_client = require "skynet-fly.client.contriner_client"
+local container_client = require "skynet-fly.client.container_client"
 local string_util = require "skynet-fly.utils.string_util"
 local env_util = require "skynet-fly.utils.env_util"
 local table_util = require "skynet-fly.utils.table_util"
@@ -87,7 +87,7 @@ function M.get_players_info(player_list, field_map)
     for svr_id, list in pairs(svr_map) do
         --本服
         if g_svr_name == "hallserver" and svr_id == g_svr_id then
-            local ret_map = contriner_client:instance("room_game_hall_m"):balance_call("player_get_players_info", nil, list, field_map)
+            local ret_map = container_client:instance("room_game_hall_m"):balance_call("player_get_players_info", nil, list, field_map)
             table_util.merge(res, ret_map)
         else
             --其他服
@@ -108,7 +108,7 @@ end
 function M.get_player_info(player_id, field_map)
     local svr_id = player_util.get_svr_id_by_player_id(player_id)
     if g_svr_name == "hallserver" and svr_id == g_svr_id then
-        return contriner_client:instance("room_game_hall_m"):mod_call("player_get_info", nil, player_id, field_map)
+        return container_client:instance("room_game_hall_m"):mod_call("player_get_info", nil, player_id, field_map)
     else
         local cli = base.hallserver_room_game_hall_m(player_id)
         local ret, code, errmsg = cli:mod_call("player_get_info", nil, player_id)

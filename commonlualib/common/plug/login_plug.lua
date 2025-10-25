@@ -3,11 +3,11 @@ local ws_pbnet_byrpc = require "skynet-fly.utils.net.ws_pbnet_byrpc"
 local pb_netpack = require "skynet-fly.netpack.pb_netpack"
 local errorcode = require "common.enum.errorcode"
 local timer = require "skynet-fly.timer"
-local contriner_client = require "skynet-fly.client.contriner_client"
+local container_client = require "skynet-fly.client.container_client"
 local pack_helper = require "common.pack_helper"
 local module_info = require "skynet-fly.etc.module_info"
 
-contriner_client:register("token_m")
+container_client:register("token_m")
 
 do
 	--加载pb文件
@@ -70,7 +70,7 @@ function M.check(pack_id, pack_body)
 	end
 
 	--校验token
-	if not contriner_client:instance("token_m"):mod_call("auth_token", player_id, token) then
+	if not container_client:instance("token_m"):mod_call("auth_token", player_id, token) then
 		log.error("token err ", pack_body)
 		return false, errorcode.TOKEN_ERR, "TOKEN err"
 	end

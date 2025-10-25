@@ -3,13 +3,13 @@ local radix_router = require "skynet-fly.3rd.radix-router"
 local time_util = require "skynet-fly.utils.time_util"
 local CODE = require "common.enum.CODE"
 local rsp_body = require "common.rsp_body"
-local contriner_client = require "skynet-fly.client.contriner_client"
+local container_client = require "skynet-fly.client.container_client"
 local log = require "skynet-fly.log"
 local skynet = require "skynet"
 local file_util = require "skynet-fly.utils.file_util"
 local ENUM = require "enum.ENUM"
 
-contriner_client:register("signature_m")
+container_client:register("signature_m")
 
 local assert = assert
 local type = type
@@ -19,7 +19,7 @@ local tinsert = table.insert
 local M = {}
 
 function M.create_token(username,roles,routes_map)
-    local signature = contriner_client:instance("signature_m"):mod_call("create", username)
+    local signature = container_client:instance("signature_m"):mod_call("create", username)
     assert(signature, "can`t create signature")
 
     local cur_time = os.time()
@@ -69,7 +69,7 @@ function M.auth(white_list) --验证白名单
                 return
             end
 
-            local signature = contriner_client:instance("signature_m"):mod_call("get", username)
+            local signature = container_client:instance("signature_m"):mod_call("get", username)
             local payload,msg = jwt.verify(token, "HS256", signature)
             if not payload then
                 --token失效

@@ -2,7 +2,7 @@ local log = require "skynet-fly.log"
 local errorcode = require "common.enum.errorcode"
 local GAME_STATE = require "enum.GAME_STATE"
 local skynet = require "skynet"
-local contriner_client = require "skynet-fly.client.contriner_client"
+local container_client = require "skynet-fly.client.container_client"
 local ENUM = require "common.enum.ENUM"
 local cfg = require "skynet-fly.etc.module_info".get_cfg()
 local game_redis = require "common.redis.game"
@@ -10,7 +10,7 @@ local watch_server = require "skynet-fly.rpc.watch_server"
 local SYN_CHANNEL_NAME = require "common.enum.SYN_CHANNEL_NAME"
 local timer = require "skynet-fly.timer"
 
-contriner_client:register("share_config_m", "token_m")
+container_client:register("share_config_m", "token_m")
 
 local table = table
 local ipairs = ipairs
@@ -77,7 +77,7 @@ function CMD.createtable(player_list, create_time, play_type)
 		leave_players = {},				--已离开的
 	}
 	--创建token
-	local token_list = contriner_client:instance("token_m"):mod_call("create_token", player_list, ENUM.LOGIN_TOKEN_TIME_OUT)
+	local token_list = container_client:instance("token_m"):mod_call("create_token", player_list, ENUM.LOGIN_TOKEN_TIME_OUT)
 	return table_id, token_list
 end
 
@@ -96,7 +96,7 @@ M.register_cmd = CMD
 function M.init(alloc_interface) --初始化
 	g_alloc_interface = alloc_interface
 	skynet.fork(function()
-		local confclient = contriner_client:new("share_config_m")
+		local confclient = container_client:new("share_config_m")
         local room_game_login = confclient:mod_call('query','room_game_login')
         g_info.host = room_game_login.wsgateconf.host
 	end)

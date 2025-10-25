@@ -1,10 +1,10 @@
 local log = require "skynet-fly.log"
 local json = require "cjson"
 local CODE = require "common.enum.CODE"
-local contriner_client = require "skynet-fly.client.contriner_client"
+local container_client = require "skynet-fly.client.container_client"
 local orm_table_client = require "skynet-fly.client.orm_table_client"
 
-contriner_client:register("signature_m")
+container_client:register("signature_m")
 
 local g_roles_client = orm_table_client:new("roles")
 
@@ -120,7 +120,7 @@ function M.update_role(name,role)
         return nil,CODE.ERR_SERVER,"update err"
     end
 
-    contriner_client:instance("signature_m"):mod_call("refresh", name)   --刷新密钥，使之前的token失效
+    container_client:instance("signature_m"):mod_call("refresh", name)   --刷新密钥，使之前的token失效
 
     return "success"
 end

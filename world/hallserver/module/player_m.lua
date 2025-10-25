@@ -1,13 +1,13 @@
 local orm_table_client = require "skynet-fly.client.orm_table_client"
 local skynet = require "skynet"
-local contriner_client = require "skynet-fly.client.contriner_client"
+local container_client = require "skynet-fly.client.container_client"
 local ENUM = require "common.enum.ENUM"
 local log = require "skynet-fly.log"
 local time_util = require "skynet-fly.utils.time_util"
 local regiter = require "common.redis.count.regiter"
 local env_util = require "skynet-fly.utils.env_util"
 
-contriner_client:register("share_config_m")
+container_client:register("share_config_m")
 
 local tonumber = tonumber
 local assert = assert
@@ -52,7 +52,7 @@ end
 
 function CMD.start()
     skynet.fork(function()
-        local confclient = contriner_client:new("share_config_m")
+        local confclient = container_client:new("share_config_m")
         local room_game_login = confclient:mod_call('query','room_game_login')
         g_host = room_game_login.wsgateconf.host
     end)

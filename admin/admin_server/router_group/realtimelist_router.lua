@@ -1,5 +1,5 @@
 local rsp_body = require "common.rsp_body"
-local contriner_client = require "skynet-fly.client.contriner_client"
+local container_client = require "skynet-fly.client.container_client"
 local frpc_client = require "skynet-fly.client.frpc_client"
 local timer = require "skynet-fly.timer"
 local time_util = require "skynet-fly.utils.time_util"
@@ -20,14 +20,14 @@ local io = io
 local tonumber = tonumber
 local ipairs = ipairs
 
-contriner_client:register("monitor_m")
+container_client:register("monitor_m")
 
 local g_register_map = {}
 local g_cluster_list = {}
 
 local function get_register_map()
     if not next(g_register_map) then
-        g_register_map = contriner_client:instance("monitor_m"):mod_call("get_rigister_info")
+        g_register_map = container_client:instance("monitor_m"):mod_call("get_rigister_info")
         for cluster_name,server_map in pairs(g_register_map) do
             tinsert(g_cluster_list,cluster_name)
         end

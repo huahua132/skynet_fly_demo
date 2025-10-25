@@ -1,5 +1,5 @@
 local rsp_body = require "common.rsp_body"
-local contriner_client = require "skynet-fly.client.contriner_client"
+local container_client = require "skynet-fly.client.container_client"
 local tti = require "skynet-fly.cache.tti"
 local timer = require "skynet-fly.timer"
 local time_util = require "skynet-fly.utils.time_util"
@@ -19,7 +19,7 @@ local io = io
 local tonumber = tonumber
 local ipairs = ipairs
 
-contriner_client:register("monitor_online_m")
+container_client:register("monitor_online_m")
 
 local g_monitor_log_dir = nil
 local g_node_map = {}
@@ -86,7 +86,7 @@ end
 
 local function get_node_map()
     if not next(g_node_map) then
-        g_node_map,g_monitor_log_dir = contriner_client:instance("monitor_online_m"):mod_call("get_node_map")
+        g_node_map,g_monitor_log_dir = container_client:instance("monitor_online_m"):mod_call("get_node_map")
     end
     get_node_files(g_node_map)
     return g_node_map
