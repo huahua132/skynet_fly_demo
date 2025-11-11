@@ -14,9 +14,11 @@
 local container_client = require "skynet-fly.client.container_client"
 local skynet = require "skynet"
 local table_util = require "skynet-fly.utils.table_util"
+
 local setmetatable = setmetatable
 local tpack = table.pack
 local tunpack = table.unpack
+local rawget = rawget
 local assert = assert
 local error = error
 
@@ -29,7 +31,9 @@ local g_instance_map = {}
 local M = {}
 
 local mt = {__index = function(t,k)
-    t[k] = function(self,...)
+    local f = rawget(t, k)
+    if f then return f end
+    f = function(self, ...)
         t._client = t._client or container_client:new("orm_table_m",t._orm_name)
         local ret = nil
         --尝试 100 次，还不成功，那肯定是数据库挂逼了或者热更后执行保存比较耗时
@@ -44,7 +48,8 @@ local mt = {__index = function(t,k)
         
         error("call err " .. k .. ' ' .. table_util.dump({...}))
     end
-    return t[k]
+    t[k] = f
+    return f
 end}
 
 ---#desc 创建一个orm访问对象

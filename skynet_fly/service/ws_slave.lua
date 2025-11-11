@@ -59,6 +59,7 @@ function HANDLER.connect(fd)
 	g_conn_map[fd] = {
 		fd = fd,
 		addr = addr,
+		total_msg = "",
 	}
 
 	--这里必须使用call，避免没有设置好转发就开始处理消息了
@@ -69,22 +70,45 @@ function HANDLER.handshake(fd,header,url)
 	--log.info("handshake:",fd,header,url)
 end
 
-function HANDLER.message(fd, msg, msg_type)
+local function unpack_msg(c)
+	local total_msg = c.total_msg
+	local sz = total_msg:len()
+	if sz < 2 then
+		return nil
+	end
+
+	local pack_sz = (total_msg:byte(1) << 8) + total_msg:byte(2)
+	if sz < pack_sz + 2 then
+		return nil
+	end
+
+	local offset = 2
+	local msg = total_msg:sub(offset + 1,offset + pack_sz)
+	c.total_msg = total_msg:sub(offset + 1 + pack_sz)
+	return msg
+end
+
+function HANDLER.message(fd, recvmsg, msg_type)
 	assert(msg_type == "binary" or msg_type == "text")
 	local c = g_conn_map[fd]
 	local agent = c.agent
-
-	if agent then
-		if c.is_pause then
-			if not c.msg_que then
-				c.msg_que = {}
+	c.total_msg = c.total_msg .. recvmsg
+	
+	while true do
+		local msg = unpack_msg(c)
+		if not msg then return end
+		if agent then
+			if c.is_pause then
+				if not c.msg_que then
+					c.msg_que = {}
+				end
+				tinsert(c.msg_que, msg)
+			else
+				skynet.redirect(agent, 0, 'client', fd, msg)
 			end
-			tinsert(c.msg_que, msg)
 		else
-			skynet.redirect(agent, 0, 'client', fd, msg)
+			skynet.send(g_watchdog,'lua','socket','data', fd, msg)
 		end
-	else
-		skynet.send(g_watchdog,'lua','socket','data', fd, msg)
 	end
 end
 

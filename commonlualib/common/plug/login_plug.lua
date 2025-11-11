@@ -109,8 +109,8 @@ function M.logining(player_id, packid, rsp_session, fd)
 end
 
 --重复登录
-function M.repeat_login(player_id, packid, rsp_session)
-	errors_msg:errors(player_id, errorcode.REPAET_LOGIN, "repeat_login", packid, rsp_session)
+function M.repeat_login(player_id)
+	errors_msg:errors(player_id, errorcode.REPAET_LOGIN, "repeat_login")
 end
 
 local CMD = {}
